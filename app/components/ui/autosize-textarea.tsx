@@ -1,7 +1,5 @@
 import * as React from "react";
-
-import { cn } from "~/lib/utils";
-
+import { cn } from "#app/utils/misc.tsx";
 import { useImperativeHandle } from "react";
 
 interface UseAutosizeTextAreaProps {
@@ -20,7 +18,7 @@ export const useAutosizeTextArea = ({
   const [init, setInit] = React.useState(true);
   React.useEffect(() => {
     // We need to reset the height momentarily to get the correct scrollHeight for the textarea
-    const offsetBorder = 6;
+    const offsetBorder = 2;
     const textAreaElement = textAreaRef.current;
     if (textAreaElement) {
       if (init) {
@@ -54,20 +52,17 @@ type AutosizeTextAreaProps = {
   minHeight?: number;
 } & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-export const AutosizeTextarea = React.forwardRef<
-  AutosizeTextAreaRef,
-  AutosizeTextAreaProps
->(
+export const AutosizeTextarea = React.forwardRef<AutosizeTextAreaRef, AutosizeTextAreaProps>(
   (
     {
       maxHeight = Number.MAX_SAFE_INTEGER,
-      minHeight = 32,
+      minHeight = 52,
       className,
       onChange,
       value,
       ...props
     }: AutosizeTextAreaProps,
-    ref: React.Ref<AutosizeTextAreaRef>,
+    ref: React.Ref<AutosizeTextAreaRef>
   ) => {
     const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const [triggerAutoSize, setTriggerAutoSize] = React.useState("");
@@ -97,7 +92,7 @@ export const AutosizeTextarea = React.forwardRef<
         ref={textAreaRef}
         className={cn(
           "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className,
+          className
         )}
         onChange={(e) => {
           setTriggerAutoSize(e.target.value);
@@ -105,6 +100,7 @@ export const AutosizeTextarea = React.forwardRef<
         }}
       />
     );
-  },
+  }
 );
+
 AutosizeTextarea.displayName = "AutosizeTextarea";
