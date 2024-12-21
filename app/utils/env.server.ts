@@ -26,7 +26,6 @@ declare global {
 
 export function init() {
   const parsed = schema.safeParse(process.env);
-  console.warn("DEBUGPRINT[1]: env.server.ts:28: parsed=", parsed);
 
   if (parsed.success === false) {
     console.error(

@@ -11,20 +11,18 @@ export function headers() {
 }
 
 import ky from "ky";
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
   const { id } = params;
   // Gunakan Promise.all untuk menangani beberapa permintaan secara paralel
-  const ayat = await api.get(`ayat/page/${id}`).json();
-
-  if (!ayat.status) {
-    throw new Response("Not Found", { status: 404 });
-  }
-  const last_ayat = ayat.data[ayat.data.length - 1].surah;
-  const surat = await api.get(`surat/${last_ayat}`).json();
+  const [surat, ayat] = await Promise.all([
+    api.get(`surat/${id}`).json(),
+    api.get(`ayat/page/${id}`).json(),
+  ]);
 
   // Validasi respons
-  if (!surat.status) {
+  if (!surat.status || !ayat.status) {
     throw new Response("Not Found", { status: 404 });
   }
 

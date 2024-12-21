@@ -11,7 +11,6 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import {
-  Link,
   NavLink,
   Links,
   Meta,
@@ -313,7 +312,7 @@ export function ErrorBoundary() {
 
 const navItems = [
   { to: "/muslim/sholawat", label: "Sholawat" },
-  { to: "/muslim/doaharian", label: "Do'a Harian" },
+  { to: "/muslim/doa", label: "Do'a Harian" },
   { to: "/muslim/dzikr", label: "Dzikr" },
   { to: "/muslim/tahlil", label: "Tahlil" },
   { to: "/muslim/quran-surat", label: "Qur'an" },
@@ -333,34 +332,42 @@ import {
 import { Button } from "#app/components/ui/button";
 import { Separator } from "#app/components/ui/separator";
 
+const components: { title: string; href: string; description: string }[] = [
+  {
+    title: "Al Qur'an",
+    href: "/muslim/quran",
+    description: "Temukan ketenangan melalui ayat-ayat Al Qur'an.",
+  },
+  {
+    title: "Sholawat",
+    href: "/muslim/sholawat",
+    description: "Dekatkan diri dengan Rasulullah melalui sholawat.",
+  },
+  {
+    title: "Dzikir",
+    href: "/muslim/dzikir",
+    description: "Hiasi hari dengan dzikir dan ingat Allah selalu.",
+  },
+  {
+    title: "Tahlil",
+    href: "/muslim/tahlil",
+    description: "Doakan yang tercinta dengan tahlil penuh makna.",
+  },
+  {
+    title: "Do'a",
+    href: "/muslim/doa",
+    description: "Awali hari dengan doa untuk keberkahan hidup.",
+  },
+];
+
+const toolsLinks: { title: string; href: string; description: string }[] = [
+  {
+    title: "Kalkulator",
+    href: "/tools/calculator",
+    description: "Simple Kalkulator",
+  },
+];
 function Navbar({ children }) {
-  const components: { title: string; href: string; description: string }[] = [
-    {
-      title: "Al Qur'an",
-      href: "/muslim/quran",
-      description: "Temukan ketenangan melalui ayat-ayat Al Qur'an.",
-    },
-    {
-      title: "Sholawat",
-      href: "/muslim/sholawat",
-      description: "Dekatkan diri dengan Rasulullah melalui sholawat.",
-    },
-    {
-      title: "Dzikir",
-      href: "/muslim/dizkir",
-      description: "Hiasi hari dengan dzikir dan ingat Allah selalu.",
-    },
-    {
-      title: "Tahlil",
-      href: "/muslim/tahlil",
-      description: "Doakan yang tercinta dengan tahlil penuh makna.",
-    },
-    {
-      title: "Do'a Harian",
-      href: "/muslim/doaharian",
-      description: "Awali hari dengan doa untuk keberkahan hidup.",
-    },
-  ];
   return (
     <React.Fragment>
       <div className="flex h-14 items-center px-4 border-b fixed w-full top-0 bg-transparent backdrop-blur-md z-10">
@@ -383,7 +390,9 @@ function Navbar({ children }) {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Muslim</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="bg-transparent">
+                  Muslim
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {components.map((component) => (
@@ -409,12 +418,32 @@ function Navbar({ children }) {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={navigationMenuTriggerStyle()}
-                  asChild
-                >
-                  <NavLink to="/docs">Documentation</NavLink>
-                </NavigationMenuLink>
+                <NavigationMenuTrigger className="bg-transparent">
+                  Alat
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    {toolsLinks.map((component) => (
+                      <li key={component.title} title={component.title}>
+                        <NavigationMenuLink asChild>
+                          <NavLink
+                            to={component.href}
+                            className={cn(
+                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                            )}
+                          >
+                            <div className="text-sm font-medium leading-none">
+                              {component.title}
+                            </div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              {component.description}
+                            </p>
+                          </NavLink>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
@@ -503,19 +532,17 @@ function CommandMenu({ ...props }: DialogProps) {
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandSeparator />
           <CommandGroup heading="Daftar menu">
-            {navItems.map((navItem, index) => (
+            {components.map((navItem, index) => (
               <CommandItem
                 key={index}
                 value={index}
                 className="flex items-center gap-1.5"
                 onSelect={() => {
-                  runCommand(() =>
-                    navigate(`/muslim/quran-surat/${navItem.id}` as string),
-                  );
+                  runCommand(() => navigate(navItem.href as string));
                 }}
               >
                 <Circle />
-                <span>{navItem.label}</span>
+                <span>{navItem.title}</span>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -559,11 +586,11 @@ function NavbarMobile() {
         </DrawerHeader>*/}
 
         <nav className="flex flex-col items-start gap-3 p-4">
-          {navItems.map((item) => (
+          {components.map((item) => (
             <NavLink
               onClick={() => setOpen(false)}
-              key={item.to}
-              to={item.to}
+              key={item.href}
+              to={item.href}
               className={({ isActive }) =>
                 [
                   isActive ? "text-primary" : "text-primary/80",
@@ -571,7 +598,7 @@ function NavbarMobile() {
                 ].join(" ")
               }
             >
-              {item.label}
+              {item.title}
             </NavLink>
           ))}
         </nav>

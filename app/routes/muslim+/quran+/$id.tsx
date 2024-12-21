@@ -11,12 +11,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "#app/components/ui/popover";
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "#app/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,18 +21,7 @@ import {
 } from "#app/components/ui/dropdown-menu";
 import { Badge } from "#app/components/ui/badge";
 import { Button } from "#app/components/ui/button";
-import { Bookmark, Heart, Ellipsis, X } from "lucide-react";
-
-// export function headers(_: Route.HeadersArgs) {
-//   return {
-//     "Cache-Control": "public, max-age=31560000, immutable",
-//   };
-// }
-
-import localforage from "localforage";
-
-import { ChevronsUpDown } from "lucide-react";
-
+import { Bookmark, Heart, Ellipsis } from "lucide-react";
 import { Spinner } from "#app/components/ui/spinner";
 
 const SpinnerFull = () => {
@@ -50,56 +33,54 @@ const SpinnerFull = () => {
     </div>
   );
 };
+
+import { getCache, setCache } from "#app/utils/cache-client.ts";
+const FAVORITES_KEY = "FAVORITES";
+const LASTVISIT_KEY = "LASTVISIT";
+const LASTREAD_KEY = "LASTREAD";
+
 export default function Index() {
-  const fetcher = useFetcher();
+  const params = useParams();
+  const fetcher = useFetcher({ key: params.id });
   const ayat = fetcher.data?.ayat;
   const surat = fetcher.data?.surat;
-  const params = useParams();
   const [favorites, setFavorites] = useState<Array>([]);
   const [lastRead, setLastRead] = useState<number | null>(null);
   const navigate = useNavigate();
 
   // Ambil semua nomor halaman unik dari data ayat
-  const totalPagesSurat = 1;
-  const totalPages = 604;
 
+  // const total_ayat = surat ? surat?.number_of_verses : null;
+  // const last_ayat = ayat ? ayat[ayat.length - 1].ayah : null;
   // Filter ayat berdasarkan halaman yang dipilih
   useEffect(() => {
     fetcher.load(`/resources/quran/page/${params.id}`);
     const loadFavorites = async () => {
-      const storedFavorites = await localforage.getItem("favorites");
+      if (surat) {
+        await setCache(LASTVISIT_KEY, surat);
+      }
+
+      const storedFavorites = await getCache(FAVORITES_KEY);
       if (storedFavorites) {
         setFavorites(storedFavorites);
       }
     };
 
     const loadLastRead = async () => {
-      const storedLastRead = await localforage.getItem("lastRead");
+      const storedLastRead = await getCache(LASTREAD_KEY);
       if (storedLastRead !== null) {
         setLastRead(storedLastRead);
       }
     };
 
     loadFavorites();
-
     loadLastRead();
-  }, []);
+  }, [params.id]);
 
-  // Simpan data favorit ke localForage
-  // useEffect(() => {
-  //   const persistedValue = window.localStorage.getItem("page_number");
-  //   setCurrentPage(
-  //     persistedValue !== null ? JSON.parse(persistedValue) : initialPage,
-  //   );
-  //   if (persistedValue) {
-  //     window.localStorage.removeItem("page_number");
-  //   }
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, [initialPage]);
   // Simpan data favorit ke localForage
   useEffect(() => {
     const saveFavorites = async (favorites) => {
-      // await localforage.setItem<Set<number>>("favorites", favorites);
+      await setCache(FAVORITES_KEY, favorites);
     };
     saveFavorites(favorites);
   }, [favorites]);
@@ -109,19 +90,19 @@ export default function Index() {
   useEffect(() => {
     if (lastRead !== null) {
       const saveLastRead = async (lastRead) => {
-        await localforage.setItem<Set<number>>("lastRead", lastRead);
+        await setCache(LASTREAD_KEY, lastRead);
       };
       saveLastRead(lastRead);
     }
   }, [lastRead]);
 
   // Fungsi untuk toggle favorit
-  const toggleFavorite = (ayat: Ayat) => {
-    const isFavorite = favorites.some((fav) => fav.aya_id === ayat.aya_id);
+  const toggleFavorite = (ayat) => {
+    const isFavorite = favorites.some((fav) => fav.id === ayat.id);
 
     if (isFavorite) {
       // Hapus ayat dari favorites
-      setFavorites(favorites.filter((fav) => fav.aya_id !== ayat.aya_id));
+      setFavorites(favorites.filter((fav) => fav.id !== ayat.id));
     } else {
       // Tambahkan ayat ke favorites
       setFavorites([...favorites, ayat]);
@@ -135,15 +116,15 @@ export default function Index() {
 
   // Fungsi untuk pindah ke halaman berikutnya
   const nextPage = () => {
-    navigate(`/muslim/quran-surat/`, {
-      preventScrollReset: false,
+    navigate(`/muslim/quran/${parseInt(params.id) + 1}`, {
+      preventScrollReset: true,
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Fungsi untuk pindah ke halaman sebelumnya
   const prevPage = () => {
-    navigate(`/muslim/quran-surat/`, {
+    navigate(`/muslim/quran/${parseInt(params.id) - 1}`, {
       preventScrollReset: false,
     });
   };
@@ -167,21 +148,20 @@ export default function Index() {
       </Popover>
 
       <ul role="list" className="">
-        {/*<DisplayTrigger key={currentPage} />*/}
-        {ayat.map((d, index) => {
-          const isFavorite = favorites.some((fav) => fav.aya_id === d.id);
-          const isLastRead = lastRead?.aya_id === d.id;
+        {ayat.map((d) => {
+          const isFavorite = favorites.some((fav) => fav.id === d.id);
+          const isLastRead = lastRead?.id === d.id;
 
           return (
             <li
               key={d.id}
               className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-accent rounded-md ${
-                isLastRead ? "bg-muted" : ""
+                isLastRead ? "bg-accent" : ""
               }`}
             >
               <div className=" w-full text-right flex gap-x-2.5 items-start justify-end">
                 <div className="grid gap-1">
-                  <Badge className="rounded px-2">{d.id}</Badge>
+                  <Badge className="rounded px-2">{d.ayah}</Badge>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="group-hover:visible invisible h-auto">
                       <Ellipsis className="fill-primary w-5 h-5" />
@@ -221,40 +201,39 @@ export default function Index() {
                 <div className="w-full text-right flex gap-x-2.5 items-center justify-end mt-2">
                   {isLastRead && <Bookmark className="fill-primary w-5 h-5" />}
                   {isFavorite && (
-                    <Heart className="fill-destructive text-destructive w-5 h-5" />
+                    <Heart className="fill-destructive dark:fill-red-400 dark:text-red-400 text-destructive w-5 h-5" />
                   )}
                 </div>
               )}
             </li>
           );
         })}
-        {/* Pagination Controls */}
-        <div className="ml-auto flex items-center justify-center gap-3 my-3">
-          <Button
-            onClick={prevPage}
-            // disabled={currentPage === 1}
-            variant="outline"
-            className="h-8 w-8 p-0"
-          >
-            <span className="sr-only">Go to previous page</span>
-            <ChevronLeftIcon className="h-4 w-4" />
-          </Button>
-
-          {/*<span className="text-sm text-muted-foreground">
-            Halaman <strong>{currentPage}</strong> dari{" "}
-            <strong>{totalPages}</strong>
-          </span>*/}
-          <Button
-            onClick={nextPage}
-            // disabled={currentPage === totalPages}
-            variant="outline"
-            className="h-8 w-8 p-0"
-          >
-            <span className="sr-only">Go to next page</span>
-            <ChevronRightIcon className="h-4 w-4" />
-          </Button>
-        </div>
       </ul>
+      {/* Pagination Controls */}
+      <div className="ml-auto flex items-center justify-center gap-3 my-5">
+        <Button
+          onClick={prevPage}
+          disabled={parseInt(params.id) === 1}
+          variant="outline"
+          className="h-8 w-8 p-0"
+        >
+          <span className="sr-only">Go to previous page</span>
+          <ChevronLeftIcon className="h-4 w-4" />
+        </Button>
+
+        <span className="text-sm text-muted-foreground">
+          Halaman <strong>{params.id}</strong> dari <strong>604</strong>
+        </span>
+        <Button
+          onClick={nextPage}
+          disabled={parseInt(params.id) === 604}
+          variant="outline"
+          className="h-8 w-8 p-0"
+        >
+          <span className="sr-only">Go to next page</span>
+          <ChevronRightIcon className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
