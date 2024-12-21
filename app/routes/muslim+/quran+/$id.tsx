@@ -162,7 +162,7 @@ export default function Index() {
           return (
             <div
               key={d.id}
-              className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-accent rounded-md ${
+              className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-muted rounded-md ${
                 isLastRead ? "bg-accent" : ""
               }`}
             >

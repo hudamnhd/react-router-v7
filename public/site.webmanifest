@@ -1,6 +1,7 @@
 {
-  "name": "Hudq App",
-  "short_name": "Hudq App",
+  "name": "Doti App",
+  "short_name": "Doti App",
+  "description": "Simplify your day with Doti - Track habits, manage tasks, and stay motivated!",
   "start_url": "/",
   "icons": [
     {

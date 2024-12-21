@@ -64,8 +64,11 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    { title: data ? "Hudq App" : "Error | Hudq App" },
-    { name: "description", content: `Huda's free time project` },
+    { title: data ? "Doti App" : "Error | Doti App" },
+    {
+      name: "description",
+      content: `Doti - Simplify your day and achieve your goals with ease! A platform to track daily habits, manage tasks, and stay motivated. Build positive routines and get things done with Doti.`,
+    },
   ];
 };
 
@@ -384,7 +387,7 @@ function Navbar({ children }) {
                 d="M39.445 25.555 37 17.163 65 0 47.821 28l-8.376-2.445Zm-13.89 0L28 17.163 0 0l17.179 28 8.376-2.445Zm13.89 13.89L37 47.837 65 65 47.821 37l-8.376 2.445Zm-13.89 0L28 47.837 0 65l17.179-28 8.376 2.445Z"
               ></path>
             </svg>
-            <span className="hidden font-bold lg:inline-block">Hudq App</span>
+            <span className="hidden font-bold lg:inline-block">Doti App</span>
           </NavLink>
 
           <NavigationMenu>
