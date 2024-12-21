@@ -23,8 +23,6 @@
   },
   "eslintIgnore": ["/node_modules", "/build", "/public/build", "/server-build"],
   "dependencies": {
-    "@netlify/functions": "^2.6.0",
-    "@netlify/remix-adapter": "^2.3.1",
     "@conform-to/react": "^1.0.4",
     "@conform-to/zod": "^1.0.4",
     "@epic-web/cachified": "^5.1.2",
@@ -94,6 +92,8 @@
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-radix": "^2.8.0",
     "vaul": "^1.1.1",
+    "@vercel/analytics": "^1.2.2",
+    "@vercel/remix": "2.10.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

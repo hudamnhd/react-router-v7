@@ -1,6 +1,6 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { flatRoutes } from "remix-flat-routes";
-import { netlifyPlugin } from "@netlify/remix-adapter/plugin";
+import { vercelPreset } from "@vercel/remix/vite";
 import { defineConfig } from "vite";
 
 const MODE = process.env.NODE_ENV;
@@ -36,7 +36,7 @@ export default defineConfig({
           ],
         });
       },
+      presets: [vercelPreset()],
     }),
-    netlifyPlugin(),
   ],
 });
