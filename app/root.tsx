@@ -64,8 +64,8 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    { title: data ? "Epic App" : "Error | Epic App" },
-    { name: "description", content: `Your own captain's log` },
+    { title: data ? "Hudq App" : "Error | Hudq App" },
+    { name: "description", content: `Huda's free time project` },
   ];
 };
 
@@ -384,7 +384,7 @@ function Navbar({ children }) {
                 d="M39.445 25.555 37 17.163 65 0 47.821 28l-8.376-2.445Zm-13.89 0L28 17.163 0 0l17.179 28 8.376-2.445Zm13.89 13.89L37 47.837 65 65 47.821 37l-8.376 2.445Zm-13.89 0L28 47.837 0 65l17.179-28 8.376 2.445Z"
               ></path>
             </svg>
-            <span className="hidden font-bold lg:inline-block">Epic App</span>
+            <span className="hidden font-bold lg:inline-block">Hudq App</span>
           </NavLink>
 
           <NavigationMenu>
@@ -404,10 +404,10 @@ function Navbar({ children }) {
                               "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             )}
                           >
-                            <div className="text-sm font-medium leading-none">
+                            <div className="font-medium leading-none">
                               {component.title}
                             </div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            <p className="line-clamp-2 leading-snug text-muted-foreground">
                               {component.description}
                             </p>
                           </NavLink>
@@ -432,10 +432,10 @@ function Navbar({ children }) {
                               "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             )}
                           >
-                            <div className="text-sm font-medium leading-none">
+                            <div className="font-medium leading-none">
                               {component.title}
                             </div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            <p className="line-clamp-2 leading-snug text-muted-foreground">
                               {component.description}
                             </p>
                           </NavLink>
@@ -514,7 +514,7 @@ function CommandMenu({ ...props }: DialogProps) {
       <Button
         variant="outline"
         className={cn(
-          "relative h-8 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64",
+          "relative h-8 w-full justify-start rounded-md bg-muted/50 font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64",
         )}
         onClick={() => setOpen(true)}
         {...props}
@@ -522,7 +522,7 @@ function CommandMenu({ ...props }: DialogProps) {
         <span className="hidden lg:inline-flex">Cari ...</span>
         <span className="inline-flex lg:hidden">Cari ...</span>
         <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.35rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
+          <span className="text-sm">⌘</span>K
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>

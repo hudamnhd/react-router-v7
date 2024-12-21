@@ -4,7 +4,7 @@ export default function Route() {
   const tahlil = data;
 
   return (
-    <div>
+    <div className="sm:max-w-4xl mx-auto pb-5">
       <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mb-4">
         Tahlil
       </h1>
@@ -13,7 +13,7 @@ export default function Route() {
         const arabicContent = ayat?.arabic;
         const translateContent = ayat?.translation;
         return (
-          <li
+          <div
             key={index}
             style={{ animationDelay: `${index * 0.1}s` }}
             className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent rounded-md `}
@@ -25,7 +25,7 @@ export default function Route() {
             </div>
             <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
               <p
-                className="relative mt-2 text-right font-lpmq"
+                className="relative mt-2 font-lpmq text-right text-primary"
                 dangerouslySetInnerHTML={{
                   __html: arabicContent,
                 }}
@@ -33,13 +33,13 @@ export default function Route() {
             </div>
             <div className="mt-3 space-y-3">
               <div
-                className="translation-text prose-sm text-muted-foreground"
+                className="translation-text prose text-muted-foreground max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: translateContent,
                 }}
               />
             </div>
-          </li>
+          </div>
         );
       })}
     </div>

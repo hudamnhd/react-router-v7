@@ -17,13 +17,13 @@ export default function DzikrView() {
   const { dzikr } = data;
 
   return (
-    <div>
+    <div className="sm:max-w-4xl mx-auto">
       <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mb-4">
         Dzikir {getWaktuSekarang()}
       </h1>
 
       {getWaktuSekarang() === "pagi" ? (
-        <ul role="list" className="">
+        <div>
           {dzikr
             .filter((d) => d.time === "" || d.time === "pagi")
             .map((ayat, index) => {
@@ -34,7 +34,7 @@ export default function DzikrView() {
                 .replace(/@/g, "<br/><br/>")
                 .replace(/(\.)(\s|$)/g, "$1<br />");
               return (
-                <li
+                <div
                   key={index}
                   style={{ animationDelay: `${index * 0.1}s` }}
                   className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent rounded-md `}
@@ -42,7 +42,7 @@ export default function DzikrView() {
                   <div>
                     <div className="space-y-1 mb-2">
                       <h4 className="font-medium leading-none">{ayat.title}</h4>
-                      <div className="flex items-center gap-x-1 text-sm text-muted-foreground italic">
+                      <div className="flex items-center gap-x-1 text-muted-foreground italic">
                         {ayat?.note && (
                           <span className="italic">{ayat.note}</span>
                         )}
@@ -66,19 +66,22 @@ export default function DzikrView() {
                   </div>
                   <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
                     <div
-                      className="relative mt-2 text-right font-lpmq"
+                      className="relative mt-2 font-lpmq text-right text-primary"
                       dangerouslySetInnerHTML={{
                         __html: arabicContent,
                       }}
                     />
                   </div>
+
                   <div className="mt-3 space-y-3">
-                    <div
-                      className="translation-text prose-sm text-muted-foreground"
-                      dangerouslySetInnerHTML={{
-                        __html: translateContent,
-                      }}
-                    />
+                    <div className="translation-text">
+                      <div
+                        className="max-w-none prose text-accent-foreground"
+                        dangerouslySetInnerHTML={{
+                          __html: translateContent,
+                        }}
+                      />
+                    </div>
 
                     {ayat.faedah && (
                       <Badge className="bg-lime-400 text-foreground dark:text-background">
@@ -86,24 +89,24 @@ export default function DzikrView() {
                       </Badge>
                     )}
                     <div
-                      className="prose-sm text-muted-foreground"
+                      className="max-w-none prose text-muted-foreground italic"
                       dangerouslySetInnerHTML={{
                         __html: ayat.faedah,
                       }}
                     />
                     <div
-                      className="text-sm text-muted-foreground italic"
+                      className="max-w-none prose text-muted-foreground italic"
                       dangerouslySetInnerHTML={{
                         __html: ayat.narrator,
                       }}
                     />
                   </div>
-                </li>
+                </div>
               );
             })}
-        </ul>
+        </div>
       ) : (
-        <ul role="list" className="">
+        <div>
           {dzikr
             .filter((d) => d.time === "" || d.time === "petang")
             .map((ayat, index) => {
@@ -114,7 +117,7 @@ export default function DzikrView() {
                 .replace(/@/g, "<br/><br/>")
                 .replace(/(\.)(\s|$)/g, "$1<br />");
               return (
-                <li
+                <div
                   key={index}
                   style={{ animationDelay: `${index * 0.1}s` }}
                   className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent rounded-md `}
@@ -122,7 +125,7 @@ export default function DzikrView() {
                   <div>
                     <div className="space-y-1 mb-2">
                       <h4 className="font-medium leading-none">{ayat.title}</h4>
-                      <div className="flex items-center gap-x-1 text-sm text-muted-foreground italic">
+                      <div className="flex items-center gap-x-1 text-muted-foreground italic">
                         {ayat?.note && (
                           <span className="italic">{ayat.note}</span>
                         )}
@@ -153,29 +156,37 @@ export default function DzikrView() {
                     />
                   </div>
                   <div className="mt-3 space-y-3">
+                    <div className="translation-text">
+                      <div
+                        className="max-w-none prose text-accent-foreground"
+                        dangerouslySetInnerHTML={{
+                          __html: translateContent,
+                        }}
+                      />
+                    </div>
+
+                    {ayat.faedah && (
+                      <Badge className="bg-lime-400 text-foreground dark:text-background">
+                        Faedah
+                      </Badge>
+                    )}
                     <div
-                      className="translation-text text-sm text-muted-foreground"
-                      dangerouslySetInnerHTML={{
-                        __html: translateContent,
-                      }}
-                    />
-                    <div
-                      className="text-sm text-muted-foreground italic"
+                      className="max-w-none prose text-muted-foreground italic"
                       dangerouslySetInnerHTML={{
                         __html: ayat.faedah,
                       }}
                     />
                     <div
-                      className="text-sm text-muted-foreground italic"
+                      className="max-w-none prose text-muted-foreground italic"
                       dangerouslySetInnerHTML={{
                         __html: ayat.narrator,
                       }}
                     />
                   </div>
-                </li>
+                </div>
               );
             })}
-        </ul>
+        </div>
       )}
     </div>
   );

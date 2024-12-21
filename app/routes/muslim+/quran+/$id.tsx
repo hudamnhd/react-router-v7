@@ -21,7 +21,7 @@ import {
 } from "#app/components/ui/dropdown-menu";
 import { Badge } from "#app/components/ui/badge";
 import { Button } from "#app/components/ui/button";
-import { Bookmark, Heart, Ellipsis } from "lucide-react";
+import { Bookmark, Heart, Ellipsis, Dot, Minus } from "lucide-react";
 import { Spinner } from "#app/components/ui/spinner";
 
 const SpinnerFull = () => {
@@ -131,38 +131,45 @@ export default function Index() {
 
   if (!fetcher.data || fetcher.state !== "idle") return <SpinnerFull />;
 
+  const first_ayah = ayat[0]?.ayah;
+  const last_ayah = ayat[ayat.length - 1]?.ayah;
   return (
     <div className="prose dark:prose-invert max-w-none">
       <Popover>
         <PopoverTrigger className="w-fit mx-auto flex items-center justify-center">
-          <h1 className="text-3xl font-bold md:text-4xl">
+          <div className="text-3xl font-bold md:text-4xl">
             {surat.name_id}
             <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
               ( {surat.name_short} )
             </span>
-          </h1>
+            <div className="flex items-center sm:max-w-4xl mx-auto text-lg font-medium justify-center">
+              <span>Ayat {first_ayah}</span>
+              <Minus />
+              <span>Ayat {last_ayah}</span>
+            </div>
+          </div>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
           <SuratDetail data={surat} />
         </PopoverContent>
       </Popover>
 
-      <ul role="list" className="">
+      <div className="sm:max-w-4xl mx-auto">
         {ayat.map((d) => {
           const isFavorite = favorites.some((fav) => fav.id === d.id);
           const isLastRead = lastRead?.id === d.id;
 
           return (
-            <li
+            <div
               key={d.id}
               className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-accent rounded-md ${
                 isLastRead ? "bg-accent" : ""
               }`}
             >
-              <div className=" w-full text-right flex gap-x-2.5 items-start justify-end">
-                <div className="grid gap-1">
+              <div className="w-full text-right flex gap-x-2.5 items-start justify-between">
+                <div className="grid gap-1 place-items-center">
                   <Badge className="rounded px-2">{d.ayah}</Badge>
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger className="group-hover:visible invisible h-auto">
                       <Ellipsis className="fill-primary w-5 h-5" />
                     </DropdownMenuTrigger>
@@ -173,24 +180,26 @@ export default function Index() {
                         <Heart className="mr-2 w-4 h-4" /> Favorite
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleRead(d)}>
-                        <Bookmark className="mr-2 w-4 h-4" /> Last read
+                        <Bookmark className="mr-2 w-4 h-4" /> Terakhir Baca
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <p className="relative mt-2 font-lpmq text-right">{d.arab}</p>
+                <p className="relative mt-2 font-lpmq text-right text-primary">
+                  {d.arab}
+                </p>
               </div>
-              <div className="translation-text mt-3 flex items-end justify-end">
+              <div className="translation-text">
                 <div
-                  className="text-sm text-muted-foreground text-right sm:max-w-[80%] "
+                  className="max-w-none prose text-muted-foreground"
                   dangerouslySetInnerHTML={{
                     __html: d.latin,
                   }}
                 />
               </div>
-              <div className="translation-text mt-3 flex items-end justify-end">
+              <div className="translation-text mt-3">
                 <div
-                  className="text-sm text-muted-foreground text-right sm:max-w-[80%] "
+                  className="max-w-none prose text-accent-foreground"
                   dangerouslySetInnerHTML={{
                     __html: d.text,
                   }}
@@ -205,33 +214,33 @@ export default function Index() {
                   )}
                 </div>
               )}
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
       {/* Pagination Controls */}
       <div className="ml-auto flex items-center justify-center gap-3 my-5">
         <Button
           onClick={prevPage}
           disabled={parseInt(params.id) === 1}
           variant="outline"
-          className="h-8 w-8 p-0"
+          size="icon"
         >
           <span className="sr-only">Go to previous page</span>
-          <ChevronLeftIcon className="h-4 w-4" />
+          <ChevronLeftIcon />
         </Button>
 
-        <span className="text-sm text-muted-foreground">
+        <span className="text-accent-foreground">
           Halaman <strong>{params.id}</strong> dari <strong>604</strong>
         </span>
         <Button
           onClick={nextPage}
           disabled={parseInt(params.id) === 604}
+          size="icon"
           variant="outline"
-          className="h-8 w-8 p-0"
         >
           <span className="sr-only">Go to next page</span>
-          <ChevronRightIcon className="h-4 w-4" />
+          <ChevronRightIcon />
         </Button>
       </div>
     </div>
@@ -241,34 +250,27 @@ export default function Index() {
 const SuratDetail = ({ data }: { data: any }) => {
   return (
     <div className="max-w-2xl mx-auto p-6 border shadow-lg rounded-lg prose dark:prose-invert">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-bold">{data.name_id}</h1>
-          <h2 className="text-sm italic">{data.name_en}</h2>
-        </div>
-        <div className="text-right">
-          <p className="text-xl font-semibold font-lpmq-2">{data.name_short}</p>
-          <p className="text-sm font-lpmq-2">{data.name_long}</p>
-        </div>
+      <div className="flex items-start justify-between h-10">
+        <h1 className="text-2xl font-bold">
+          {data.number}. {data.name_id}
+          <span className="ml-2 font-normal">( {data.translation_id} )</span>
+        </h1>
+        <p className="-translate-y-5 text-xl font-semibold font-lpmq-2 text-right">
+          {data.name_long}
+        </p>
       </div>
 
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm">
-          Revelation: {data.revelation_en} ({data.revelation_id})
-        </p>
-        <p className="text-sm">Sequence: {data.sequence}</p>
-      </div>
-
-      <div className="mb-4">
-        <h3 className="text-lg font-bold">Translation</h3>
-        <p className="text-sm">
-          {data.translation_id} ({data.translation_en})
-        </p>
+      <div className="flex items-center text-muted-foreground gap-1">
+        <span>{data.revelation_id}</span>
+        <div className="w-2 relative">
+          <Dot className="absolute -left-2 -top-3" />
+        </div>
+        <span>{data.number_of_verses} ayat</span>
       </div>
 
       <div className="mb-4">
         <h3 className="text-lg font-bold ">Tafsir</h3>
-        <p className="prose-sm">{data.tafsir}</p>
+        <p>{data.tafsir}</p>
       </div>
 
       <div className="mb-4">
@@ -277,15 +279,6 @@ const SuratDetail = ({ data }: { data: any }) => {
           <source src={data.audio_url} type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
-      </div>
-
-      <div className="flex justify-between mt-6">
-        <div>
-          <p className="text-sm">Number of Verses: {data.number_of_verses}</p>
-        </div>
-        <div>
-          <p className="text-sm">Surah Number: {data.number}</p>
-        </div>
       </div>
     </div>
   );

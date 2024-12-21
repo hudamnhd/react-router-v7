@@ -1,7 +1,7 @@
 import ky from "ky";
 import { useNavigate, useLoaderData } from "@remix-run/react";
 import { json, type ClientLoaderFunctionArgs } from "@remix-run/node";
-import { Star, BookOpen, Scroll, MoveRight, Minus } from "lucide-react";
+import { Star, BookOpen, Scroll, MoveRight, Minus, Dot } from "lucide-react";
 import {
   Command,
   CommandDialog,
@@ -20,6 +20,7 @@ import {
   TabsTrigger,
 } from "#app/components/ui/tabs";
 import { Input } from "#app/components/ui/input";
+import { Badge } from "#app/components/ui/badge";
 import { Label } from "#app/components/ui/label";
 import { Button } from "#app/components/ui/button";
 
@@ -85,8 +86,11 @@ export default function Index() {
 
       <Tabs
         defaultValue="juz"
-        className="flex flex-col items-center mt-2 w-[400px] mx-auto"
+        className="flex flex-col items-center mt-2 sm:w-[50vh] mx-auto"
       >
+        {/*<div className="max-w-xl ">
+          <pre>{JSON.stringify(surat[0], null, 2)}</pre>
+        </div>*/}
         <TabsList className="grid grid-cols-2">
           <TabsTrigger value="juz">Juz</TabsTrigger>
           <TabsTrigger value="surat">Surat</TabsTrigger>
@@ -106,18 +110,28 @@ export default function Index() {
                     <CommandItem
                       key={navItem.number}
                       value={navItem.number}
-                      className="flex items-center gap-1.5"
+                      className="flex items-start gap-1.5"
                       onSelect={() => {
                         navigate(`/muslim/quran/${navItem.number}` as string);
                       }}
                     >
-                      <Star className="h-5 w-5 fill-muted" />
-                      <span>{navItem.number}. </span>
-                      <span>{navItem.name_id}</span>
-                      {/*<span>{navItem.revelation_id}</span>*/}
-                      <CommandShortcut>
-                        {navItem.number_of_verses} ayat
-                      </CommandShortcut>
+                      {navItem.number}.
+                      <div>
+                        <span className="font-semibold">{navItem.name_id}</span>{" "}
+                        <span className="opacity-80">
+                          ({navItem.translation_id})
+                        </span>
+                        <div className="flex items-center text-muted-foreground gap-1">
+                          <span>{navItem.revelation_id}</span>
+                          <div className="w-2 relative">
+                            <Dot className="absolute -left-2 -top-3" />
+                          </div>
+                          <span>{navItem.number_of_verses} ayat</span>
+                        </div>
+                      </div>
+                      <div className="ml-auto font-lpmq2 text-lg text-primary text-right">
+                        {navItem.name_short}
+                      </div>
                     </CommandItem>
                   ))}
               </CommandGroup>
@@ -131,17 +145,28 @@ export default function Index() {
                     <CommandItem
                       key={navItem.number}
                       value={navItem.number}
-                      className="flex items-center gap-1.5"
+                      className="flex items-start gap-1.5"
                       onSelect={() => {
                         navigate(`/muslim/quran/${navItem.number}` as string);
                       }}
                     >
-                      <BookOpen className="h-5 w-5" />
-                      <span>{navItem.number}. </span>
-                      <span>{navItem.name_id}</span>
-                      <CommandShortcut>
-                        {navItem.number_of_verses} ayat
-                      </CommandShortcut>
+                      {navItem.number}.
+                      <div>
+                        <span className="font-semibold">{navItem.name_id}</span>{" "}
+                        <span className="opacity-80">
+                          ({navItem.translation_id})
+                        </span>
+                        <div className="flex items-center text-muted-foreground gap-1">
+                          <span>{navItem.revelation_id}</span>
+                          <div className="w-2 relative">
+                            <Dot className="absolute -left-2 -top-3" />
+                          </div>
+                          <span>{navItem.number_of_verses} ayat</span>
+                        </div>
+                      </div>
+                      <div className="ml-auto font-lpmq2 text-lg text-primary text-right">
+                        {navItem.name_short}
+                      </div>
                     </CommandItem>
                   ))}
               </CommandGroup>
@@ -156,7 +181,7 @@ export default function Index() {
               <CommandSeparator />
               <CommandGroup heading="Daftar Juz">
                 {juz?.map((navItem, index) => {
-                  const itemNumber = index * 20 + 1;
+                  const itemNumber = index === 0 ? 1 : index * 20 + 2;
                   return (
                     <CommandItem
                       key={navItem.number}
@@ -168,8 +193,8 @@ export default function Index() {
                     >
                       <Scroll className="h-5 w-5 fill-muted mt-1" />
                       <div>
-                        <span>{navItem.name}</span>
-                        <div className="flex items-center text-muted-foreground gap-1">
+                        <span className="font-semibold">{navItem.name}</span>
+                        <div className="flex items-center text-sm text-muted-foreground gap-1">
                           <span>
                             {navItem.name_start_id} {navItem.verse_start}
                           </span>
@@ -179,6 +204,7 @@ export default function Index() {
                           </span>
                         </div>
                       </div>
+                      <CommandShortcut>Hal {itemNumber}</CommandShortcut>
                     </CommandItem>
                   );
                 })}
