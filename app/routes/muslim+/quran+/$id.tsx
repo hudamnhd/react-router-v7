@@ -163,7 +163,7 @@ export default function Index() {
             <div
               key={d.id}
               className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-muted rounded-md ${
-                isLastRead ? "bg-accent" : ""
+                isLastRead ? "bg-muted" : ""
               }`}
             >
               <div className="w-full text-right flex gap-x-2.5 items-start justify-between">
@@ -249,8 +249,8 @@ export default function Index() {
 
 const SuratDetail = ({ data }: { data: any }) => {
   return (
-    <div className="max-w-2xl mx-auto p-6 border shadow-lg rounded-lg prose dark:prose-invert">
-      <div className="flex items-start justify-between h-10">
+    <div className="md:max-w-2xl mx-auto p-6 border shadow-lg rounded-lg prose dark:prose-invert">
+      <div className="flex sm:flex-row flex-col items-start justify-between sm:h-10">
         <h1 className="text-2xl font-bold">
           {data.number}. {data.name_id}
           <span className="ml-2 font-normal">( {data.translation_id} )</span>
@@ -270,7 +270,7 @@ const SuratDetail = ({ data }: { data: any }) => {
 
       <div className="mb-4">
         <h3 className="text-lg font-bold ">Tafsir</h3>
-        <p>{data.tafsir}</p>
+        <p className="sm:max-w-lg max-w-sm">{data.tafsir}</p>
       </div>
 
       <div className="mb-4">
