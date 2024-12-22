@@ -37,7 +37,7 @@ export default function DzikrView() {
                 <div
                   key={index}
                   style={{ animationDelay: `${index * 0.1}s` }}
-                  className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-muted rounded-md `}
+                  className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent/70 rounded-md `}
                 >
                   <div>
                     <div className="space-y-1 mb-2">
@@ -120,7 +120,7 @@ export default function DzikrView() {
                 <div
                   key={index}
                   style={{ animationDelay: `${index * 0.1}s` }}
-                  className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-muted rounded-md `}
+                  className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent/70 rounded-md `}
                 >
                   <div>
                     <div className="space-y-1 mb-2">

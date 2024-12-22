@@ -78,11 +78,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 
 let initial_data = true;
 async function load_data_daily_tasks() {
-  const spinner = document.getElementById("initial-loading");
-  if (spinner) {
-    spinner.style.display = "flex";
-  }
-
   const data_tasks = localStorage.getItem("daily-tasks");
   const initialTasks = data_tasks ? JSON.parse(data_tasks) : {};
   // const initialTasks = await getCache("daily-tasks");

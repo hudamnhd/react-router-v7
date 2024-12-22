@@ -365,9 +365,19 @@ const components: { title: string; href: string; description: string }[] = [
 
 const toolsLinks: { title: string; href: string; description: string }[] = [
   {
+    title: "Daily tasks",
+    href: "/tools/daily-tasks",
+    description: "Daily tasks with podomoro",
+  },
+  {
     title: "Kalkulator",
     href: "/tools/calculator",
     description: "Simple Kalkulator",
+  },
+  {
+    title: "Podomoro",
+    href: "/tools/podomoro",
+    description: "Simple Podomoro",
   },
 ];
 function Navbar({ children }) {
@@ -535,7 +545,7 @@ function CommandMenu({ ...props }: DialogProps) {
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandSeparator />
           <CommandGroup heading="Daftar menu">
-            {components.map((navItem, index) => (
+            {[...components, ...toolsLinks].map((navItem, index) => (
               <CommandItem
                 key={index}
                 value={index}
@@ -589,7 +599,7 @@ function NavbarMobile() {
         </DrawerHeader>*/}
 
         <nav className="flex flex-col items-start gap-3 p-4">
-          {components.map((item) => (
+          {[...components, ...toolsLinks].map((item) => (
             <NavLink
               onClick={() => setOpen(false)}
               key={item.href}

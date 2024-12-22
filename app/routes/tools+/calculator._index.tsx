@@ -1,4 +1,5 @@
 import { Equal, Plus, Minus, History, Delete, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "#app/components/ui/button";
 import React, { useState } from "react";
 import {
@@ -123,10 +124,7 @@ const Calculator: React.FC = () => {
       localStorage.setItem("calcHistory", JSON.stringify(updatedHistory));
 
       setHistory(updatedHistory);
-      // toast({
-      //   title: "Sukses",
-      //   description: `Sukses tersimpan dalam riwayat`,
-      // });
+      toast.success("Sukses tersimpan dalam riwayat");
       // setCurrentInput(result.toString());
       // setTotal(result); // Update total dengan hasil terakhir
     } catch (error) {
@@ -256,8 +254,6 @@ const Calculator: React.FC = () => {
     });
   };
 
-  const is_equal_window = window.innerHeight === window.outerHeight;
-
   return (
     <div
       className={cn(
@@ -269,7 +265,7 @@ const Calculator: React.FC = () => {
         <div className="w-full flex items-center justify-between">
           <div>
             <h1 className="mr-2 bg-gradient-to-r from-blue-500 via-green-500 to-orange-500 inline-block text-transparent bg-clip-text uppercase text-xl my-2 font-sans font-bold">
-              MHDA
+              Calculator
             </h1>
           </div>
           <PopoverTrigger className="flex items-center gap-x-2">

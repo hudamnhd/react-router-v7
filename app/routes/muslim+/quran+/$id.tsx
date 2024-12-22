@@ -22,17 +22,7 @@ import {
 import { Badge } from "#app/components/ui/badge";
 import { Button } from "#app/components/ui/button";
 import { Bookmark, Heart, Ellipsis, Dot, Minus } from "lucide-react";
-import { Spinner } from "#app/components/ui/spinner";
-
-const SpinnerFull = () => {
-  return (
-    <div className="absolute h-full w-full flex items-center justify-center bottom-0 left-1/2 transform -translate-x-1/2  z-20 backdrop-blur-[1px] rounded-xl">
-      <div className="flex justify-center">
-        <Spinner>Loading...</Spinner>
-      </div>
-    </div>
-  );
-};
+import Loader from "#app/components/ui/loader";
 
 import { getCache, setCache } from "#app/utils/cache-client.ts";
 const FAVORITES_KEY = "FAVORITES";
@@ -129,7 +119,7 @@ export default function Index() {
     });
   };
 
-  if (!fetcher.data || fetcher.state !== "idle") return <SpinnerFull />;
+  if (!fetcher.data || fetcher.state !== "idle") return <Loader />;
 
   const first_ayah = ayat[0]?.ayah;
   const last_ayah = ayat[ayat.length - 1]?.ayah;
@@ -162,7 +152,7 @@ export default function Index() {
           return (
             <div
               key={d.id}
-              className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-muted rounded-md ${
+              className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-accent/70 rounded-md ${
                 isLastRead ? "bg-muted" : ""
               }`}
             >

@@ -1,50 +1,68 @@
-import React from "react";
-import { cn } from "#app/utils/misc.tsx";
-import { VariantProps, cva } from "class-variance-authority";
-import { Loader2 } from "lucide-react";
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "#app/utils/misc";
 
-const spinnerVariants = cva("flex-col items-center justify-center", {
-  variants: {
-    show: {
-      true: "flex",
-      false: "hidden",
-    },
-  },
-  defaultVariants: {
-    show: true,
-  },
-});
-
-const loaderVariants = cva("animate-spin text-primary", {
+const spinnerVariants = cva("relative block opacity-[0.65]", {
   variants: {
     size: {
-      small: "size-6",
-      medium: "size-8",
-      large: "size-12",
+      sm: "w-4 h-4",
+      md: "w-6 h-6",
+      lg: "w-8 h-8",
     },
   },
   defaultVariants: {
-    size: "medium",
+    size: "sm",
   },
 });
 
-interface SpinnerContentProps
-  extends VariantProps<typeof spinnerVariants>,
-    VariantProps<typeof loaderVariants> {
-  className?: string;
-  children?: React.ReactNode;
+export interface SpinnerProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof spinnerVariants> {
+  loading?: boolean;
+  asChild?: boolean;
 }
 
-export function Spinner({
-  size,
-  show,
-  children,
-  className,
-}: SpinnerContentProps) {
-  return (
-    <span className={spinnerVariants({ show })}>
-      <Loader2 className={cn(loaderVariants({ size }), className)} />
-      {children}
-    </span>
-  );
-}
+const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
+  ({ className, size, loading = true, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "span";
+
+    const [bgColorClass, filteredClassName] = React.useMemo(() => {
+      const bgClass = className?.match(/(?:dark:bg-|bg-)[a-zA-Z0-9-]+/g) || [];
+      const filteredClasses = className
+        ?.replace(/(?:dark:bg-|bg-)[a-zA-Z0-9-]+/g, "")
+        .trim();
+
+      return [bgClass, filteredClasses];
+    }, [className]);
+
+    if (!loading) return null;
+
+    return (
+      <Comp
+        className={cn(spinnerVariants({ size, className: filteredClassName }))}
+        ref={ref}
+        {...props}
+      >
+        {Array.from({ length: 8 }).map((_, i) => (
+          <span
+            key={i}
+            className="absolute top-0 left-1/2 w-[12.5%] h-full animate-spinner-leaf-fade"
+            style={{
+              transform: `rotate(${i * 45}deg)`,
+              animationDelay: `${-(7 - i) * 100}ms`,
+            }}
+          >
+            <span
+              className={cn("block w-full h-[30%] rounded-full", bgColorClass)}
+            ></span>
+          </span>
+        ))}
+      </Comp>
+    );
+  },
+);
+
+Spinner.displayName = "Spinner";
+
+export { Spinner };
