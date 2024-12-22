@@ -144,7 +144,7 @@ export default function Route() {
             {result?.map((d) => (
               <React.Fragment key={d.label}>
                 <CommandSeparator />
-                <CommandGroup heading={d.label}>
+                <CommandGroup className="capitalize" heading={d.label}>
                   {d.data.map((doa, index) => {
                     return <ListItem key={index} index={index} doa={doa} />;
                   })}
@@ -185,13 +185,14 @@ const ListItem = ({ doa, index }) => {
       )}
       <CommandItem
         value={value}
-        className="flex items-center gap-1.5 text-md"
+        className="flex items-start gap-1.5 text-md"
         onSelect={() => {
           setContent(doa);
         }}
       >
-        <Icon className="h-5 w-5 flex-none" />
-        <span className="">{doa.judul}</span>
+        <Icon className="h-5 w-5 flex-none sm:flex hidden" />
+        <span className="flex-none sm:hidden flex">·</span>
+        <span className="mr-auto">{doa.judul}</span>
       </CommandItem>
     </React.Fragment>
   );

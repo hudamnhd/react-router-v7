@@ -130,7 +130,7 @@ const CalendarYears = ({ total_sessions }) => {
           <GardenSessionBadge text={true} sessionCount={20} />
         </div>
       </div>
-      <div className="mx-auto grid grid-cols-1 gap-5 gap-y-10 md:grid-cols-3 mt-5 p-3">
+      <div className="w-fit mx-auto grid grid-cols-1 gap-5 gap-y-10 md:grid-cols-3 mt-5 p-3">
         {monthsInYear.map((monthStart) => {
           const monthName = monthStart.toLocaleString("default", {
             month: "long",
@@ -237,7 +237,8 @@ const GardenSessionBadge = ({ sessionCount, text }) => {
     icon = "🌱";
     sessionText = "1 session";
   } else {
-    icon = "❌"; // Ini opsional untuk ketika sessionCount === 0 atau tidak valid
+    // icon = "❌"; // Ini opsional untuk ketika sessionCount === 0 atau tidak valid
+    icon = " "; // Ini opsional untuk ketika sessionCount === 0 atau tidak valid
     sessionText = "No session";
   }
 

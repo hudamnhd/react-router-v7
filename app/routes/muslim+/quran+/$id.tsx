@@ -1,4 +1,14 @@
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "#app/components/ui/drawer";
+import {
   useFetcher,
   useParams,
   useNavigate,
@@ -125,9 +135,9 @@ export default function Index() {
   const last_ayah = ayat[ayat.length - 1]?.ayah;
   return (
     <div className="prose dark:prose-invert max-w-none">
-      <Popover>
-        <PopoverTrigger className="w-fit mx-auto flex items-center justify-center">
-          <div className="text-3xl font-bold md:text-4xl">
+      <Drawer>
+        <DrawerTrigger asChild>
+          <div className="text-3xl font-bold md:text-4xl w-fit mx-auto">
             {surat.name_id}
             <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
               ( {surat.name_short} )
@@ -138,11 +148,49 @@ export default function Index() {
               <span>Ayat {last_ayah}</span>
             </div>
           </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <SuratDetail data={surat} />
-        </PopoverContent>
-      </Popover>
+        </DrawerTrigger>
+        <DrawerContent className="sm:max-w-3xl mx-auto">
+          <DrawerHeader>
+            <p className="-translate-y-0 text-xl sm:text-2xl font-semibold font-lpmq-2 text-center">
+              {surat.name_long}
+            </p>
+            <DrawerTitle>
+              {surat.number}. {surat.name_id}
+              <span className="ml-2 font-normal">
+                ( {surat.translation_id} )
+              </span>
+            </DrawerTitle>
+
+            <DrawerDescription className="flex items-center text-muted-foreground gap-1 justify-center sm:justify-start">
+              <span>{surat.revelation_id}</span>
+              <div className="w-2 relative">
+                <Dot className="absolute -left-2 -top-3" />
+              </div>
+              <span>{surat.number_of_verses} ayat</span>
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-4 max-h-[70vh] overflow-y-auto">
+            <div className="mb-4">
+              <h3 className="font-bold ">Tafsir</h3>
+              <p className="prose max-w-none">{surat.tafsir}</p>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="font-bold mb-1">Audio</h3>
+              <audio controls className="w-full">
+                <source src={surat.audio_url} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          </div>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="outline">Close</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       <div className="sm:max-w-4xl mx-auto">
         {ayat.map((d) => {
@@ -236,40 +284,3 @@ export default function Index() {
     </div>
   );
 }
-
-const SuratDetail = ({ data }: { data: any }) => {
-  return (
-    <div className="md:max-w-2xl mx-auto p-6 border shadow-lg rounded-lg prose dark:prose-invert">
-      <div className="flex sm:flex-row flex-col items-start justify-between sm:h-10">
-        <h1 className="text-2xl font-bold">
-          {data.number}. {data.name_id}
-          <span className="ml-2 font-normal">( {data.translation_id} )</span>
-        </h1>
-        <p className="-translate-y-5 text-xl font-semibold font-lpmq-2 text-right">
-          {data.name_long}
-        </p>
-      </div>
-
-      <div className="flex items-center text-muted-foreground gap-1">
-        <span>{data.revelation_id}</span>
-        <div className="w-2 relative">
-          <Dot className="absolute -left-2 -top-3" />
-        </div>
-        <span>{data.number_of_verses} ayat</span>
-      </div>
-
-      <div className="mb-4">
-        <h3 className="text-lg font-bold ">Tafsir</h3>
-        <p className="sm:max-w-lg max-w-sm">{data.tafsir}</p>
-      </div>
-
-      <div className="mb-4">
-        <h3 className="text-lg font-bold ">Audio</h3>
-        <audio controls className="w-full">
-          <source src={data.audio_url} type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
-      </div>
-    </div>
-  );
-};

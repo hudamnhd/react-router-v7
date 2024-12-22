@@ -38,13 +38,12 @@ import { useNonce } from "./utils/nonce-provider.ts";
 import { useRequestInfo } from "./utils/request-info.ts";
 import { type Theme, setTheme, getTheme } from "./utils/theme.server.ts";
 import { getToast } from "./utils/toast.server.ts";
-
 export const links: LinksFunction = () => {
   return [
     // Preload svg sprite as a resource to avoid render blocking
     { rel: "preload", href: iconsHref, as: "image" },
     // Preload CSS as a resource to avoid render blocking
-    { rel: "mask-icon", href: "/favicons/mask-icon.svg" },
+    // { rel: "mask-icon", href: "/favicons/mask-icon.svg" },
     {
       rel: "alternate icon",
       type: "image/png",
@@ -58,6 +57,17 @@ export const links: LinksFunction = () => {
     } as const, // necessary to make typescript happy
     //These should match the css preloads above to avoid css as render blocking resource
     { rel: "icon", type: "image/svg+xml", href: "/favicons/favicon.svg" },
+
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    {
+      rel: "preconnect",
+      href: "https://fonts.gstatic.com",
+      crossOrigin: "anonymous",
+    },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap",
+    },
     { rel: "stylesheet", href: tailwindStyleSheetUrl },
   ].filter(Boolean);
 };
@@ -187,6 +197,7 @@ function App() {
           </nav>
         </header>
         <div className="flex-1">
+          {/*<Frame size={500} color="#FFF" strokeWidth={3} />*/}
           <Outlet />
         </div>
       </div>
@@ -334,59 +345,15 @@ import {
 
 import { Button } from "#app/components/ui/button";
 import { Separator } from "#app/components/ui/separator";
+import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Al Qur'an",
-    href: "/muslim/quran",
-    description: "Temukan ketenangan melalui ayat-ayat Al Qur'an.",
-  },
-  {
-    title: "Sholawat",
-    href: "/muslim/sholawat",
-    description: "Dekatkan diri dengan Rasulullah melalui sholawat.",
-  },
-  {
-    title: "Dzikir",
-    href: "/muslim/dzikir",
-    description: "Hiasi hari dengan dzikir dan ingat Allah selalu.",
-  },
-  {
-    title: "Tahlil",
-    href: "/muslim/tahlil",
-    description: "Doakan yang tercinta dengan tahlil penuh makna.",
-  },
-  {
-    title: "Do'a",
-    href: "/muslim/doa",
-    description: "Awali hari dengan doa untuk keberkahan hidup.",
-  },
-];
-
-const toolsLinks: { title: string; href: string; description: string }[] = [
-  {
-    title: "Daily tasks",
-    href: "/tools/daily-tasks",
-    description: "Daily tasks with podomoro",
-  },
-  {
-    title: "Kalkulator",
-    href: "/tools/calculator",
-    description: "Simple Kalkulator",
-  },
-  {
-    title: "Podomoro",
-    href: "/tools/podomoro",
-    description: "Simple Podomoro",
-  },
-];
 function Navbar({ children }) {
   return (
     <React.Fragment>
       <div className="flex h-14 items-center px-4 border-b fixed w-full top-0 bg-transparent backdrop-blur-md z-10">
         <div className="mr-4 hidden md:flex">
           <NavLink className="mr-4 flex items-center gap-2 lg:mr-6" to="/">
-            <svg
+            {/*<svg
               className="w-5 h-5 text-foreground"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -396,8 +363,9 @@ function Navbar({ children }) {
                 fill="currentColor"
                 d="M39.445 25.555 37 17.163 65 0 47.821 28l-8.376-2.445Zm-13.89 0L28 17.163 0 0l17.179 28 8.376-2.445Zm13.89 13.89L37 47.837 65 65 47.821 37l-8.376 2.445Zm-13.89 0L28 47.837 0 65l17.179-28 8.376 2.445Z"
               ></path>
-            </svg>
-            <span className="hidden font-bold lg:inline-block">Doti App</span>
+            </svg>*/}
+            <Frame className="w-5 h-5 text-foreground -translate-y-[1px]" />
+            <span className="hidden font-bold lg:inline-block">Doti</span>
           </NavLink>
 
           <NavigationMenu>
@@ -408,21 +376,27 @@ function Navbar({ children }) {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {components.map((component) => (
+                    {muslimLinks.map((component) => (
                       <li key={component.title} title={component.title}>
                         <NavigationMenuLink asChild>
                           <NavLink
                             to={component.href}
                             className={cn(
-                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                              "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             )}
                           >
-                            <div className="font-medium leading-none">
-                              {component.title}
+                            <component.icon
+                              size={20}
+                              className="flex-none translate-y-[2px]"
+                            />
+                            <div>
+                              <div className="font-medium leading-none">
+                                {component.title}
+                              </div>
+                              <p className="line-clamp-2 leading-snug text-muted-foreground">
+                                {component.description}
+                              </p>
                             </div>
-                            <p className="line-clamp-2 leading-snug text-muted-foreground">
-                              {component.description}
-                            </p>
                           </NavLink>
                         </NavigationMenuLink>
                       </li>
@@ -442,15 +416,21 @@ function Navbar({ children }) {
                           <NavLink
                             to={component.href}
                             className={cn(
-                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                              "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
                             )}
                           >
-                            <div className="font-medium leading-none">
-                              {component.title}
+                            <component.icon
+                              size={20}
+                              className="flex-none translate-y-[2px]"
+                            />
+                            <div>
+                              <div className="font-medium leading-none">
+                                {component.title}
+                              </div>
+                              <p className="line-clamp-2 leading-snug text-muted-foreground">
+                                {component.description}
+                              </p>
                             </div>
-                            <p className="line-clamp-2 leading-snug text-muted-foreground">
-                              {component.description}
-                            </p>
                           </NavLink>
                         </NavigationMenuLink>
                       </li>
@@ -472,7 +452,7 @@ function Navbar({ children }) {
     </React.Fragment>
   );
 }
-import { BookOpenText, Circle, Menu } from "lucide-react";
+import { Circle, Menu, Frame } from "lucide-react";
 import { type DialogProps } from "@radix-ui/react-dialog";
 import { cn } from "#app/utils/misc.tsx";
 
@@ -493,7 +473,6 @@ import {
 function CommandMenu({ ...props }: DialogProps) {
   const navigate = useNavigate();
 
-  const { data } = [];
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -545,7 +524,7 @@ function CommandMenu({ ...props }: DialogProps) {
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandSeparator />
           <CommandGroup heading="Daftar menu">
-            {[...components, ...toolsLinks].map((navItem, index) => (
+            {[...muslimLinks, ...toolsLinks].map((navItem, index) => (
               <CommandItem
                 key={index}
                 value={index}
@@ -554,7 +533,7 @@ function CommandMenu({ ...props }: DialogProps) {
                   runCommand(() => navigate(navItem.href as string));
                 }}
               >
-                <Circle />
+                <navItem.icon />
                 <span>{navItem.title}</span>
               </CommandItem>
             ))}
@@ -599,7 +578,7 @@ function NavbarMobile() {
         </DrawerHeader>*/}
 
         <nav className="flex flex-col items-start gap-3 p-4">
-          {[...components, ...toolsLinks].map((item) => (
+          {[...muslimLinks, ...toolsLinks].map((item) => (
             <NavLink
               onClick={() => setOpen(false)}
               key={item.href}

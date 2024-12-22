@@ -6,7 +6,6 @@ import { Button } from "#app/components/ui/button";
 import { useBeforeUnload } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
-import { Label } from "#app/components/ui/label";
 
 enum MODE {
   POMO = "Pomo",
@@ -101,11 +100,7 @@ const App: React.FC = () => {
   const strokeDashoffset = isRunning ? (1 - progress) * 2 * Math.PI * 45 : 0;
 
   return (
-    <div className="grid place-items-center p-4 text-center space-y-4 sm:max-w-md mx-auto">
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
-        Pomodoro
-      </h1>
-
+    <div className="grid place-items-center sm:py-4 px-4 text-center space-y-4 sm:max-w-md mx-auto">
       <div className="my-4 grid grid-cols-3 gap-2">
         <Button
           variant={mode === MODE.POMO ? "default" : "outline"}
@@ -239,5 +234,41 @@ const App: React.FC = () => {
 };
 
 export default function Route() {
-  return <ClientOnly fallback={<Loader />}>{() => <App />}</ClientOnly>;
+  return (
+    <ClientOnly fallback={<Loader />}>
+      {() => (
+        <React.Fragment>
+          <Example />
+          <App />
+        </React.Fragment>
+      )}
+    </ClientOnly>
+  );
+}
+
+function Example() {
+  return (
+    <div className="relative sm:py-4 bg-background overflow-hidden">
+      <div className="relative px-4 sm:px-6 lg:px-8">
+        <div className="text-lg max-w-prose mx-auto">
+          <h1>
+            <span className="block text-2xl text-center leading-8 font-extrabold tracking-tight sm:text-3xl">
+              Pomodoro
+            </span>
+          </h1>
+          <p className="sm:block hidden sm:mt-4 sm:text-lg leading-8 text-primary/80">
+            Kata <strong>pomodoro</strong> berasal dari bahasa Italia yang
+            berarti <strong>tomat</strong>. Metode Pomodoro Technique dinamai
+            demikian karena Francesco Cirillo, pencipta metode ini, awalnya
+            menggunakan timer dapur berbentuk tomat untuk mengatur waktu
+            kerjanya. Pomodoro Technique Ini adalah teknik manajemen waktu yang
+            membagi waktu kerja menjadi interval fokus (biasanya{" "}
+            <strong>25 menit</strong>), yang disebut <strong>pomodoros</strong>,
+            diikuti dengan istirahat singkat (biasanya <strong>5 menit</strong>
+            ).
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
