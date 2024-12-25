@@ -1,3 +1,4 @@
+import { cn } from "#app/utils/misc.tsx";
 import {
   Drawer,
   DrawerClose,
@@ -25,8 +26,17 @@ import {
   DropdownMenuTrigger,
 } from "#app/components/ui/dropdown-menu";
 import { Badge } from "#app/components/ui/badge";
+import { Separator } from "#app/components/ui/separator";
 import { Button } from "#app/components/ui/button";
-import { Bookmark, Heart, Ellipsis, Dot, Minus } from "lucide-react";
+import {
+  Bookmark,
+  Heart,
+  Ellipsis,
+  Dot,
+  Minus,
+  Plus,
+  BookOpen,
+} from "lucide-react";
 import Loader from "#app/components/ui/loader";
 
 import { getCache, setCache } from "#app/utils/cache-client.ts";
@@ -37,23 +47,16 @@ const LASTREAD_KEY = "LASTREAD";
 export default function Index() {
   const params = useParams();
   const fetcher = useFetcher({ key: params.id });
-  const ayat = fetcher.data?.ayat;
-  const surat = fetcher.data?.surat;
   const [favorites, setFavorites] = useState<Array>([]);
   const [lastRead, setLastRead] = useState<number | null>(null);
   const navigate = useNavigate();
 
-  // Ambil semua nomor halaman unik dari data ayat
-
-  // const total_ayat = surat ? surat?.number_of_verses : null;
-  // const last_ayat = ayat ? ayat[ayat.length - 1].ayah : null;
-  // Filter ayat berdasarkan halaman yang dipilih
   useEffect(() => {
     fetcher.load(`/resources/quran/page/${params.id}`);
     const loadFavorites = async () => {
-      if (surat) {
-        await setCache(LASTVISIT_KEY, surat);
-      }
+      // if (surat) {
+      //   await setCache(LASTVISIT_KEY, surat);
+      // }
 
       const storedFavorites = await getCache(FAVORITES_KEY);
       if (storedFavorites) {
@@ -126,133 +129,170 @@ export default function Index() {
 
   if (!fetcher.data || fetcher.state !== "idle") return <Loader />;
 
-  const first_ayah = ayat[0]?.ayah;
-  const last_ayah = ayat[ayat.length - 1]?.ayah;
   return (
-    <div className="prose dark:prose-invert max-w-none">
-      <Drawer>
-        <DrawerTrigger asChild>
-          <div className="text-3xl font-bold md:text-4xl w-fit mx-auto">
-            {surat.name_id}
-            <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
-              ( {surat.name_short} )
-            </span>
-            <div className="flex items-center text-lg font-medium justify-center">
-              <span>Ayat {first_ayah}</span>
-              <Minus />
-              <span>Ayat {last_ayah}</span>
-            </div>
-          </div>
-        </DrawerTrigger>
-        <DrawerContent className="sm:max-w-3xl mx-auto">
-          <DrawerHeader>
-            <p className="-translate-y-0 text-xl sm:text-2xl font-semibold font-lpmq-2 text-center">
-              {surat.name_long}
-            </p>
-            <DrawerTitle>
-              {surat.number}. {surat.name_id}
-              <span className="ml-2 font-normal">
-                ( {surat.translation_id} )
-              </span>
-            </DrawerTitle>
+    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
+      {Object.values(fetcher.data?.group_surat).map((d) => {
+        const first_ayah = d.ayat[0]?.ayah;
+        const last_ayah = d.ayat[d.ayat.length - 1]?.ayah;
+        return (
+          <React.Fragment key={d.surah.number}>
+            <div className="prose dark:prose-invert max-w-none">
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <div className="text-3xl font-bold md:text-4xl w-fit mx-auto mt-2 mb-3">
+                    {d.surah.name_id}
+                    <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
+                      ( {d.surah.name_short} )
+                    </span>
+                    <div className="flex items-center text-base font-medium justify-center">
+                      Hal {params.id}
+                      <Dot />
+                      <span>Ayat {first_ayah}</span>
+                      <Minus />
+                      <span>{last_ayah}</span>
+                    </div>
+                  </div>
+                </DrawerTrigger>
+                <DrawerContent className="sm:max-w-3xl mx-auto">
+                  <DrawerHeader>
+                    <p className="-translate-y-0 text-xl sm:text-2xl font-semibold font-lpmq-2 text-center">
+                      {d.surah.name_long}
+                    </p>
+                    <DrawerTitle>
+                      {d.surah.number}. {d.surah.name_id}
+                      <span className="ml-2 font-normal">
+                        ( {d.surah.translation_id} )
+                      </span>
+                    </DrawerTitle>
 
-            <DrawerDescription className="flex items-center text-muted-foreground gap-1 justify-center sm:justify-start">
-              <span>{surat.revelation_id}</span>
-              <div className="w-2 relative">
-                <Dot className="absolute -left-2 -top-3" />
+                    <DrawerDescription className="flex items-center text-muted-foreground gap-1 justify-center sm:justify-start">
+                      <span>{d.surah.revelation_id}</span>
+                      <div className="w-2 relative">
+                        <Dot className="absolute -left-2 -top-3" />
+                      </div>
+                      <span>{d.surah.number_of_verses} ayat</span>
+                    </DrawerDescription>
+                  </DrawerHeader>
+
+                  <div className="px-4 max-h-[70vh] overflow-y-auto">
+                    <div className="mb-4">
+                      <h3 className="font-bold ">Tafsir</h3>
+                      <p className="prose max-w-none">{d.surah.tafsir}</p>
+                    </div>
+
+                    <div className="mb-4">
+                      <h3 className="font-bold mb-1">Audio</h3>
+                      <audio controls className="w-full">
+                        <source src={d.surah.audio_url} type="audio/mpeg" />
+                        Your browser does not support the audio element.
+                      </audio>
+                    </div>
+                  </div>
+                  <DrawerFooter>
+                    <DrawerClose asChild>
+                      <Button variant="outline">Close</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
+
+              <div className="">
+                {d.ayat.map((dt) => {
+                  const isFavorite = favorites.some((fav) => fav.id === dt.id);
+                  const isLastRead = lastRead?.id === dt.id;
+
+                  return (
+                    <div className="border-t" key={dt.id}>
+                      <div
+                        className={cn(
+                          "group relative py-4 px-4 sm:px-5 md:border-t",
+                          isFavorite &&
+                            "bg-gradient-to-b from-background via-background to-pink-400/50 dark:to-pink-600/50",
+                          isLastRead &&
+                            "bg-gradient-to-b from-background via-background to-lime-400/50 dark:to-lime-600/50",
+                        )}
+                      >
+                        <div className="w-full text-right flex gap-x-2.5 items-center justify-between">
+                          <div className="flex items-center gap-x-3">
+                            {isFavorite ? (
+                              <div className="bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl">
+                                <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                              </div>
+                            ) : (
+                              <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 p-3 rounded-xl">
+                                <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                              </div>
+                            )}
+                            <div className="grid text-left">
+                              <span className="text-lg font-medium text-gray-900 dark:text-white">
+                                Ayat {dt.ayah}
+                              </span>
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                Juz {dt.juz} • Hal {dt.page}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-x-2">
+                            {isLastRead && (
+                              <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl">
+                                <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                              </div>
+                            )}
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger className="bg-muted p-2 rounded-xl">
+                                <Ellipsis className="fill-primary w-5 h-5" />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuLabel>Action</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => toggleFavorite(dt)}
+                                >
+                                  <Heart className="mr-2 w-4 h-4" /> Favorite
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleRead(dt)}
+                                >
+                                  <Bookmark className="mr-2 w-4 h-4" /> Terakhir
+                                  Baca
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                        <div className="w-full text-right flex gap-x-2.5 items-end justify-end">
+                          <div className="relative font-lpmq text-right text-primary my-5">
+                            {dt.arab}
+                          </div>
+                        </div>
+                        <div className="translation-text">
+                          <div
+                            className="max-w-none prose-normal duration-300 text-muted-foreground mb-2"
+                            dangerouslySetInnerHTML={{
+                              __html: dt.latin,
+                            }}
+                          />
+                        </div>
+                        <div className="translation-text">
+                          <div
+                            className="max-w-none prose text-accent-foreground"
+                            dangerouslySetInnerHTML={{
+                              __html: dt.text,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <span>{surat.number_of_verses} ayat</span>
-            </DrawerDescription>
-          </DrawerHeader>
-
-          <div className="px-4 max-h-[70vh] overflow-y-auto">
-            <div className="mb-4">
-              <h3 className="font-bold ">Tafsir</h3>
-              <p className="prose max-w-none">{surat.tafsir}</p>
+              {/* Pagination Controls */}
             </div>
-
-            <div className="mb-4">
-              <h3 className="font-bold mb-1">Audio</h3>
-              <audio controls className="w-full">
-                <source src={surat.audio_url} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-          </div>
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button variant="outline">Close</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-
-      <div className="">
-        {ayat.map((d) => {
-          const isFavorite = favorites.some((fav) => fav.id === d.id);
-          const isLastRead = lastRead?.id === d.id;
-
-          return (
-            <div
-              key={d.id}
-              className={`group relative py-5 pr-4 pl-2 sm:px-5 hover:bg-accent/70 rounded-md ${
-                isLastRead ? "bg-muted" : ""
-              }`}
-            >
-              <div className="w-full text-right flex gap-x-2.5 items-start justify-between">
-                <div className="grid gap-1 place-items-center">
-                  <Badge className="rounded px-2">{d.ayah}</Badge>
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger className="group-hover:visible invisible h-auto">
-                      <Ellipsis className="fill-primary w-5 h-5" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuLabel>Action</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => toggleFavorite(d)}>
-                        <Heart className="mr-2 w-4 h-4" /> Favorite
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleRead(d)}>
-                        <Bookmark className="mr-2 w-4 h-4" /> Terakhir Baca
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <p className="relative mt-2 font-lpmq text-right text-primary">
-                  {d.arab}
-                </p>
-              </div>
-              <div className="translation-text">
-                <div
-                  className="max-w-none prose text-muted-foreground"
-                  dangerouslySetInnerHTML={{
-                    __html: d.latin,
-                  }}
-                />
-              </div>
-              <div className="translation-text mt-3">
-                <div
-                  className="max-w-none prose text-accent-foreground"
-                  dangerouslySetInnerHTML={{
-                    __html: d.text,
-                  }}
-                />
-              </div>
-
-              {(isLastRead || isFavorite) && (
-                <div className="w-full text-right flex gap-x-2.5 items-center justify-end mt-2">
-                  {isLastRead && <Bookmark className="fill-primary w-5 h-5" />}
-                  {isFavorite && (
-                    <Heart className="fill-destructive dark:fill-red-400 dark:text-red-400 text-destructive w-5 h-5" />
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+          </React.Fragment>
+        );
+      })}
       {/* Pagination Controls */}
-      <div className="ml-auto flex items-center justify-center gap-3 my-5">
+      <div className="ml-auto flex items-center justify-center gap-3 py-5 border-t ">
         <Button
           onClick={prevPage}
           disabled={parseInt(params.id) === 1}

@@ -66,9 +66,9 @@ const toolsLinks: {
     icon: Calculator,
   },
   {
-    title: "Podomoro",
+    title: "Pomodoro",
     href: "/tools/pomodoro",
-    description: "Simple Podomoro",
+    description: "Simple Pomodoro",
     icon: Timer,
   },
 ];

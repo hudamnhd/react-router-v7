@@ -134,10 +134,10 @@ export default function Route() {
   return (
     <React.Fragment>
       <div>
-        <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mb-2">
+        <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize my-2">
           Do'a
         </h1>
-        <Command className="rounded-lg border shadow-md max-w-4xl mx-auto">
+        <Command className="rounded-lg border shadow-md max-w-3xl mx-auto">
           <CommandInput className="text-md" placeholder="Cari doa..." />
           <CommandList className="max-h-[calc(100vh-200px)] h-full">
             <CommandEmpty>No results found.</CommandEmpty>

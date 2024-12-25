@@ -435,8 +435,6 @@ function Navbar({ children }) {
           </div>
         </div>
       </header>
-
-      <Separator className="h-2 bg-transparent" />
     </React.Fragment>
   );
 }

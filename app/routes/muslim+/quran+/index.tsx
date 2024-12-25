@@ -19,10 +19,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "#app/components/ui/tabs";
-import { Input } from "#app/components/ui/input";
-import { Badge } from "#app/components/ui/badge";
-import { Label } from "#app/components/ui/label";
-import { Button } from "#app/components/ui/button";
+import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 
 export function headers() {
   return {
@@ -32,20 +29,18 @@ export function headers() {
 
 export async function loader() {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
-  const [surat, juz] = await Promise.all([
-    api.get("surat/semua").json(),
-    api.get("juz/semua").json(),
-  ]);
+
+  const juz = await api.get("juz/semua").json();
 
   // Validasi respons
-  if (!surat.status || !juz.status) {
+  if (!juz.status) {
     throw new Response("Not Found", { status: 404 });
   }
 
   // Gabungkan data
   const data = {
     juz: juz.data,
-    surat: surat.data,
+    surat: daftar_surat,
   };
 
   return json(data, {
@@ -79,7 +74,7 @@ export default function Index() {
   const { juz, surat } = useLoaderData();
   const navigate = useNavigate();
   return (
-    <div>
+    <div className="mt-2">
       <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
         Al-Qur'an
       </h1>
@@ -98,7 +93,7 @@ export default function Index() {
         <TabsContent value="surat" className="w-full">
           <Command className="rounded-lg border shadow-md">
             <CommandInput placeholder="Cari surat..." />
-            <CommandList className="max-h-[calc(100vh-300px)] h-full">
+            <CommandList className="max-h-[calc(100vh-250px)] h-full">
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandSeparator />
               <CommandGroup heading="Surat Favorit">
@@ -176,7 +171,7 @@ export default function Index() {
         <TabsContent value="juz" className="w-full h-full">
           <Command className="rounded-lg border shadow-md">
             <CommandInput placeholder="Cari Juz..." />
-            <CommandList className="max-h-[calc(100vh-300px)] h-full">
+            <CommandList className="max-h-[calc(100vh-250px)] h-full">
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandSeparator />
               <CommandGroup heading="Daftar Juz">

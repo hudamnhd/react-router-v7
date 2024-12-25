@@ -11,6 +11,8 @@ export function headers() {
 }
 
 import ky from "ky";
+import { data as daftar_surat } from "#app/constants/daftar-surat.json";
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
   const { id } = params;
@@ -28,10 +30,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw new Response("Not Found", { status: 404 });
   }
 
+  const group_surat = ayat.data.reduce((result, item, index, array) => {
+    const no_surah = item.surah; // Ambil nomor surah
+    const detail = daftar_surat.find((d) => d.number === no_surah);
+
+    // Jika belum ada surah di result, inisialisasi dengan detail dan array kosong
+    if (!result[no_surah]) {
+      result[no_surah] = { surah: detail, ayat: [] };
+    }
+
+    // Tambahkan ayat ke array surah
+    result[no_surah].ayat.push(item);
+
+    return result;
+  }, {});
+
+  // console.log(Object.values(group_surat));
   // Gabungkan data
   const data = {
-    ayat: ayat.data,
-    surat: surat.data,
+    group_surat,
   };
 
   return json(data, {

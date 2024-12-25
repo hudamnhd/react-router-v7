@@ -17,8 +17,8 @@ export default function DzikrView() {
   const { dzikr } = data;
 
   return (
-    <div className="">
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mb-4">
+    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
+      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize my-4">
         Dzikir {getWaktuSekarang()}
       </h1>
 
@@ -34,14 +34,12 @@ export default function DzikrView() {
                 .replace(/@/g, "<br/><br/>")
                 .replace(/(\.)(\s|$)/g, "$1<br />");
               return (
-                <div
-                  key={index}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                  className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent/70 rounded-md `}
-                >
+                <div key={index} className="group relative p-4 sm:p-5 border-t">
                   <div>
                     <div className="space-y-1 mb-2">
-                      <h4 className="font-medium leading-none">{ayat.title}</h4>
+                      <div className="font-medium leading-none">
+                        {ayat.title}
+                      </div>
                       <div className="flex items-center gap-x-1 text-muted-foreground italic">
                         {ayat?.note && (
                           <span className="italic">{ayat.note}</span>
@@ -83,13 +81,8 @@ export default function DzikrView() {
                       />
                     </div>
 
-                    {ayat.faedah && (
-                      <Badge className="bg-lime-400 text-foreground dark:text-background">
-                        Faedah
-                      </Badge>
-                    )}
                     <div
-                      className="max-w-none prose text-muted-foreground italic"
+                      className="max-w-none prose text-muted-foreground italic pl-3 border-l-2"
                       dangerouslySetInnerHTML={{
                         __html: ayat.faedah,
                       }}
@@ -117,14 +110,12 @@ export default function DzikrView() {
                 .replace(/@/g, "<br/><br/>")
                 .replace(/(\.)(\s|$)/g, "$1<br />");
               return (
-                <div
-                  key={index}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                  className={`animate-slide-top [animation-fill-mode:backwards] group relative py-5 px-3 sm:px-5 hover:bg-accent/70 rounded-md `}
-                >
+                <div key={index} className="group relative p-4 sm:p-5 border-t">
                   <div>
                     <div className="space-y-1 mb-2">
-                      <h4 className="font-medium leading-none">{ayat.title}</h4>
+                      <div className="font-medium leading-none">
+                        {ayat.title}
+                      </div>
                       <div className="flex items-center gap-x-1 text-muted-foreground italic">
                         {ayat?.note && (
                           <span className="italic">{ayat.note}</span>
@@ -148,7 +139,7 @@ export default function DzikrView() {
                     </div>
                   </div>
                   <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                    <p
+                    <span
                       className="relative mt-2 text-right font-lpmq"
                       dangerouslySetInnerHTML={{
                         __html: arabicContent,
@@ -165,13 +156,8 @@ export default function DzikrView() {
                       />
                     </div>
 
-                    {ayat.faedah && (
-                      <Badge className="bg-lime-400 text-foreground dark:text-background">
-                        Faedah
-                      </Badge>
-                    )}
                     <div
-                      className="max-w-none prose text-muted-foreground italic"
+                      className="max-w-none prose text-muted-foreground italic pl-3 border-l-2"
                       dangerouslySetInnerHTML={{
                         __html: ayat.faedah,
                       }}
