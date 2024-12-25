@@ -17,11 +17,6 @@ import {
 import React, { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "#app/components/ui/popover";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -142,7 +137,7 @@ export default function Index() {
             <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
               ( {surat.name_short} )
             </span>
-            <div className="flex items-center sm:max-w-4xl mx-auto text-lg font-medium justify-center">
+            <div className="flex items-center text-lg font-medium justify-center">
               <span>Ayat {first_ayah}</span>
               <Minus />
               <span>Ayat {last_ayah}</span>
@@ -192,7 +187,7 @@ export default function Index() {
         </DrawerContent>
       </Drawer>
 
-      <div className="sm:max-w-4xl mx-auto">
+      <div className="">
         {ayat.map((d) => {
           const isFavorite = favorites.some((fav) => fav.id === d.id);
           const isLastRead = lastRead?.id === d.id;

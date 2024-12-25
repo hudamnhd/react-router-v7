@@ -172,6 +172,7 @@ const ListItem = ({ doa, index }) => {
   const value = index + doa.source;
   const [content, setContent] = React.useState(null);
   const renderCount = React.useRef(0);
+  const isDesktop = React.useRef(false);
   renderCount.current++;
 
   const runCommand = React.useCallback(() => {
@@ -181,12 +182,17 @@ const ListItem = ({ doa, index }) => {
   return (
     <React.Fragment>
       {content && (
-        <DialogResponsive content={content} runCommand={runCommand} />
+        <DialogResponsive
+          isDesktop={isDesktop.current}
+          content={content}
+          runCommand={runCommand}
+        />
       )}
       <CommandItem
         value={value}
         className="flex items-start gap-1.5 text-md"
         onSelect={() => {
+          isDesktop.current = window.innerWidth > 767;
           setContent(doa);
         }}
       >
@@ -198,25 +204,7 @@ const ListItem = ({ doa, index }) => {
   );
 };
 
-export const DialogResponsive = ({ content, runCommand }) => {
-  const [isDesktop, setIsDesktop] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth > 767);
-    };
-
-    // Pastikan listener hanya ditambahkan di client-side
-    if (typeof window !== "undefined") {
-      handleResize(); // Set initial value
-      window.addEventListener("resize", handleResize);
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
+export const DialogResponsive = ({ isDesktop, content, runCommand }) => {
   return (
     <React.Fragment>
       {isDesktop ? (
@@ -226,7 +214,7 @@ export const DialogResponsive = ({ content, runCommand }) => {
             if (!e) runCommand();
           }}
         >
-          <DialogContent className="sm:max-w-4xl mx-auto">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>{content.judul}</DialogTitle>
               <DialogDescription>sumber: {content.source}</DialogDescription>
@@ -257,7 +245,7 @@ export const DialogResponsive = ({ content, runCommand }) => {
             if (!e) runCommand();
           }}
         >
-          <DrawerContent className="sm:max-w-4xl mx-auto">
+          <DrawerContent>
             <DrawerHeader className="p-0 px-4 py-2">
               <DrawerTitle>{content.judul}</DrawerTitle>
               <DrawerDescription>sumber: {content.source}</DrawerDescription>

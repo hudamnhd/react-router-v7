@@ -17,7 +17,7 @@ export default function DzikrView() {
   const { dzikr } = data;
 
   return (
-    <div className="sm:max-w-4xl mx-auto">
+    <div className="">
       <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mb-4">
         Dzikir {getWaktuSekarang()}
       </h1>

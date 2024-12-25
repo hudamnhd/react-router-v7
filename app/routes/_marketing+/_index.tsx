@@ -23,8 +23,10 @@ export default function Example() {
             className="rounded-lg border p-4 hover:shadow-md"
           >
             <div className="mb-8 flex items-center justify-between">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-muted p-2">
-                {/*<LayoutGrid />*/}
+              <div
+                onClick={() => navigate(action.href)}
+                className="flex size-10 items-center justify-center rounded-lg bg-muted p-2"
+              >
                 <action.icon className="h-6 w-6" aria-hidden="true" />
               </div>
               <Button
@@ -36,7 +38,12 @@ export default function Example() {
               </Button>
             </div>
             <div>
-              <h2 className="mb-1 font-semibold">{action.title}</h2>
+              <h2
+                onClick={() => navigate(action.href)}
+                className="mb-1 font-semibold"
+              >
+                {action.title}
+              </h2>
               <p className="line-clamp-2 text-gray-500">{action.description}</p>
             </div>
           </div>

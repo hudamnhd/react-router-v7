@@ -188,18 +188,11 @@ function App() {
       allowIndexing={allowIndexing}
       env={data.ENV}
     >
-      <div className="flex h-screen flex-col justify-between">
-        <header>
-          <nav>
-            <Navbar>
-              <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
-            </Navbar>
-          </nav>
-        </header>
-        <div className="flex-1">
-          {/*<Frame size={500} color="#FFF" strokeWidth={3} />*/}
-          <Outlet />
-        </div>
+      <Navbar>
+        <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+      </Navbar>
+      <div className="px-3 2xl:px-0 2xl:container">
+        <Outlet />
       </div>
       <EpicToaster closeButton position="top-center" theme={theme} />
       <EpicProgress />
@@ -350,105 +343,100 @@ import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
 function Navbar({ children }) {
   return (
     <React.Fragment>
-      <div className="flex h-14 items-center px-4 border-b fixed w-full top-0 bg-transparent backdrop-blur-md z-10">
-        <div className="mr-4 hidden md:flex">
-          <NavLink className="mr-4 flex items-center gap-2 lg:mr-6" to="/">
-            {/*<svg
-              className="w-5 h-5 text-foreground"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 65 65"
-            >
-              <path
-                fill="currentColor"
-                d="M39.445 25.555 37 17.163 65 0 47.821 28l-8.376-2.445Zm-13.89 0L28 17.163 0 0l17.179 28 8.376-2.445Zm13.89 13.89L37 47.837 65 65 47.821 37l-8.376 2.445Zm-13.89 0L28 47.837 0 65l17.179-28 8.376 2.445Z"
-              ></path>
-            </svg>*/}
-            <Frame className="w-5 h-5 text-foreground -translate-y-[1px]" />
-            <span className="hidden font-bold lg:inline-block">Doti</span>
-          </NavLink>
+      <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container-wrapper">
+          <div className="px-3 2xl:px-0 2xl:container flex h-14 items-center">
+            <div className="mr-4 hidden md:flex">
+              <NavLink className="mr-4 flex items-center gap-2 lg:mr-6" to="/">
+                <Frame className="w-5 h-5 text-foreground -translate-y-[1px]" />
+                <span className="hidden font-bold lg:inline-block">Doti</span>
+              </NavLink>
+              <NavigationMenu>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="bg-transparent">
+                      Muslim
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                        {muslimLinks.map((component) => (
+                          <li key={component.title} title={component.title}>
+                            <NavigationMenuLink asChild>
+                              <NavLink
+                                to={component.href}
+                                className={cn(
+                                  "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                )}
+                              >
+                                <component.icon
+                                  size={20}
+                                  className="flex-none translate-y-[2px]"
+                                />
+                                <div>
+                                  <div className="font-medium leading-none">
+                                    {component.title}
+                                  </div>
+                                  <p className="line-clamp-2 leading-snug text-muted-foreground">
+                                    {component.description}
+                                  </p>
+                                </div>
+                              </NavLink>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="bg-transparent">
+                      Alat
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                        {toolsLinks.map((component) => (
+                          <li key={component.title} title={component.title}>
+                            <NavigationMenuLink asChild>
+                              <NavLink
+                                to={component.href}
+                                className={cn(
+                                  "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                )}
+                              >
+                                <component.icon
+                                  size={20}
+                                  className="flex-none translate-y-[2px]"
+                                />
+                                <div>
+                                  <div className="font-medium leading-none">
+                                    {component.title}
+                                  </div>
+                                  <p className="line-clamp-2 leading-snug text-muted-foreground">
+                                    {component.description}
+                                  </p>
+                                </div>
+                              </NavLink>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            </div>
 
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent">
-                  Muslim
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {muslimLinks.map((component) => (
-                      <li key={component.title} title={component.title}>
-                        <NavigationMenuLink asChild>
-                          <NavLink
-                            to={component.href}
-                            className={cn(
-                              "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                            )}
-                          >
-                            <component.icon
-                              size={20}
-                              className="flex-none translate-y-[2px]"
-                            />
-                            <div>
-                              <div className="font-medium leading-none">
-                                {component.title}
-                              </div>
-                              <p className="line-clamp-2 leading-snug text-muted-foreground">
-                                {component.description}
-                              </p>
-                            </div>
-                          </NavLink>
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent">
-                  Alat
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {toolsLinks.map((component) => (
-                      <li key={component.title} title={component.title}>
-                        <NavigationMenuLink asChild>
-                          <NavLink
-                            to={component.href}
-                            className={cn(
-                              "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-                            )}
-                          >
-                            <component.icon
-                              size={20}
-                              className="flex-none translate-y-[2px]"
-                            />
-                            <div>
-                              <div className="font-medium leading-none">
-                                {component.title}
-                              </div>
-                              <p className="line-clamp-2 leading-snug text-muted-foreground">
-                                {component.description}
-                              </p>
-                            </div>
-                          </NavLink>
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+            <NavbarMobile />
+            <div className="flex flex-1 items-center justify-between gap-2 md:justify-end">
+              <div className="w-full flex-1 md:w-auto md:flex-none">
+                <CommandMenu />
+              </div>
+              <nav className="flex items-center gap-0.5">{children}</nav>
+            </div>
+          </div>
         </div>
+      </header>
 
-        <NavbarMobile />
-        <div className="flex flex-1 items-center justify-between gap-2 md:justify-end">
-          <CommandMenu />
-          {children}
-        </div>
-      </div>
-      <Separator className="h-16 sm:h-[65px] bg-transparent" />
+      <Separator className="h-2 bg-transparent" />
     </React.Fragment>
   );
 }
