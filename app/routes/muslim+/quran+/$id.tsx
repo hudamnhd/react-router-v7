@@ -130,7 +130,7 @@ export default function Index() {
   if (!fetcher.data || fetcher.state !== "idle") return <Loader />;
 
   return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
+    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x divide-y">
       {Object.values(fetcher.data?.group_surat).map((d) => {
         const first_ayah = d.ayat[0]?.ayah;
         const last_ayah = d.ayat[d.ayat.length - 1]?.ayah;
@@ -205,7 +205,7 @@ export default function Index() {
                     <div className="border-t" key={dt.id}>
                       <div
                         className={cn(
-                          "group relative py-4 px-4 sm:px-5 md:border-t",
+                          "group relative py-4 px-4 sm:px-5",
                           isFavorite &&
                             "bg-gradient-to-b from-background via-background to-pink-400/50 dark:to-pink-600/50",
                           isLastRead &&

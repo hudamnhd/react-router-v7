@@ -45,8 +45,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return result;
   }, {});
 
-  // console.log(Object.values(group_surat));
-  // Gabungkan data
   const data = {
     group_surat,
   };
@@ -58,23 +56,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 }
 
-import { getCache, setCache, constructKey } from "#app/utils/cache-client.ts";
+// import { getCache, setCache, constructKey } from "#app/utils/cache-client.ts";
 
-export async function clientLoader({
-  request,
-  serverLoader,
-}: ClientLoaderFunctionArgs) {
-  const key = constructKey(request);
+// export async function clientLoader({
+//   request,
+//   serverLoader,
+// }: ClientLoaderFunctionArgs) {
+//   const key = constructKey(request);
+//
+//   const cachedData = await getCache(key);
+//
+//   if (cachedData) {
+//     return cachedData; // (3)
+//   }
+//
+//   const serverData = await serverLoader();
+//   await setCache(key, serverData);
+//   return serverData;
+// }
 
-  const cachedData = await getCache(key);
-
-  if (cachedData) {
-    return cachedData; // (3)
-  }
-
-  const serverData = await serverLoader();
-  await setCache(key, serverData);
-  return serverData;
-}
-
-clientLoader.hydrate = true;
+// clientLoader.hydrate = true;

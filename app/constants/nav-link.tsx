@@ -1,5 +1,6 @@
 import {
   Book,
+  Activity,
   Heart,
   Star,
   Bookmark,
@@ -40,10 +41,16 @@ const muslimLinks: {
     icon: Bookmark,
   },
   {
-    title: "Do'a",
+    title: "Kumpulan Do'a",
     href: "/muslim/doa",
     description: "Awali hari dengan doa untuk keberkahan hidup.",
     icon: Sun,
+  },
+  {
+    title: "Do'a Sehari-hari",
+    href: "/muslim/doa-sehari-hari",
+    description: "Awali hari dengan doa untuk keberkahan hidup.",
+    icon: Activity,
   },
 ];
 
