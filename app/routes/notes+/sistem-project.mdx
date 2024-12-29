@@ -1,0 +1,142 @@
+---
+title: Sistem Manajemen Magang Berbasis SmartContract
+description: Sistem Manajemen Magang Berbasis SmartContract
+published: 2024-11-18
+featured: true
+---
+
+# {frontmatter.title}
+
+Dokumentasi ini menjelaskan alur kerja dan arsitektur sistem manajemen magang yang menggunakan blockchain untuk menyimpan hasil akhir dan database tradisional untuk data sementara.
+
+---
+
+## Gambaran Umum
+
+Sistem ini dirancang untuk mengelola pengajuan dan penilaian magang dengan pendekatan fuzzy dari daftar mata kuliah yang ditentukan dengan kombinasi blockchain untuk penyimpanan hasil akhir yang aman dan database tradisional untuk data sementara. Fitur utama meliputi:
+
+1. **Koneksi Wallet**: Pengguna harus menghubungkan wallet MetaMask untuk berinteraksi dengan sistem.
+2. **Peran Pengguna**: Pengguna mendaftar sebagai **Admin** atau **Mahasiswa**.
+3. **Proses Magang**: Mahasiswa mengajukan pengajuan magang, yang ditinjau dan diproses oleh admin.
+4. **Penyimpanan Hasil Akhir**: Penilaian akhir dihitung oleh admin, disimpan di MySQL, dan blockchain.
+5. **Sertifikat Digital**: Mahasiswa dapat mengakses sertifikat berbasis blockchain dengan kode QR yang mengarah ke data yang disimpan di blockchain.
+
+---
+
+## Alur Kerja
+
+### 1. **Koneksi Wallet**
+
+- Ketika pengguna membuka aplikasi, mereka akan diminta untuk menghubungkan wallet MetaMask.
+- Setelah terhubung, alamat wallet diverifikasi dan digunakan sebagai pengenal unik untuk tindakan pengguna.
+
+### 2. **Registrasi Pengguna**
+
+- **Langkah 1**: Pengguna mendaftarkan detail mereka.
+- **Langkah 2**: Saat mendaftar, mereka memilih peran:
+  - **Admin**: Untuk mengelola pengajuan magang dan penilaian.
+  - **Mahasiswa**: Untuk mengajukan dan melihat data terkait magang.
+- **Popup MetaMask**: Registrasi diselesaikan dengan transaksi MetaMask untuk mengonfirmasi alamat wallet mereka.
+
+### 3. **Proses Login**
+
+- Setelah wallet terhubung, sistem memverifikasi peran pengguna dari data blockchain.
+- Arahkan berdasarkan peran:
+  - **Dashboard Admin**
+  - **Dashboard Mahasiswa**
+
+---
+
+### 4. **Fitur Peran Mahasiswa**
+
+#### a. **Ajukan Pengajuan Magang**
+
+- Mahasiswa mengisi formulir untuk mengajukan pengajuan magang.
+- Data disimpan di **database PlanetScale MySQL** menggunakan **Prisma ORM**.
+
+#### b. **Alur Magang**
+
+Alur kerja pengajuan magang mencakup langkah-langkah berikut:
+
+1. **Ajukan Pengajuan**: Data formulir disimpan di database.
+2. **Tinjauan Admin**: Admin meninjau pengajuan dan memperbarui status.
+3. **Umpan Balik/Resubmisi**: Jika diperlukan, mahasiswa mengajukan ulang pengajuan yang diperbarui.
+4. **Persetujuan Akhir**: Setelah disetujui, admin menyelesaikan pengajuan.
+
+#### c. **Lihat Hasil Akhir**
+
+- Setelah magang selesai dan dinilai, mahasiswa dapat melihat:
+  - **Nilai Penilaian**: Data diambil dari MySQL.
+  - **Sertifikat Digital**: Data berbasis blockchain yang dapat diakses melalui kode QR.
+
+---
+
+### 5. **Fitur Peran Admin**
+
+#### a. **Kelola Pengajuan Magang**
+
+Admin dapat:
+
+- Meninjau dan memperbarui status pengajuan.
+- Meminta revisi dari mahasiswa jika diperlukan.
+
+#### b. **Hitung Penilaian Akhir**
+
+- Admin menghitung nilai akhir berdasarkan semua input yang diajukan mahasiswa selama magang.
+- **Penyimpanan**:
+  - Detail penilaian disimpan di **MySQL**.
+  - Hasil akhir dan data sertifikat digital disimpan di **blockchain**.
+
+---
+
+## Integrasi Blockchain
+
+1. **Penyimpanan Hasil Akhir**:
+
+   - Nilai penilaian akhir disimpan di blockchain menggunakan smart contract.
+   - Hash transaksi digunakan sebagai bukti data yang disimpan.
+
+2. **Sertifikat Digital**:
+   - Mahasiswa dapat melihat sertifikat mereka melalui dashboard.
+   - Sertifikat mencakup kode QR yang mengarah ke catatan blockchain berdasarkan ID unik yang disimpan di MySQL.
+
+---
+
+## Teknologi yang Digunakan
+
+- **Frontend**: React + Tailwind CSS
+- **Backend**: Remix JS dengan Prisma ORM
+- **Database**: PlanetScale (MySQL)
+- **Blockchain**: Jaringan Ethereum Sepolia dengan Smart Contract
+- **Integrasi Wallet**: MetaMask
+- **Alat Tambahan**:
+  - Generator Kode QR untuk sertifikat digital.
+
+---
+
+## Alur Database dan Blockchain
+
+1. **Data Sementara**: Disimpan di **PlanetScale** menggunakan **Prisma ORM** selama tahap pengajuan dan peninjauan.
+2. **Data Akhir**: Disimpan di **blockchain** untuk pencatatan yang tidak dapat diubah dan transparan.
+
+---
+
+## Pengembangan di Masa Depan
+
+1. **Notifikasi Berdasarkan Peran**:
+   - Memberitahu mahasiswa tentang pembaruan status.
+   - Memberitahu admin tentang pengajuan yang tertunda.
+2. **Peningkatan Integrasi Blockchain**:
+   - Menggunakan sidechain untuk transaksi yang lebih cepat dan murah.
+3. **Pelaporan dan Analitik**:
+   - Laporan detail untuk admin tentang pengajuan magang dan hasilnya.
+
+---
+
+## Contoh Sertifikat QR
+
+Kode QR pada sertifikat digital akan mengarahkan ke halaman web yang menampilkan data yang disimpan di blockchain untuk verifikasi.
+
+Tautan yang dienkode dalam kode QR mengambil data dari blockchain berdasarkan hash transaksi.
+
+---

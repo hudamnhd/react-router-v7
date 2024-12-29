@@ -58,16 +58,6 @@ export const links: LinksFunction = () => {
     //These should match the css preloads above to avoid css as render blocking resource
     { rel: "icon", type: "image/svg+xml", href: "/favicons/favicon.svg" },
 
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    {
-      rel: "preconnect",
-      href: "https://fonts.gstatic.com",
-      crossOrigin: "anonymous",
-    },
-    {
-      rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap",
-    },
     { rel: "stylesheet", href: tailwindStyleSheetUrl },
   ].filter(Boolean);
 };
