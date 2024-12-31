@@ -298,22 +298,6 @@ export function ErrorBoundary() {
   );
 }
 
-// import {
-//   useFetcher,
-//   useLoaderData,
-//   useRouteLoaderData,
-//   Outlet,
-//   NavLink,
-//   useNavigate,
-// } from "react-router";
-
-const navItems = [
-  { to: "/muslim/sholawat", label: "Sholawat" },
-  { to: "/muslim/doa", label: "Do'a Harian" },
-  { to: "/muslim/dzikr", label: "Dzikr" },
-  { to: "/muslim/tahlil", label: "Tahlil" },
-  { to: "/muslim/quran-surat", label: "Qur'an" },
-];
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -432,6 +416,8 @@ import { Circle, Menu, Frame } from "lucide-react";
 import { type DialogProps } from "@radix-ui/react-dialog";
 import { cn } from "#app/utils/misc.tsx";
 
+import * as Dialog from "@radix-ui/react-dialog";
+
 // import { cn } from "~/lib/utils";
 // import { Button } from "@/registry/new-york/ui/button";
 import {
@@ -493,43 +479,40 @@ function CommandMenu({ ...props }: DialogProps) {
           <span className="text-sm">⌘</span>K
         </kbd>
       </Button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Cari menu..." />
 
-        <CommandList className="">
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandSeparator />
-          <CommandGroup heading="Daftar menu">
-            {[...muslimLinks, ...toolsLinks].map((navItem, index) => (
-              <CommandItem
-                key={index}
-                value={index}
-                className="flex items-center gap-1.5"
-                onSelect={() => {
-                  runCommand(() => navigate(navItem.href as string));
-                }}
-              >
-                <navItem.icon />
-                <span>{navItem.title}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <Dialog.Content className="fixed sm:left-[50%] sm:top-[50%] z-50 w-full sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] border sm:border-none bg-background sm:rounded-md inset-x-0 top-0 rounded-b-md p-2 sm:p-0">
+            <Command className="border rounded-lg my-1.5 sm:my-0">
+              <CommandInput placeholder="Cari menu..." />
+              <CommandList className="">
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandSeparator />
+                <CommandGroup heading="Daftar menu">
+                  {[...muslimLinks, ...toolsLinks].map((navItem, index) => (
+                    <CommandItem
+                      key={index}
+                      value={index}
+                      className="flex items-center gap-1.5 py-2.5"
+                      onSelect={() => {
+                        runCommand(() => navigate(navItem.href as string));
+                      }}
+                    >
+                      <navItem.icon />
+                      <span>{navItem.title}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 }
-
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "#app/components/ui/drawer";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 function NavbarMobile() {
   const [open, setOpen] = React.useState(false);
@@ -538,45 +521,43 @@ function NavbarMobile() {
     command();
   }, []);
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <button className="md:hidden -ml-2 mr-2 flex h-8 w-8 cursor-pointer items-center justify-center">
-          <Menu size={20} />
-        </button>
-      </DrawerTrigger>
-
-      <DrawerContent>
-        {/*<DrawerHeader>
-          <DrawerTitle>Navigation Menu</DrawerTitle>
-          <DrawerDescription>
-            This is a list of navigation menus.
-          </DrawerDescription>
-        </DrawerHeader>*/}
-
-        <nav className="flex flex-col items-start gap-3 p-4">
-          {[...muslimLinks, ...toolsLinks].map((item) => (
-            <NavLink
-              onClick={() => setOpen(false)}
-              key={item.href}
-              to={item.href}
-              className={({ isActive }) =>
-                [
-                  isActive ? "text-primary" : "text-primary/80",
-                  "font-medium transition-colors hover:text-primary",
-                ].join(" ")
-              }
-            >
-              {item.title}
-            </NavLink>
-          ))}
-        </nav>
-        {/*<DrawerFooter>
-          <Button>Submit</Button>
-          <DrawerClose>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>*/}
-      </DrawerContent>
-    </Drawer>
+    <React.Fragment>
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Trigger asChild>
+          <button className="md:hidden -ml-2 mr-2 flex h-8 w-8 cursor-pointer items-center justify-center">
+            <Menu size={20} />
+          </button>
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <Dialog.Content className="fixed z-50 w-full bg-background sm:rounded-md inset-x-0 bottom-0 rounded-t-xl px-2 pb-4 outline-none">
+            <Dialog.Close className="flex items-center justify-center w-full outline-none">
+              <div className="mx-auto mt-4 mb-3 h-2 w-[100px] rounded-full bg-muted" />
+            </Dialog.Close>
+            <nav className="flex flex-col items-start gap-0.5">
+              {[...muslimLinks, ...toolsLinks].map((item) => (
+                <NavLink
+                  onClick={runCommand}
+                  key={item.href}
+                  to={item.href}
+                  className={({ isActive }) =>
+                    [
+                      isActive ? "font-semibold bg-muted" : "",
+                      "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-1.5",
+                    ].join(" ")
+                  }
+                >
+                  <item.icon
+                    size={20}
+                    className="flex-none translate-y-[2px]"
+                  />
+                  <span>{item.title}</span>
+                </NavLink>
+              ))}
+            </nav>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </React.Fragment>
   );
 }

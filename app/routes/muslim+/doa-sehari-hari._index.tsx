@@ -60,7 +60,10 @@ export default function Route() {
           Do'a Sehari-hari
         </h1>
         <div className="w-fit mx-auto mb-2">
-          <a href="https://gist.github.com/autotrof/172eb06313bebaefbc88ec1b04da4fef">
+          <a
+            className="text-xs"
+            href="https://gist.github.com/autotrof/172eb06313bebaefbc88ec1b04da4fef"
+          >
             Source data
           </a>
         </div>
