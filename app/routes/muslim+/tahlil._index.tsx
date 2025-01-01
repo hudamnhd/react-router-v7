@@ -5,7 +5,7 @@ export default function Route() {
 
   return (
     <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mt-3 mb-4">
+      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-4">
         Tahlil
       </h1>
 

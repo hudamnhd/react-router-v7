@@ -5,10 +5,7 @@ import { useFetcher } from "@remix-run/react";
 
 export const action = async () => {
   const headers = new Headers();
-  headers.append(
-    "Clear-Site-Data",
-    '"cache", "cookies", "storage", "executionContexts"',
-  );
+  headers.append("Clear-Site-Data", '"cache", "cookies", "storage"');
   return json({ success: true }, { headers });
 };
 

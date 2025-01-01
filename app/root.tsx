@@ -124,83 +124,6 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ result: submission.reply() }, responseInit);
 }
 
-function Document({
-  children,
-  nonce,
-  theme = "light",
-  env = {},
-  allowIndexing = true,
-}: {
-  children: React.ReactNode;
-  nonce: string;
-  theme?: Theme;
-  env?: Record<string, string>;
-  allowIndexing?: boolean;
-}) {
-  return (
-    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
-      <head>
-        <ClientHintCheck nonce={nonce} />
-        <Meta />
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        {allowIndexing ? null : (
-          <meta name="robots" content="noindex, nofollow" />
-        )}
-        <Links />
-      </head>
-      <body className="bg-background text-foreground">
-        {children}
-        <script
-          nonce={nonce}
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(env)}`,
-          }}
-        />
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
-      </body>
-    </html>
-  );
-}
-
-function App() {
-  const data = useLoaderData<typeof loader>();
-  const nonce = data.nonce;
-  const theme = useTheme();
-  const allowIndexing = data.ENV.ALLOW_INDEXING !== "false";
-  useToast(data.toast);
-
-  return (
-    <Document
-      nonce={nonce}
-      theme={theme}
-      allowIndexing={allowIndexing}
-      env={data.ENV}
-    >
-      <Navbar>
-        <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
-      </Navbar>
-      <div className="px-3 2xl:px-0 2xl:container">
-        <Outlet />
-      </div>
-      <EpicToaster closeButton position="top-center" theme={theme} />
-      <EpicProgress />
-    </Document>
-  );
-}
-
-function AppWithProviders() {
-  const data = useLoaderData<typeof loader>();
-  return (
-    <HoneypotProvider {...data.honeyProps}>
-      <App />
-    </HoneypotProvider>
-  );
-}
-
-export default AppWithProviders;
-
 /**
  * @returns the user's theme preference, or the client hint theme if the user
  * has not set a preference.
@@ -323,7 +246,9 @@ function Navbar({ children }) {
             <div className="mr-4 hidden md:flex">
               <NavLink className="mr-4 flex items-center gap-2 lg:mr-6" to="/">
                 <Frame className="w-5 h-5 text-foreground -translate-y-[1px]" />
-                <span className="hidden font-bold lg:inline-block">Doti</span>
+                <span className="hidden font-bold lg:inline-block sm:text-sm text-base">
+                  Doti
+                </span>
               </NavLink>
               <NavigationMenu>
                 <NavigationMenuList>
@@ -332,7 +257,7 @@ function Navbar({ children }) {
                       Muslim
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                      <ul className="grid w-[400px] gap-2.5 p-2.5 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                         {muslimLinks.map((component) => (
                           <li key={component.title} title={component.title}>
                             <NavigationMenuLink asChild>
@@ -347,7 +272,7 @@ function Navbar({ children }) {
                                   className="flex-none translate-y-[2px]"
                                 />
                                 <div>
-                                  <div className="font-medium leading-none">
+                                  <div className="font-medium leading-none mb-1">
                                     {component.title}
                                   </div>
                                   <p className="line-clamp-2 leading-snug text-muted-foreground">
@@ -412,7 +337,7 @@ function Navbar({ children }) {
     </React.Fragment>
   );
 }
-import { Circle, Menu, Frame } from "lucide-react";
+import { TimerReset, Menu, Frame } from "lucide-react";
 import { type DialogProps } from "@radix-ui/react-dialog";
 import { cn } from "#app/utils/misc.tsx";
 
@@ -468,14 +393,14 @@ function CommandMenu({ ...props }: DialogProps) {
       <Button
         variant="outline"
         className={cn(
-          "relative h-8 w-full justify-start rounded-md bg-muted/50 font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64",
+          "relative h-8 w-full justify-start rounded-md bg-muted/50 font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64 sm:text-sm text-base",
         )}
         onClick={() => setOpen(true)}
         {...props}
       >
         <span className="hidden lg:inline-flex">Cari ...</span>
         <span className="inline-flex lg:hidden">Cari ...</span>
-        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.35rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.45rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
           <span className="text-sm">⌘</span>K
         </kbd>
       </Button>
@@ -483,10 +408,13 @@ function CommandMenu({ ...props }: DialogProps) {
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
-          <Dialog.Content className="fixed sm:left-[50%] sm:top-[50%] z-50 w-full sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] border sm:border-none bg-background sm:rounded-md inset-x-0 top-0 rounded-b-md p-2 sm:p-0">
-            <Command className="border rounded-lg my-1.5 sm:my-0">
-              <CommandInput placeholder="Cari menu..." />
-              <CommandList className="">
+          <Dialog.Content className="fixed sm:left-[50%] sm:top-[50%] z-50 w-full sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] border sm:border-none bg-background sm:rounded-xl inset-x-0 top-0 rounded-b-xl shadow-2xl p-2 sm:p-0 bg-background">
+            <Command className="rounded-lg my-1.5 sm:my-0">
+              <CommandInput
+                placeholder="Cari menu..."
+                className="sm:text-sm text-base"
+              />
+              <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandSeparator />
                 <CommandGroup heading="Daftar menu">
@@ -494,7 +422,7 @@ function CommandMenu({ ...props }: DialogProps) {
                     <CommandItem
                       key={index}
                       value={index}
-                      className="flex items-center gap-1.5 py-2.5"
+                      className="flex items-center gap-2.5 p-2.5"
                       onSelect={() => {
                         runCommand(() => navigate(navItem.href as string));
                       }}
@@ -503,6 +431,15 @@ function CommandMenu({ ...props }: DialogProps) {
                       <span>{navItem.title}</span>
                     </CommandItem>
                   ))}
+                  <CommandItem
+                    className="hover:bg-indigo-600 hover:text-foreground dark:hover:bg-indigo-400 flex items-center gap-2.5 py-2.5 sm:text-sm text-base"
+                    onSelect={() => {
+                      runCommand(() => navigate("/resources/reset" as string));
+                    }}
+                  >
+                    <TimerReset />
+                    <span>Reset data</span>
+                  </CommandItem>
                 </CommandGroup>
               </CommandList>
             </Command>
@@ -558,6 +495,92 @@ function NavbarMobile() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+    </React.Fragment>
+  );
+}
+
+function AppWithProviders() {
+  const data = useLoaderData<typeof loader>();
+
+  return (
+    <HoneypotProvider {...data.honeyProps}>
+      <App />
+    </HoneypotProvider>
+  );
+}
+
+// export default withSentry(AppWithProviders);
+export default AppWithProviders;
+
+function Document({
+  children,
+  nonce,
+  theme = "light",
+  env = {},
+}: {
+  children: React.ReactNode;
+  nonce: string;
+  theme?: Theme;
+  env?: Record<string, string>;
+  allowIndexing?: boolean;
+}) {
+  // const allowIndexing = ENV.ALLOW_INDEXING !== "false";
+  const allowIndexing = env.ALLOW_INDEXING !== "false";
+  return (
+    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
+      <head>
+        <ClientHintCheck nonce={nonce} />
+        <Meta />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        {allowIndexing ? null : (
+          <meta name="robots" content="noindex, nofollow" />
+        )}
+        <Links />
+      </head>
+      <body className="bg-background text-foreground ">
+        {children}
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(env)}`,
+          }}
+        />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+      </body>
+    </html>
+  );
+}
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  // if there was an error running the loader, data could be missing
+  const data = useLoaderData<typeof loader | null>();
+  // const nonce = useNonce();
+  const nonce = data.nonce;
+  const theme = useTheme();
+  return (
+    <Document theme={theme} nonce={nonce} env={data?.ENV}>
+      {children}
+    </Document>
+  );
+}
+
+function App() {
+  const data = useLoaderData<typeof loader>();
+  const theme = useTheme();
+  useToast(data.toast);
+
+  return (
+    <React.Fragment>
+      <Navbar>
+        <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+      </Navbar>
+      <div className="px-3 2xl:px-0 2xl:container">
+        <Outlet />
+      </div>
+      <EpicToaster closeButton position="top-center" theme={theme} />
+      <EpicProgress />
     </React.Fragment>
   );
 }

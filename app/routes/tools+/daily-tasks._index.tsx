@@ -3,7 +3,7 @@ import lodash from "lodash";
 import React, { useMemo, useState, useRef, useCallback } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
-import { Link } from "@remix-run/react";
+import { Link, useBeforeUnload } from "@remix-run/react";
 import { toast } from "sonner";
 import { Badge } from "#app/components/ui/badge";
 import { Label } from "#app/components/ui/label";
@@ -448,8 +448,6 @@ const Layout = () => {
     );
   }
 };
-
-import { useBeforeUnload } from "react-router-dom";
 
 const Unload = ({ data }) => {
   useBeforeUnload(
