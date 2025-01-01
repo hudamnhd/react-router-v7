@@ -1,21 +1,19 @@
 import { cn } from "#app/utils/misc.tsx";
-import * as Dialog from "@radix-ui/react-dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "#app/components/ui/drawer";
 import {
   useFetcher,
   useParams,
   useNavigate,
   useLoaderData,
 } from "@remix-run/react";
+
+import {
+  Dialog,
+  Heading,
+  DialogTrigger,
+  Button as ButtonTrigger,
+  Modal,
+  ModalOverlay,
+} from "react-aria-components";
 import React, { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import {
@@ -27,7 +25,6 @@ import {
   DropdownMenuTrigger,
 } from "#app/components/ui/dropdown-menu";
 import { Badge } from "#app/components/ui/badge";
-import { Separator } from "#app/components/ui/separator";
 import { Button } from "#app/components/ui/button";
 import {
   Bookmark,
@@ -139,7 +136,119 @@ export default function Index() {
         return (
           <React.Fragment key={d.surah.number}>
             <div className="prose dark:prose-invert max-w-none">
-              <Dialog.Root>
+              <React.Fragment>
+                <DialogTrigger type="modal">
+                  <ButtonTrigger className="w-full">
+                    <div className="text-3xl font-bold md:text-4xl w-fit mx-auto mt-2 mb-3">
+                      {d.surah.name_id}
+                      <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
+                        ( {d.surah.name_short} )
+                      </span>
+                      <div className="flex items-center text-base font-medium justify-center">
+                        Hal {params.id}
+                        <Dot />
+                        <span>Ayat {first_ayah}</span>
+                        <Minus />
+                        <span>{last_ayah}</span>
+                      </div>
+                    </div>
+                  </ButtonTrigger>
+                  <ModalOverlay
+                    isDismissable
+                    className={({ isEntering, isExiting }) =>
+                      cn(
+                        "fixed inset-0 z-50 bg-black/80",
+                        isEntering
+                          ? "animate-in fade-in duration-300 ease-out"
+                          : "",
+                        isExiting
+                          ? "animate-out fade-out duration-300 ease-in"
+                          : "",
+                      )
+                    }
+                  >
+                    <Modal
+                      className={({ isEntering, isExiting }) =>
+                        cn(
+                          "fixed z-50 w-full bg-background sm:rounded-md inset-x-0 bottom-0 px-2 pb-4 outline-none sm:max-w-3xl mx-auto",
+                          isEntering
+                            ? "animate-in slide-in-from-bottom duration-300"
+                            : "",
+                          isExiting
+                            ? "animate-out slide-out-to-bottom duration-300"
+                            : "",
+                        )
+                      }
+                    >
+                      <Dialog
+                        role="alertdialog"
+                        className="outline-none relative"
+                      >
+                        {({ close }) => (
+                          <div className="grid gap-2.5 px-2">
+                            <div className="w-fit mx-auto">
+                              <Button
+                                onPress={close}
+                                size="sm"
+                                className="mt-4 mb-3 h-2 w-[100px] rounded-full bg-muted"
+                              />
+                            </div>
+                            <p className="-translate-y-0 text-xl sm:text-2xl font-semibold font-lpmq-2 text-center mb-1.5">
+                              {d.surah.name_long}
+                            </p>
+                            <Heading>
+                              {d.surah.number}. {d.surah.name_id}
+                              <span className="ml-2 font-normal">
+                                ( {d.surah.translation_id} )
+                              </span>
+                            </Heading>
+
+                            <div className="flex items-center text-muted-foreground gap-1">
+                              <span>{d.surah.revelation_id}</span>
+                              <div className="w-2 relative">
+                                <Dot className="absolute -left-2 -top-3" />
+                              </div>
+                              <span>{d.surah.number_of_verses} ayat</span>
+                            </div>
+
+                            <div className="max-h-[70vh] overflow-y-auto">
+                              <div className="mb-4">
+                                <h3 className="font-bold text-lg">Tafsir</h3>
+                                <p className="prose max-w-none">
+                                  {d.surah.tafsir}
+                                </p>
+                              </div>
+
+                              <div className="mb-4">
+                                <h3 className="font-bold mb-1">Audio</h3>
+                                <audio controls className="w-full">
+                                  <source
+                                    src={d.surah.audio_url}
+                                    type="audio/mpeg"
+                                  />
+                                  Your browser does not support the audio
+                                  element.
+                                </audio>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-center w-full outline-none">
+                              <Button
+                                onPress={close}
+                                variant="outline"
+                                className="w-full"
+                              >
+                                <X />
+                                Close
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </Dialog>
+                    </Modal>
+                  </ModalOverlay>
+                </DialogTrigger>
+              </React.Fragment>
+              {/*<Dialog.Root>
                 <Dialog.Trigger asChild>
                   <div className="text-3xl font-bold md:text-4xl w-fit mx-auto mt-2 mb-3">
                     {d.surah.name_id}
@@ -201,7 +310,7 @@ export default function Index() {
                     </Dialog.Close>
                   </Dialog.Content>
                 </Dialog.Portal>
-              </Dialog.Root>
+              </Dialog.Root>*/}
 
               <div className="">
                 {d.ayat.map((dt) => {
@@ -245,24 +354,33 @@ export default function Index() {
                                 <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                               </div>
                             )}
-                            <DropdownMenu modal={false}>
-                              <DropdownMenuTrigger className="bg-muted p-2 rounded-xl">
-                                <Ellipsis className="fill-primary w-5 h-5" />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="left">
-                                <DropdownMenuItem
-                                  onClick={() => toggleFavorite(dt)}
-                                >
-                                  <Heart className="mr-2 w-4 h-4" /> Favorite
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleRead(dt)}
-                                >
-                                  <Bookmark className="mr-2 w-4 h-4" /> Terakhir
-                                  Baca
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <MenuTrigger>
+                              <Button
+                                aria-label="Menu"
+                                variant="secondary"
+                                size="icon"
+                                className="[&_svg]:size-5 rounded-xl h-9 w-9"
+                              >
+                                <Ellipsis />
+                              </Button>
+                              <Popover className=" bg-background p-1 w-56 overflow-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5 entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left">
+                                <Menu className="outline-none">
+                                  <ActionItem
+                                    id="new"
+                                    onAction={() => toggleFavorite(dt)}
+                                  >
+                                    <Heart className="mr-2 w-4 h-4" /> Favorite
+                                  </ActionItem>
+                                  <ActionItem
+                                    id="open"
+                                    onAction={() => handleRead(dt)}
+                                  >
+                                    <Bookmark className="mr-2 w-4 h-4" />{" "}
+                                    Terakhir Baca
+                                  </ActionItem>
+                                </Menu>
+                              </Popover>
+                            </MenuTrigger>
                           </div>
                         </div>
                         <div className="w-full text-right flex gap-x-2.5 items-end justify-end">
@@ -322,5 +440,16 @@ export default function Index() {
         </Button>
       </div>
     </div>
+  );
+}
+import { Menu, MenuItem, MenuTrigger, Popover } from "react-aria-components";
+import type { MenuItemProps } from "react-aria-components";
+
+function ActionItem(props: MenuItemProps) {
+  return (
+    <MenuItem
+      {...props}
+      className="bg-background relative flex gap-1.5 select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50  [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0"
+    />
   );
 }

@@ -338,13 +338,7 @@ function Navbar({ children }) {
   );
 }
 import { TimerReset, Menu, Frame } from "lucide-react";
-import { type DialogProps } from "@radix-ui/react-dialog";
 import { cn } from "#app/utils/misc.tsx";
-
-import * as Dialog from "@radix-ui/react-dialog";
-
-// import { cn } from "~/lib/utils";
-// import { Button } from "@/registry/new-york/ui/button";
 import {
   Command,
   CommandDialog,
@@ -357,144 +351,78 @@ import {
   CommandSeparator,
 } from "#app/components/ui/command";
 
-function CommandMenu({ ...props }: DialogProps) {
-  const navigate = useNavigate();
-
-  const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
-        if (
-          (e.target instanceof HTMLElement && e.target.isContentEditable) ||
-          e.target instanceof HTMLInputElement ||
-          e.target instanceof HTMLTextAreaElement ||
-          e.target instanceof HTMLSelectElement
-        ) {
-          return;
-        }
-
-        e.preventDefault();
-        setOpen((open) => !open);
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
-  const runCommand = React.useCallback((command: () => unknown) => {
-    setOpen(false);
-    command();
-  }, []);
-
-  return (
-    <>
-      <Button
-        variant="outline"
-        className={cn(
-          "relative h-8 w-full justify-start rounded-md bg-muted/50 font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64 sm:text-sm text-base",
-        )}
-        onClick={() => setOpen(true)}
-        {...props}
-      >
-        <span className="hidden lg:inline-flex">Cari ...</span>
-        <span className="inline-flex lg:hidden">Cari ...</span>
-        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.45rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-sm">⌘</span>K
-        </kbd>
-      </Button>
-
-      <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
-          <Dialog.Content className="fixed sm:left-[50%] sm:top-[50%] z-50 w-full sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] border sm:border-none bg-background sm:rounded-xl inset-x-0 top-0 rounded-b-xl shadow-2xl p-2 sm:p-0 bg-background">
-            <Command className="rounded-lg my-1.5 sm:my-0">
-              <CommandInput
-                placeholder="Cari menu..."
-                className="sm:text-sm text-base"
-              />
-              <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
-                <CommandSeparator />
-                <CommandGroup heading="Daftar menu">
-                  {[...muslimLinks, ...toolsLinks].map((navItem, index) => (
-                    <CommandItem
-                      key={index}
-                      value={index}
-                      className="flex items-center gap-2.5 p-2.5"
-                      onSelect={() => {
-                        runCommand(() => navigate(navItem.href as string));
-                      }}
-                    >
-                      <navItem.icon />
-                      <span>{navItem.title}</span>
-                    </CommandItem>
-                  ))}
-                  <CommandItem
-                    className="hover:bg-indigo-600 hover:text-foreground dark:hover:bg-indigo-400 flex items-center gap-2.5 py-2.5 sm:text-sm text-base"
-                    onSelect={() => {
-                      runCommand(() => navigate("/resources/reset" as string));
-                    }}
-                  >
-                    <TimerReset />
-                    <span>Reset data</span>
-                  </CommandItem>
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-    </>
-  );
-}
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-
 function NavbarMobile() {
-  const [open, setOpen] = React.useState(false);
-  const runCommand = React.useCallback((command: () => unknown) => {
-    setOpen(false);
-    command();
-  }, []);
+  const navigate = useNavigate();
   return (
     <React.Fragment>
-      <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Trigger asChild>
-          <button className="md:hidden -ml-2 mr-2 flex h-8 w-8 cursor-pointer items-center justify-center">
-            <Menu size={20} />
-          </button>
-        </Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
-          <Dialog.Content className="fixed z-50 w-full bg-background sm:rounded-md inset-x-0 bottom-0 rounded-t-xl px-2 pb-4 outline-none">
-            <Dialog.Close className="flex items-center justify-center w-full outline-none">
-              <div className="mx-auto mt-4 mb-3 h-2 w-[100px] rounded-full bg-muted" />
-            </Dialog.Close>
-            <nav className="flex flex-col items-start gap-0.5">
-              {[...muslimLinks, ...toolsLinks].map((item) => (
-                <NavLink
-                  onClick={runCommand}
-                  key={item.href}
-                  to={item.href}
-                  className={({ isActive }) =>
-                    [
-                      isActive ? "font-semibold bg-muted" : "",
-                      "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-1.5",
-                    ].join(" ")
-                  }
-                >
-                  <item.icon
-                    size={20}
-                    className="flex-none translate-y-[2px]"
-                  />
-                  <span>{item.title}</span>
-                </NavLink>
-              ))}
-            </nav>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <DialogTrigger type="modal">
+        <Button
+          variant="ghost"
+          className="focus-visible:ring-0 outline-none md:hidden -ml-2 mr-2 flex h-8 w-8 cursor-pointer items-center justify-center"
+        >
+          <Menu size={20} />
+        </Button>
+        <ModalOverlay
+          isDismissable
+          className={({ isEntering, isExiting }) =>
+            cn(
+              "fixed inset-0 z-50 bg-black/80",
+              isEntering ? "animate-in fade-in duration-300 ease-out" : "",
+              isExiting ? "animate-out fade-out duration-300 ease-in" : "",
+            )
+          }
+        >
+          <Modal
+            className={({ isEntering, isExiting }) =>
+              cn(
+                "fixed z-50 w-full bg-background sm:rounded-md inset-x-0 bottom-0 px-2 pb-4 outline-none",
+                isEntering
+                  ? "animate-in slide-in-from-bottom duration-300"
+                  : "",
+                isExiting ? "animate-out slide-out-to-bottom duration-300" : "",
+              )
+            }
+          >
+            <Dialog role="alertdialog" className="outline-none relative">
+              {({ close }) => (
+                <>
+                  <div className="w-fit mx-auto">
+                    <Button
+                      onPress={close}
+                      size="sm"
+                      className="mt-4 mb-3 h-2 w-[100px] rounded-full bg-muted"
+                    />
+                  </div>
+                  <nav className="flex flex-col items-start gap-0.5">
+                    {[...muslimLinks, ...toolsLinks].map((item) => (
+                      <NavLink
+                        onClick={() => {
+                          navigate(item.href as string);
+                          close();
+                        }}
+                        key={item.href}
+                        to={item.href}
+                        className={({ isActive }) =>
+                          [
+                            isActive ? "font-semibold bg-muted" : "",
+                            "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-1.5",
+                          ].join(" ")
+                        }
+                      >
+                        <item.icon
+                          size={20}
+                          className="flex-none translate-y-[2px]"
+                        />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    ))}
+                  </nav>
+                </>
+              )}
+            </Dialog>
+          </Modal>
+        </ModalOverlay>
+      </DialogTrigger>
     </React.Fragment>
   );
 }
@@ -584,3 +512,137 @@ function App() {
     </React.Fragment>
   );
 }
+
+import { ModalContext } from "react-aria-components";
+
+interface KeyboardModalTriggerProps {
+  keyboardShortcut: string;
+  children: React.ReactNode;
+}
+
+function KeyboardModalTrigger(props: KeyboardModalTriggerProps) {
+  let [isOpen, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
+        if (
+          (e.target instanceof HTMLElement && e.target.isContentEditable) ||
+          e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement ||
+          e.target instanceof HTMLSelectElement
+        ) {
+          return;
+        }
+
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [props.keyboardShortcut]);
+
+  return (
+    <ModalContext.Provider value={{ isOpen, onOpenChange: setOpen }}>
+      <Button
+        variant="outline"
+        className={cn(
+          "focus-visible:ring-0 outline-none relative h-8 w-full justify-start rounded-md bg-muted/50 font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64 sm:text-sm text-base",
+        )}
+        onPress={() => setOpen(true)}
+        {...props}
+      >
+        <span className="hidden lg:inline-flex">Cari ...</span>
+        <span className="inline-flex lg:hidden">Cari ...</span>
+        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.40rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+          <span className="text-sm">⌘</span>K
+        </kbd>
+      </Button>
+      {props.children}
+    </ModalContext.Provider>
+  );
+}
+
+import {
+  Dialog,
+  DialogTrigger,
+  Modal,
+  ModalOverlay,
+} from "react-aria-components";
+
+const CommandMenu = () => {
+  const navigate = useNavigate();
+  return (
+    <KeyboardModalTrigger keyboardShortcut="/">
+      <ModalOverlay
+        isDismissable
+        className={({ isEntering, isExiting }) =>
+          cn(
+            "fixed inset-0 z-50 bg-black/80",
+            isEntering ? "animate-in fade-in duration-200 ease-out" : "",
+            isExiting ? "animate-out fade-out duration-200 ease-in" : "",
+          )
+        }
+      >
+        <Modal
+          className={({ isEntering, isExiting }) =>
+            cn(
+              "fixed sm:left-[50%] sm:top-[50%] z-50 w-full sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] border-b sm:border-none bg-background sm:rounded-md inset-x-0 top-0 shadow-xl bg-background p-2 sm:p-0",
+              isEntering ? "animate-in slide-in-from-top duration-200" : "",
+              isExiting ? "animate-out slide-out-to-top duration-200" : "",
+            )
+          }
+        >
+          <Dialog role="alertdialog" className="outline-none relative">
+            {({ close }) => (
+              <>
+                <div>
+                  <Command className="rounded-lg border">
+                    <CommandInput
+                      placeholder="Cari menu..."
+                      className="sm:text-sm text-base"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No results found.</CommandEmpty>
+                      <CommandSeparator />
+                      <CommandGroup heading="Daftar menu">
+                        {[...muslimLinks, ...toolsLinks].map(
+                          (navItem, index) => (
+                            <CommandItem
+                              key={index}
+                              value={index}
+                              className="flex items-center gap-2.5 p-2.5"
+                              onSelect={() => {
+                                navigate(navItem.href as string);
+                                close();
+                              }}
+                            >
+                              <navItem.icon />
+                              <span>{navItem.title}</span>
+                            </CommandItem>
+                          ),
+                        )}
+                        <CommandItem
+                          className="flex items-center gap-2.5 p-2.5"
+                          onSelect={() => {
+                            navigate("/resources/reset" as string);
+                            close();
+                          }}
+                        >
+                          <TimerReset />
+                          <span>Reset data</span>
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </div>
+              </>
+            )}
+          </Dialog>
+        </Modal>
+      </ModalOverlay>
+    </KeyboardModalTrigger>
+  );
+};

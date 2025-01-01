@@ -655,7 +655,7 @@ const TimeTable = () => {
           <div className="text-right relative text-xs h-20 last:h-0" key={hour}>
             {now.getHours() === hour && (
               <div
-                className="absolute z- left-full translate-x-2 w-full h-[2px] dark:bg-red-400 bg-red-600"
+                className="absolute z-10 left-full translate-x-2 w-[calc(100vw-655px)] h-[2px] dark:bg-red-400 bg-red-600"
                 style={{
                   top: `${(now.getMinutes() / 60) * 100}%`,
                 }}
