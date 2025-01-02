@@ -38,6 +38,8 @@ import { useNonce } from "./utils/nonce-provider.ts";
 import { useRequestInfo } from "./utils/request-info.ts";
 import { type Theme, setTheme, getTheme } from "./utils/theme.server.ts";
 import { getToast } from "./utils/toast.server.ts";
+import { prefs } from "./utils/prefs.server";
+
 export const links: LinksFunction = () => {
   return [
     // Preload svg sprite as a resource to avoid render blocking
@@ -75,7 +77,8 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const { toast, headers: toastHeaders } = await getToast(request);
   const honeyProps = honeypot.getInputProps();
-
+  const cookieHeader = request.headers.get("Cookie");
+  const prefsCookie = (await prefs.parse(cookieHeader)) || {};
   return json(
     {
       requestInfo: {
@@ -88,6 +91,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       },
       ENV: getEnv(),
       nonce: context.cspNonce,
+      opts: prefsCookie?.opts,
       toast,
       honeyProps,
     },

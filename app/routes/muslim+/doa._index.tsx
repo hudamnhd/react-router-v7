@@ -7,9 +7,11 @@ import {
   BookOpen,
   Scroll,
   CheckCircle,
+  Activity,
   Circle,
   Heart,
   MapPin,
+  ExternalLink,
 } from "lucide-react";
 import {
   Dialog,
@@ -95,7 +97,7 @@ const sumberIcons = {
   quran: BookOpen,
   hadits: Scroll,
   pilihan: CheckCircle,
-  harian: Circle,
+  harian: Activity,
   ibadah: Heart,
   haji: MapPin,
   lainnya: Circle,
@@ -114,7 +116,8 @@ export default function Route() {
   const result = React.useMemo(
     () =>
       filteredData?.map((item) => ({
-        label: item.request.path.replace(/\//g, " "), // Ganti '/' dengan spasi
+        label: item.request.path.replace(/\//g, " ").replace(/sumber/gi, ""), // Ganti '/' dengan spasi
+        source: item.request.path.replace(/\//g, " ").trim().split(" ").pop(),
         data: item.data,
       })),
     [filteredData],
@@ -137,7 +140,9 @@ export default function Route() {
         <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize my-2">
           Do'a
         </h1>
-        <Command className="rounded-lg border shadow-md max-w-3xl mx-auto">
+
+        <TabDemo result={result} />
+        {/*<Command className="rounded-lg border shadow-md max-w-3xl mx-auto">
           <CommandInput className="text-md" placeholder="Cari doa..." />
           <CommandList className="max-h-[calc(100vh-200px)] h-full">
             <CommandEmpty>No results found.</CommandEmpty>
@@ -161,7 +166,7 @@ export default function Route() {
               </CommandGroup>
             </React.Fragment>
           </CommandList>
-        </Command>
+        </Command>*/}
       </div>
     </React.Fragment>
   );
@@ -279,3 +284,112 @@ export const DialogResponsive = ({ isDesktop, content, runCommand }) => {
     </React.Fragment>
   );
 };
+
+// Dependencies: pnpm install lucide-react
+
+import { Badge } from "#app/components/ui/badge";
+import { ScrollArea, ScrollBar } from "#app/components/ui/scroll-area";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "#app/components/ui/tabs";
+import {
+  Box,
+  ChartLine,
+  House,
+  PanelsTopLeft,
+  Settings,
+  UsersRound,
+} from "lucide-react";
+
+function TabDemo({ result }) {
+  return (
+    <Tabs defaultValue="quran">
+      <ScrollArea className="max-w-4xl mx-auto">
+        <TabsList className=" mb-3 h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
+          {result.map((d, actionIdx) => {
+            const Icon = sumberIcons[d.source] || Circle; // Default ke Dot jika tidak match
+            return (
+              <TabsTrigger
+                value={d.source}
+                key={actionIdx}
+                className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent"
+              >
+                <Icon
+                  size={16}
+                  strokeWidth={2}
+                  className="-ms-0.5 me-1.5 opacity-60"
+                />
+                <span className="font-semibold capitalize text-sm">
+                  {d.label}
+                </span>
+                <Badge
+                  className="ms-1.5 min-w-5 bg-primary/15 px-1"
+                  variant="secondary"
+                >
+                  {d.data?.length}
+                </Badge>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+
+      {result?.map((d) => (
+        <React.Fragment key={d.label}>
+          <TabsContent value={d.source}>
+            <Command className="rounded-lg border shadow-md sm:max-w-4xl mx-auto">
+              <CommandInput
+                className="text-md"
+                placeholder={`Cari doa ${d.source}...`}
+              />
+              <CommandList className="max-h-[calc(100vh-240px)] h-full">
+                <CommandEmpty>No results found.</CommandEmpty>
+                <React.Fragment key={d.label}>
+                  <CommandSeparator />
+                  <CommandGroup className="capitalize" heading={d.label}>
+                    {d.data.map((doa, index) => {
+                      const value = index + doa.source;
+                      return (
+                        <CommandItem
+                          key={index}
+                          value={value}
+                          className="w-full border-b"
+                        >
+                          <div className="group relative py-4 px-2 sm:px-4 rounded-md w-full">
+                            <h4 className="font-medium text-lg mb-2">
+                              {doa.judul}
+                            </h4>
+                            <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
+                              <p
+                                className="relative mt-2 font-lpmq text-right text-primary"
+                                dangerouslySetInnerHTML={{
+                                  __html: doa.arab,
+                                }}
+                              />
+                            </div>
+                            <div className="mt-3 space-y-3">
+                              <div
+                                className="translation-text prose text-muted-foreground max-w-none"
+                                dangerouslySetInnerHTML={{
+                                  __html: doa.indo,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                </React.Fragment>
+              </CommandList>
+            </Command>
+          </TabsContent>
+        </React.Fragment>
+      ))}
+    </Tabs>
+  );
+}

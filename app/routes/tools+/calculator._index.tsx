@@ -82,7 +82,7 @@ const Calculator: React.FC = () => {
   const lastOperator = getLastOperator(currentInput);
   // Fungsi untuk menambahkan input ke kalkulator
 
-  const handleButtonClick = (value: string) => {
+  const handleButtonPress = (value: string) => {
     setCurrentInput((prev) => {
       // Jika input kosong dan value "0", "00", atau "000", hanya tambahkan satu "0"
       if (prev === "" && /^[0]+$/.test(value)) return "0";
@@ -466,28 +466,28 @@ const Calculator: React.FC = () => {
         {/* Calculator Buttons */}
         {/*biome-ignore format: the code should not be formatted*/}
         <div className="grid grid-cols-4 gap-2">
-            <Button size="lg" className="font-normal text-3xl" onClick={handleClear}>C</Button>
-            <Button size="lg" className="[&_svg]:size-7"  onClick={() => handleOperatorClick("*")}><X strokeWidth={2} /></Button>
-            <Button size="lg" onClick={() => handleOperatorClick("/")}><div className="text-3xl font-medium pb-1">÷</div></Button>
-            <Button size="lg" variant="destructive" className="[&_svg]:size-6"  onClick={handleBackspace}><Delete strokeWidth={2} /></Button>
+            <Button size="lg" className="font-normal text-3xl" onPress={handleClear}>C</Button>
+            <Button size="lg" className="[&_svg]:size-7"  onPress={() => handleOperatorClick("*")}><X strokeWidth={2} /></Button>
+            <Button size="lg" onPress={() => handleOperatorClick("/")}><div className="text-3xl font-medium pb-1">÷</div></Button>
+            <Button size="lg" variant="destructive" className="[&_svg]:size-6"  onPress={handleBackspace}><Delete strokeWidth={2} /></Button>
 
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("7")}>7</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("8")}>8</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("9")}>9</Button>
-            <Button className="[&_svg]:size-7"  size="lg"  onClick={() => handleOperatorClick("-")}><Minus strokeWidth={2} /></Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("4")}>4</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("5")}>5</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("6")}>6</Button>
-            <Button className="[&_svg]:size-7 duration-300"  size="lg"  onClick={() => handleOperatorClick("+")}><Plus strokeWidth={2} /></Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("7")}>7</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("8")}>8</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("9")}>9</Button>
+            <Button className="[&_svg]:size-7"  size="lg"  onPress={() => handleOperatorClick("-")}><Minus strokeWidth={2} /></Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("4")}>4</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("5")}>5</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("6")}>6</Button>
+            <Button className="[&_svg]:size-7 duration-300"  size="lg"  onPress={() => handleOperatorClick("+")}><Plus strokeWidth={2} /></Button>
 
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("1")}>1</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("2")}>2</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("3")}>3</Button>
-            <Button className="[&_svg]:size-7"  size="lg"   onClick={handleEvaluate}><Equal strokeWidth={2} /></Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("0")}>0</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("00")}>00</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick("000")}>000</Button>
-            <Button className="font-medium text-3xl" size="lg" variant="outline" onClick={() => handleButtonClick(".")}>.</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("1")}>1</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("2")}>2</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("3")}>3</Button>
+            <Button className="[&_svg]:size-7"  size="lg"   onPress={handleEvaluate}><Equal strokeWidth={2} /></Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("0")}>0</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("00")}>00</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress("000")}>000</Button>
+            <Button className="font-medium text-3xl" size="lg" variant="outline" onPress={() => handleButtonPress(".")}>.</Button>
         </div>
         {/*biome-ignore format: the code should not be formatted*/}
       </div>

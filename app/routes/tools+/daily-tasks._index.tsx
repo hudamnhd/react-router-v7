@@ -73,7 +73,7 @@ import {
 } from "#app/components/ui/popover";
 import { AutosizeTextarea } from "#app/components/ui/autosize-textarea";
 import { cn } from "#app/utils/misc";
-import { Button, buttonVariants } from "#app/components/ui/button";
+import { Button, buttonVariants } from "#app/components/ui/button-shadcn";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 
 let initial_data = true;
@@ -637,22 +637,9 @@ const TaskApp = ({
                 buttonVariants({ size: "icon", variant: "secondary" }),
               )}
             >
-              <BadgeIcon />
-            </PopoverTrigger>
-            <PopoverContent className="w-fit p-1 rounded-lg">
-              <WeeklyBadge total_sessions={total_sessions} />
-            </PopoverContent>
-          </Popover>
-
-          <Popover>
-            <PopoverTrigger
-              className={cn(
-                buttonVariants({ size: "icon", variant: "secondary" }),
-              )}
-            >
               <Activity />
             </PopoverTrigger>
-            <PopoverContent className="w-fit p-0 rounded-lg">
+            <PopoverContent className="w-fit p-0">
               <List03 tasks={todos} />
             </PopoverContent>
           </Popover>
@@ -1850,18 +1837,11 @@ const WeeklyBadge: React.FC<WeeklyBadgeProps> = ({ total_sessions }) => {
 function List03({ tasks }) {
   const flattenedSubTasks = tasks.flatMap((task) => task.sub_tasks);
   const subtask_checked = flattenedSubTasks.filter((d) => d.checked).length;
-  const date = new Date(); // Mendapatkan tanggal sekarang
+  const date = new Date();
   const formattedDate = format(date, "MMMM dd, yyyy"); // Format menjadi "June 12, 2024"
   return (
-    <div
-      className={cn(
-        "w-full max-w-md mx-auto",
-        "bg-white dark:bg-zinc-900",
-        "border border-zinc-200 dark:border-zinc-800",
-        "rounded-2xl shadow-lg",
-      )}
-    >
-      <div className="p-4 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800">
+    <div className={cn("w-full max-w-xl mx-auto")}>
+      <div className="p-4 flex items-center gap-x-2 justify-between border-b border-zinc-200 dark:border-zinc-800">
         <div>
           <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
             Today's Tasks

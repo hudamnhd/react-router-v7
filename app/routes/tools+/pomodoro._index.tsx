@@ -104,7 +104,7 @@ const App: React.FC = () => {
       <div className="my-4 grid grid-cols-3 gap-2">
         <Button
           variant={mode === MODE.POMO ? "default" : "outline"}
-          onClick={() => handleModeChange(MODE.POMO)}
+          onPress={() => handleModeChange(MODE.POMO)}
         >
           <Activity />
           <span className="sm:flex hidden">Pomodoro</span>
@@ -112,7 +112,7 @@ const App: React.FC = () => {
         </Button>
         <Button
           variant={mode === MODE.SHORTBREAK ? "default" : "outline"}
-          onClick={() => handleModeChange(MODE.SHORTBREAK)}
+          onPress={() => handleModeChange(MODE.SHORTBREAK)}
         >
           <Coffee />
           <span className="sm:flex hidden">Short Break</span>
@@ -120,7 +120,7 @@ const App: React.FC = () => {
         </Button>
         <Button
           variant={mode === MODE.LONGBREAK ? "default" : "outline"}
-          onClick={() => handleModeChange(MODE.LONGBREAK)}
+          onPress={() => handleModeChange(MODE.LONGBREAK)}
         >
           <Coffee />
           <span className="sm:flex hidden">Long Break</span>
@@ -136,7 +136,7 @@ const App: React.FC = () => {
           <div className="flex flex-col justify-center items-center">
             {mode !== "Pomo" ? (
               <Button
-                onClick={() => setIsRunning(!isRunning)}
+                onPress={() => setIsRunning(!isRunning)}
                 variant="ghost"
                 size="icon"
                 className={`h-16 w-16 [&_svg]:size-10 transition-all duration-500 ease-in-out animate-roll-reveal [animation-fill-mode:backwards] z-10 mx-auto p-0 rounded-full`}
@@ -152,7 +152,7 @@ const App: React.FC = () => {
               </Button>
             ) : (
               <Button
-                onClick={() => setIsRunning(!isRunning)}
+                onPress={() => setIsRunning(!isRunning)}
                 variant="ghost"
                 size="icon"
                 className={`h-16 w-16 [&_svg]:size-10 transition-all duration-500 ease-in-out animate-roll-reveal [animation-fill-mode:backwards] z-10 mx-auto p-0 rounded-full`}
@@ -214,13 +214,13 @@ const App: React.FC = () => {
 
       {/* Controls */}
       <div className="grid grid-cols-2 gap-2 sm:w-[70%] mx-auto">
-        <Button onClick={() => setIsRunning(!isRunning)}>
+        <Button onPress={() => setIsRunning(!isRunning)}>
           {isRunning ? <Pause /> : <Play />}
           {isRunning ? "Pause" : "Start"}
         </Button>
         <Button
           variant="secondary"
-          onClick={() => {
+          onPress={() => {
             setIsRunning(false);
             setTimeLeft(durations[mode]);
           }}
