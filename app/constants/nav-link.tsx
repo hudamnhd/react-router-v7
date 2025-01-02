@@ -8,6 +8,7 @@ import {
   List,
   Calculator,
   Timer,
+  Repeat,
 } from "lucide-react";
 
 const muslimLinks: {
@@ -77,6 +78,12 @@ const toolsLinks: {
     href: "/tools/pomodoro",
     description: "Simple Pomodoro",
     icon: Timer,
+  },
+  {
+    title: "Habit",
+    href: "/tools/habit",
+    description: "Simple Habit tracker",
+    icon: Repeat,
   },
 ];
 

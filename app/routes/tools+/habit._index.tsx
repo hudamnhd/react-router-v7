@@ -13,46 +13,24 @@ import {
   isTomorrow,
   isWeekend,
   isYesterday,
+  isBefore,
   startOfMonth,
   startOfWeek,
+  subDays,
+  addDays,
   subMonths,
   subWeeks,
 } from "date-fns";
-import { Button } from "#app/components/ui/button";
+import { Button } from "#app/components/ui/button-shadcn";
+import { Input } from "#app/components/ui/input";
 
 import {
   Circle,
+  Plus,
   PencilLine,
   Trash2,
-  Activity,
-  ArrowRight,
-  Badge as BadgeIcon,
   Check,
-  CheckCircle2,
-    CircleCheckBig,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsUpDown,
-  Circle,
   CircleCheckBig,
-  CirclePlus,
-  Coffee,
-  Crosshair,
-  Download,
-  EllipsisVertical,
-  Flame,
-  GripVertical,
-  History,
-  Info,
-  MoreHorizontal,
-  Pause,
-  Play,
-  Plus,
-  Rocket,
-  Squircle,
-  Trash2,
-  Trees,
-  Upload,
   X,
 } from "lucide-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
@@ -78,6 +56,12 @@ const HabitTracker: React.FC = () => {
 
   const today = new Date();
   const monthName = format(startOfMonth(today), "MMMM yyyy");
+  const currentWeek = eachDayOfInterval({
+    start: subDays(today, 2), // 2 hari yang lalu
+    end: addDays(today, 1), // 1 hari ke depan
+    // start: startOfWeek(today, { weekStartsOn: 1 }), // Mulai minggu, Senin (weekStartsOn: 1)
+    // end: endOfWeek(today, { weekStartsOn: 1 }), // Akhir minggu, Minggu
+  });
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(today),
     end: endOfMonth(today),
@@ -155,106 +139,167 @@ const HabitTracker: React.FC = () => {
       editHabitName(habitId, newName);
     }
   };
+  function getStatistics(habits) {
+    const stats = {};
 
+    // Hitung total habits di awal
+    const totalHabits = habits.length;
+
+    for (const habit of habits) {
+      for (const [date, completed] of Object.entries(habit.dates)) {
+        if (!stats[date]) {
+          // Inisialisasi hanya completed, total disamakan untuk semua tanggal
+          stats[date] = { total: totalHabits, completed: 0 };
+        }
+        if (completed) {
+          stats[date].completed += 1;
+        }
+      }
+    }
+
+    return stats;
+  }
+
+  // Hitung statistik
+  const statistics = getStatistics(habits);
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Habit Tracker {monthName}</h1>
+    <div className="grid xl:grid-cols-2 gap-5 sm:p-4 place-items-center max-w-4xl sm:max-w-full  w-full">
+      <div className="max-w-md w-full">
+        <h1 className="text-2xl font-bold mt-2 mb-4 sm:text-start text-center">
+          {monthName}
+        </h1>
 
-      {/* Add Habit Input */}
-      <div className="flex mb-4">
-        <input
-          type="text"
-          value={newHabit}
-          onChange={(e) => setNewHabit(e.target.value)}
-          placeholder="Enter a new habit"
-          className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-        />
-        <button
-          onClick={addHabit}
-          className="ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-        >
-          Add Habit
-        </button>
-      </div>
-
-      {/* Habit Table */}
-      <div className="overflow-x-auto">
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 p-2">Habit</th>
-              {daysInMonth.map((date) => (
-                <th
-                  key={date.toString()}
-                  className="border border-gray-300 p-2 text-center"
-                  title={format(date, "EEEE, MMM d")}
+        <div className="grid grid-cols-7 justify-center place-items-strecth rounded-lg max-w-md border  p-0.5">
+          <React.Fragment>
+            <div className="text-sm  font-bold col-span-3 py-1 flex items-center justify-center border-r-2 border-b">
+              Habit
+            </div>
+            {currentWeek.map((date, index) => {
+              const today = isToday(date);
+              return (
+                <div
+                  key={date}
+                  className={cn(
+                    "flex flex-col items-center uppercase font-semibold text-sm py-2 border-b",
+                    today && "bg-accent",
+                  )}
                 >
-                  {format(date, "d")}
-                </th>
-              ))}
-              <th className="border border-gray-300 p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {habits.map((habit) => (
-              <tr key={habit.id}>
-                <td className="border border-gray-300 p-2">{habit.name}</td>
-                {daysInMonth.map((date) => {
+                  <span>{format(date, "EEE")}</span>
+                  <span className="text-muted-foreground">
+                    {format(date, "d")}
+                  </span>
+                </div>
+              );
+            })}
+          </React.Fragment>
+
+          {habits.map((habit, index) => {
+            const last_index = habits.length - 1 === index;
+            return (
+              <React.Fragment key={habit.id}>
+                <div
+                  className={cn(
+                    "group col-span-3 p-2 border-r-2 border-b",
+                    last_index && "border-b-0",
+                  )}
+                >
+                  <div className="group-hover:hidden block">{habit.name}</div>
+                  <div className="group-hover:flex hidden gap-x-2 text-center justify-center">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => handleEditHabit(habit.id)}
+                    >
+                      <PencilLine />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="h-6 w-6"
+                      onClick={() => deleteHabit(habit.id)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </div>
+                {currentWeek.map((date) => {
                   const formattedDate = format(date, "yyyy-MM-dd");
                   const isCompleted = habit.dates[formattedDate] || false;
 
+                  const td = new Date();
+                  const todayStart = new Date(
+                    td.getFullYear(),
+                    td.getMonth(),
+                    td.getDate(),
+                  );
+                  const yesterday = isBefore(date, todayStart);
+                  const today = isToday(date);
+
                   return (
-                    <td
+                    <div
                       key={formattedDate}
-                      className="border border-gray-300 p-2 text-center"
+                      className={cn(
+                        "p-2 border-b ",
+                        today && "bg-accent",
+                        last_index && "border-b-0",
+                      )}
                     >
-                      <Button
-                        size="icon"
-                        className={cn(
-                          "[&_svg]:size-5 ",
-                          isCompleted &&
-                            "bg-green-600 dark:bg-green-500 hover:bg-green-500 dark:hover:bg-green-600 ",
-                        )}
-                        onClick={() =>
-                          toggleHabitCompletion(habit.id, formattedDate)
-                        }
-                        variant={isCompleted ? "default" : "outline"}
-                      >
-                        {isCompleted ? (
-                          <CircleCheckBig />
-                        ) : (
-                          <Circle className="text-muted-foreground opacity-50" />
-                        )}
-                      </Button>
-                    </td>
+                      <div className="group flex flex-col items-center gap-y-2 relative transition-all duration-500 ease-in-out">
+                        <button
+                          disabled={!today}
+                          onClick={() =>
+                            toggleHabitCompletion(habit.id, formattedDate)
+                          }
+                          className={cn(
+                            "flex h-6 w-6 items-center justify-center rounded-full",
+                            !isCompleted &&
+                              "bg-gray-300 dark:bg-gray-700 text-white",
+                            today && "bg-foreground/50 dark:bg-foreground",
+                            isCompleted &&
+                              "bg-green-500 dark:bg-green-500 text-white",
+                            yesterday &&
+                              !isCompleted &&
+                              "bg-red-500 dark:bg-red-500 text-white",
+                          )}
+                        >
+                          <span>
+                            {isCompleted ? (
+                              <Check />
+                            ) : yesterday && !isCompleted ? (
+                              <X />
+                            ) : (
+                              ""
+                            )}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
                   );
                 })}
-                <td className="flex gap-x-2 p-2 text-center">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleEditHabit(habit.id)}
-                  >
-                    <PencilLine />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    onClick={() => deleteHabit(habit.id)}
-                  >
-                    <Trash2 />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        {/* Add Habit Input */}
+        <div className="flex gap-2 mt-4 w-full">
+          <Input
+            type="text"
+            value={newHabit}
+            onChange={(e) => setNewHabit(e.target.value)}
+            placeholder="Enter a new habit"
+          />
+          <Button size="icon" variant="outline" onClick={addHabit}>
+            <Plus />
+          </Button>
+        </div>
       </div>
+      <CalendarMonth total_sessions={6} statistics={statistics} />
     </div>
   );
 };
 
-const CalendarMonth = ({ total_sessions }) => {
+const CalendarMonth = ({ total_sessions, statistics }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [daysInMonth, setDaysInMonth] = useState([]);
 
@@ -299,11 +344,8 @@ const CalendarMonth = ({ total_sessions }) => {
   };
 
   return (
-    <div className="bg-background">
-      <div className="flex justify-start items-center gap-3 items-center mb-4">
-        <h2 className="text-xl font-semibold">
-          {format(currentMonth, "MMMM yyyy")}
-        </h2>
+    <div className="bg-background w-full max-w-md sm:max-w-full border p-2 rounded-lg">
+      <div className="flex justify-center sm:justify-start items-center gap-3 items-center mb-4">
         <Button
           onClick={handlePreviousMonth}
           variant="outline"
@@ -312,6 +354,9 @@ const CalendarMonth = ({ total_sessions }) => {
           <span className="sr-only">Go to previous page</span>
           <ChevronLeftIcon className="h-4 w-4" />
         </Button>
+        <h2 className="text-xl font-semibold">
+          {format(currentMonth, "MMMM yyyy")}
+        </h2>
         <Button
           onClick={handleNextMonth}
           variant="outline"
@@ -321,7 +366,7 @@ const CalendarMonth = ({ total_sessions }) => {
           <ChevronRightIcon className="h-4 w-4" />
         </Button>
       </div>
-      <div className="flex gap-10">
+      <div className="flex gap-10 items-start">
         <div className="w-full grid grid-cols-7 items-center justify-center gap-3">
           {/* Header hari (Senin, Selasa, Rabu, dll.) */}
           <div className="rounded-t border-b text-center font-bold">Mo</div>
@@ -334,10 +379,12 @@ const CalendarMonth = ({ total_sessions }) => {
 
           {daysInMonth.map((day, index) => {
             const dataKey = day ? format(day, "yyyy-MM-dd") : null;
+            const sessions = total_sessions[dataKey] || 0;
+            const statistic = statistics[dataKey] || { total: 0, completed: 0 };
             return (
               <div
                 key={index}
-                className={`rounded-lg cursor-pointer
+                className={`flex flex-col items-center rounded-lg cursor-pointer
             ${day ? "" : "bg-transparent"}  // Handle empty cells
             ${isToday(day) ? "" : ""}
             ${isWeekend(day) ? "" : ""}`}
@@ -345,14 +392,200 @@ const CalendarMonth = ({ total_sessions }) => {
                 <div className="text-center">{day ? format(day, "d") : ""}</div>
                 {day && (
                   <button data-state="closed">
-                    {/*<FocusDisplay total_sessions={sessions} />*/}
+                    <FocusDisplay
+                      statistic={statistic}
+                      total_sessions={sessions}
+                    />
                   </button>
                 )}
               </div>
             );
           })}
         </div>
+        <div className="sm:block hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
+          <div className="">Perisai fokus</div>
+          <hr className="my-3" />
+          <FocusList />
+        </div>
       </div>
+    </div>
+  );
+};
+
+const FocusDisplay = ({ statistic, total_sessions, isBtn }) => {
+  return <div>{getFocusComponent(statistic, total_sessions, isBtn)}</div>;
+};
+
+const focusSessions = [
+  {
+    minFocus: 16,
+    sessions: "≥ 16 sesi fokus",
+    styles: {
+      outerBorder:
+        "border-white bg-gradient-to-r from-blue-500 to-blue-300 ring-4 ring-orange-400",
+      middleBorder:
+        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    minFocus: 12,
+    sessions: "≥ 12 sesi fokus",
+    styles: {
+      outerBorder: "border-blue-500 bg-gradient-to-r from-blue-500 to-blue-300",
+      middleBorder:
+        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    minFocus: 4,
+    sessions: "≥ 4 sesi fokus",
+    styles: {
+      outerBorder: "border-gray-300",
+      middleBorder:
+        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    minFocus: 1,
+    sessions: "≥ 1 sesi fokus",
+    styles: {
+      outerBorder: "border-gray-300",
+      middleBorder: "border-gray-300",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    minFocus: 0,
+    sessions: "0 sesi fokus",
+    styles: {
+      outerBorder: "border-gray-300",
+      middleBorder: "border-gray-300",
+      innerBorder: "border-gray-300",
+    },
+  },
+];
+
+const habitBadges = [
+  {
+    level: 1,
+    badge: "Complete Mastery",
+    styles: {
+      outerBorder:
+        "border-white bg-gradient-to-r from-blue-500 to-blue-300 ring-4 ring-orange-400",
+      middleBorder:
+        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    level: 0.75,
+    badge: "Great Progress",
+    styles: {
+      outerBorder: "border-blue-500 bg-gradient-to-r from-blue-500 to-blue-300",
+      middleBorder:
+        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    level: 0.5,
+    badge: "Good Effort",
+    styles: {
+      outerBorder: "border-gray-300",
+      middleBorder:
+        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    level: 0.25,
+    badge: "Needs Improvement",
+    styles: {
+      outerBorder: "border-gray-300",
+      middleBorder: "border-gray-300",
+      innerBorder:
+        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
+    },
+  },
+  {
+    level: 0.0,
+    badge: "Just Starting",
+    styles: {
+      outerBorder: "border-gray-300",
+      middleBorder: "border-gray-300",
+      innerBorder: "border-gray-300",
+    },
+  },
+];
+
+// Fungsi untuk menghitung persentase dan menentukan badge
+function getHabitBadge(totalHabits, completedHabits) {
+  if (totalHabits === 0) return habitBadges[habitBadges.length - 1]; // Jika tidak ada habit
+  const progress = completedHabits / totalHabits;
+  for (const badge of habitBadges) {
+    if (progress >= badge.level) {
+      return badge;
+    }
+  }
+
+  return habitBadges[habitBadges.length - 1];
+}
+
+const getFocusComponent = (statistic) => {
+  // Cari data yang cocok berdasarkan nilai fokus
+  const badge = getHabitBadge(statistic.total, statistic.completed);
+
+  // Return JSX sesuai gaya yang ditemukan
+  return (
+    <div className="flex items-center gap-2">
+      <div>
+        <div
+          className={`shrink-0 rounded-full border-2 p-1.5 ${badge.styles.outerBorder}`}
+        >
+          <div
+            className={`rounded-full border-2 p-1.5 ${badge.styles.middleBorder}`}
+          >
+            <div
+              className={`rounded-full border-2 h-2 w-2 ${badge.styles.innerBorder}`}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const FocusList = () => {
+  return (
+    <div>
+      {habitBadges.map((item, index) => (
+        <div key={index} className="mb-2 flex items-center gap-3 ">
+          <div>
+            <div
+              className={`shrink-0 rounded-full border-2 p-1.5 ${item.styles.outerBorder}`}
+            >
+              <div
+                className={`rounded-full border-2 p-1.5 ${item.styles.middleBorder}`}
+              >
+                <div
+                  className={`rounded-full border-2 h-2 w-2 ${item.styles.innerBorder}`}
+                />
+              </div>
+            </div>
+          </div>
+          <div>{item.badge}</div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -362,13 +595,6 @@ import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
 export default function Route() {
   return (
-    <ClientOnly fallback={<Loader />}>
-      {() => (
-        <React.Fragment>
-          <HabitTracker />
-          <CalendarMonth total_sessions={6} />
-        </React.Fragment>
-      )}
-    </ClientOnly>
+    <ClientOnly fallback={<Loader />}>{() => <HabitTracker />}</ClientOnly>
   );
 }
