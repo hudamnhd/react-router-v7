@@ -403,7 +403,7 @@ const CalendarMonth = ({ total_sessions, statistics }) => {
           })}
         </div>
         <div className="sm:block hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
-          <div className="">Perisai fokus</div>
+          <div className="">Perisai Target</div>
           <hr className="my-3" />
           <FocusList />
         </div>
@@ -415,62 +415,6 @@ const CalendarMonth = ({ total_sessions, statistics }) => {
 const FocusDisplay = ({ statistic, total_sessions, isBtn }) => {
   return <div>{getFocusComponent(statistic, total_sessions, isBtn)}</div>;
 };
-
-const focusSessions = [
-  {
-    minFocus: 16,
-    sessions: "≥ 16 sesi fokus",
-    styles: {
-      outerBorder:
-        "border-white bg-gradient-to-r from-blue-500 to-blue-300 ring-4 ring-orange-400",
-      middleBorder:
-        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
-      innerBorder:
-        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
-    },
-  },
-  {
-    minFocus: 12,
-    sessions: "≥ 12 sesi fokus",
-    styles: {
-      outerBorder: "border-blue-500 bg-gradient-to-r from-blue-500 to-blue-300",
-      middleBorder:
-        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
-      innerBorder:
-        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
-    },
-  },
-  {
-    minFocus: 4,
-    sessions: "≥ 4 sesi fokus",
-    styles: {
-      outerBorder: "border-gray-300",
-      middleBorder:
-        "border-white bg-gradient-to-r from-yellow-300 to-yellow-100",
-      innerBorder:
-        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
-    },
-  },
-  {
-    minFocus: 1,
-    sessions: "≥ 1 sesi fokus",
-    styles: {
-      outerBorder: "border-gray-300",
-      middleBorder: "border-gray-300",
-      innerBorder:
-        "border-green-500 bg-gradient-to-r from-green-500 to-green-300",
-    },
-  },
-  {
-    minFocus: 0,
-    sessions: "0 sesi fokus",
-    styles: {
-      outerBorder: "border-gray-300",
-      middleBorder: "border-gray-300",
-      innerBorder: "border-gray-300",
-    },
-  },
-];
 
 const habitBadges = [
   {

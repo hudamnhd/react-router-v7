@@ -1,10 +1,14 @@
 import { data } from "#/app/constants/doaharian";
+import Fuse from "fuse.js";
+import { ClientOnly } from "remix-utils/client-only";
+import Loader from "#app/components/ui/loader";
+import { Spinner } from "#app/components/ui/spinner-circle";
 import { useLoaderData } from "@remix-run/react";
 import ky from "ky";
-import React from "react";
 import { json, type ClientLoaderFunctionArgs } from "@remix-run/node";
 import {
   BookOpen,
+  Search as SearchIcon,
   Scroll,
   CheckCircle,
   Activity,
@@ -13,7 +17,6 @@ import {
   Heart,
   MapPin,
   Search,
-  ExternalLink,
 } from "lucide-react";
 
 import {
@@ -25,15 +28,6 @@ import {
   ModalContext,
 } from "react-aria-components";
 import { cn } from "#app/utils/misc.tsx";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "#app/components/ui/command";
 import { Button } from "#app/components/ui/button";
 
 export function headers() {
@@ -113,7 +107,6 @@ export default function Route() {
       })),
     [filteredData],
   );
-
   // Format data doa harian
   return (
     <React.Fragment>
@@ -127,42 +120,6 @@ export default function Route() {
     </React.Fragment>
   );
 }
-
-const ListItem = ({ doa, index }) => {
-  const Icon = sumberIcons[doa.source] || Circle; // Default ke Dot jika tidak match
-  const trimmedJudul = doa.judul.replace(/\s+/g, " ").trim();
-  let [isOpen, setOpen] = React.useState(false);
-  const renderCount = React.useRef(0);
-  const contentRef = React.useRef(null);
-  const isDesktop = React.useRef(false);
-  renderCount.current++;
-  const content = contentRef.current;
-
-  const runCommand = React.useCallback(() => {
-    setOpen(false);
-  }, []);
-
-  return (
-    <React.Fragment>
-      <ModalContext.Provider value={{ isOpen, onOpenChange: runCommand }}>
-        <DialogResponsive isDesktop={isDesktop.current} content={content} />
-      </ModalContext.Provider>
-      <CommandItem
-        value={trimmedJudul}
-        className="flex items-start gap-1.5 text-md"
-        onSelect={() => {
-          isDesktop.current = window.innerWidth > 767;
-          contentRef.current = doa;
-          setOpen(true);
-        }}
-      >
-        <Icon className="h-5 w-5 flex-none sm:flex hidden" />
-        <span className="flex-none sm:hidden flex">·</span>
-        <span className="mr-auto">{doa.judul}</span>
-      </CommandItem>
-    </React.Fragment>
-  );
-};
 
 export const DialogResponsive = ({ content }) => {
   return (
@@ -189,7 +146,10 @@ export const DialogResponsive = ({ content }) => {
               )
             }
           >
-            <Dialog role="alertdialog" className="outline-none relative pb-5">
+            <Dialog
+              role="alertdialog"
+              className="outline-none relative pb-2 sm:pb-5"
+            >
               {({ close }) => (
                 <div className="grid gap-2.5 px-2">
                   <div className="w-fit mx-auto mt-4 ">
@@ -208,7 +168,7 @@ export const DialogResponsive = ({ content }) => {
                     </div>
                   </Heading>
 
-                  <div className="px-4 max-h-[70vh] overflow-y-auto">
+                  <div className="px-4 max-h-[65vh] overflow-y-auto">
                     <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
                       <p
                         className="relative mt-2 text-right font-lpmq"
@@ -241,75 +201,6 @@ export const DialogResponsive = ({ content }) => {
           </Modal>
         </ModalOverlay>
       </DialogTrigger>
-      {/*{isDesktop ? (
-        <Dialog
-          open={true}
-          onOpenChange={(e) => {
-            if (!e) runCommand();
-          }}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{content.judul}</DialogTitle>
-              <DialogDescription>sumber: {content.source}</DialogDescription>
-            </DialogHeader>
-            <div className="px-4 max-h-[70vh] overflow-y-auto">
-              <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                <p
-                  className="relative mt-2 text-right font-lpmq"
-                  dangerouslySetInnerHTML={{
-                    __html: content.arab,
-                  }}
-                />
-              </div>
-              <div className="mt-3 space-y-3">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: content.indo,
-                  }}
-                />
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      ) : (
-        <Drawer
-          open={true}
-          onOpenChange={(e) => {
-            if (!e) runCommand();
-          }}
-        >
-          <DrawerContent>
-            <DrawerHeader className="p-0 px-4 py-2">
-              <DrawerTitle>{content.judul}</DrawerTitle>
-              <DrawerDescription>sumber: {content.source}</DrawerDescription>
-            </DrawerHeader>
-            <div className="px-4 max-h-[70vh] overflow-y-auto">
-              <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                <p
-                  className="relative mt-2 text-right font-lpmq"
-                  dangerouslySetInnerHTML={{
-                    __html: content.arab,
-                  }}
-                />
-              </div>
-              <div className="mt-3 space-y-3">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: content.indo,
-                  }}
-                />
-              </div>
-            </div>
-
-            <DrawerFooter>
-              <DrawerClose asChild>
-                <Button variant="outline">Close</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
-      )}*/}
     </React.Fragment>
   );
 };
@@ -326,6 +217,7 @@ import {
 } from "#app/components/ui/tabs";
 
 function TabDemo({ result }) {
+  const combinedData = result.flatMap((obj) => obj.data);
   const doaharian = React.useMemo(
     () =>
       data.map((d) => ({
@@ -391,7 +283,7 @@ function TabDemo({ result }) {
             return (
               <div key={index} className="w-full border-b">
                 <div className="group relative py-4 px-2 sm:px-4 rounded-md w-full">
-                  <h4 className="font-medium text-lg mb-2">{trimmedJudul}</h4>
+                  <div className="font-medium text-lg mb-2">{trimmedJudul}</div>
                   <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
                     <p
                       className="relative mt-2 font-lpmq text-right text-primary"
@@ -402,7 +294,7 @@ function TabDemo({ result }) {
                   </div>
                   <div className="mt-3 space-y-3">
                     <div
-                      className="translation-text prose text-muted-foreground max-w-none"
+                      className="translation-text prose-sm text-muted-foreground max-w-none"
                       dangerouslySetInnerHTML={{
                         __html: doa.indo,
                       }}
@@ -415,32 +307,161 @@ function TabDemo({ result }) {
         </TabsContent>
       ))}
       <TabsContent value="search" className="p-0 m-0 px-4 pt-1">
-        <Command className="rounded-lg border shadow-md">
-          <CommandInput className="text-md" placeholder="Cari doa..." />
-          <CommandList className="max-h-[calc(100vh-250px)] h-full">
-            <CommandEmpty>No results found.</CommandEmpty>
-            {result?.map((d) => (
-              <React.Fragment key={d.label}>
-                <CommandSeparator />
-                <CommandGroup className="capitalize" heading={d.label}>
-                  {d.data.map((doa, index) => {
-                    return <ListItem key={index} index={index} doa={doa} />;
-                  })}
-                </CommandGroup>
-              </React.Fragment>
-            ))}
-
-            <React.Fragment>
-              <CommandSeparator />
-              <CommandGroup heading="doa sehari-hari">
-                {doaharian.map((doa, index) => {
-                  return <ListItem key={index} index={index} doa={doa} />;
-                })}
-              </CommandGroup>
-            </React.Fragment>
-          </CommandList>
-        </Command>
+        <SurahView result={combinedData} />
       </TabsContent>
     </Tabs>
   );
 }
+
+import React, { JSX, useMemo, useState } from "react";
+import lodash from "lodash";
+
+interface SearchProps<T> {
+  data: T[];
+  searchKey: keyof T;
+  query: string;
+  render: (filteredData: T[]) => JSX.Element;
+}
+
+function SearchHandler<T>({ data, searchKey, query, render }: SearchProps<T>) {
+  const options = {
+    includeScore: false,
+    keys: searchKey,
+  };
+  const fuse = new Fuse(data, options);
+  const filteredData = useMemo(() => {
+    if (!query)
+      return data.map((d) => {
+        return { item: { ...d } };
+      });
+    return fuse.search(query);
+  }, [data, searchKey, query]);
+
+  return render(filteredData);
+}
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+function SurahView({ result }) {
+  const [input, setInput] = useState("");
+  const [query, setQuery] = useState("");
+
+  const handleSearch = useMemo(
+    () =>
+      lodash.debounce((value: string) => {
+        setQuery(value);
+        document.getElementById("loading-indicator")?.classList.add("hidden");
+      }, 300),
+    [],
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    handleSearch(e.target.value);
+    document.getElementById("loading-indicator")?.classList.remove("hidden");
+  };
+
+  return (
+    <div className="border rounded-lg">
+      <div className="relative">
+        <input
+          id="input-26"
+          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full px-3 py-5 bg-background text-sm"
+          placeholder="Cari doa berbagai sumber..."
+          type="search"
+          value={input}
+          onChange={handleInputChange}
+        />
+        <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+          <SearchIcon size={16} strokeWidth={2} />
+        </div>
+        <div
+          id="loading-indicator"
+          className="hidden absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 transition-colors"
+        >
+          <Spinner className="size-5" />
+        </div>
+      </div>
+
+      <SearchHandler
+        data={result}
+        searchKey={["judul"]}
+        query={query}
+        render={(filteredData) => <VirtualizedListSurah items={filteredData} />}
+      />
+    </div>
+  );
+}
+
+const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
+  const parentRef = React.useRef<HTMLDivElement>(null);
+
+  // Gunakan useVirtualizer
+  const rowVirtualizer = useVirtualizer({
+    count: items.length, // Jumlah total item
+    getScrollElement: () => parentRef.current, // Elemen tempat scrolling
+    estimateSize: () => 35,
+  });
+
+  let [isOpen, setOpen] = React.useState(false);
+  const renderCount = React.useRef(0);
+  const contentRef = React.useRef(null);
+  const isDesktop = React.useRef(false);
+  renderCount.current++;
+  const content = contentRef.current;
+
+  const runCommand = React.useCallback(() => {
+    setOpen(false);
+  }, []);
+  return (
+    <React.Fragment>
+      <ModalContext.Provider value={{ isOpen, onOpenChange: runCommand }}>
+        <DialogResponsive isDesktop={isDesktop.current} content={content} />
+      </ModalContext.Provider>
+      <div
+        ref={parentRef}
+        style={{
+          height: "300px",
+          overflow: "auto",
+        }}
+      >
+        <div
+          className="space-y-0.5 py-2"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const item = items[virtualRow.index].item;
+
+            const Icon = sumberIcons[item.source] || Circle; // Default ke Dot jika tidak match
+            return (
+              <div
+                key={virtualRow.key}
+                ref={virtualRow.measureElement}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                onClick={() => {
+                  isDesktop.current = window.innerWidth > 767;
+                  contentRef.current = item;
+                  setOpen(true);
+                }}
+              >
+                <div className="relative flex cursor-default select-none items-center gap-x-2.5 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground">
+                  <Icon className="h-[20px] w-[20px] flex-none sm:flex hidden" />
+                  <span className="flex-none sm:hidden flex">·</span>
+                  <span className="mr-auto line-clamp-1">{item.judul}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};

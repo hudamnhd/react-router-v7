@@ -113,3 +113,11 @@ code {
   box-sizing: border-box;
   transform: "translate(0, 0)";
 }
+
+.tab-content {
+  display: none; /* Default sembunyikan semua konten */
+}
+
+.tab-content[data-state="active"] {
+  display: block; /* Tampilkan hanya konten tab yang aktif */
+}

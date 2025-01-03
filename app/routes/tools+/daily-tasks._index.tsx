@@ -126,10 +126,6 @@ async function load_data_daily_tasks() {
   } catch (error) {
     console.warn("DEBUGPRINT[2]: todo.tsx:81: error=", error);
     initial_data = false;
-  } finally {
-    if (spinner) {
-      spinner.style.display = "none";
-    }
   }
 }
 

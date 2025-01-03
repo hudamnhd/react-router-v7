@@ -33,7 +33,7 @@ import {
 import Loader from "#app/components/ui/loader";
 import ky from "ky";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 
 export function headers() {
   return {
@@ -43,18 +43,25 @@ export function headers() {
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
+
+  const url = new URL(request.url);
+  const intent = url.searchParams.get("intent") || "page";
   const { id } = params;
-  // Gunakan Promise.all untuk menangani beberapa permintaan secara paralel
+  const is_get_surah = intent === "surat";
+  const page = is_get_surah ? await api.get(`ayat/${id}/1`).json() : null;
+
+  if (is_get_surah && !page.status) {
+    throw new Response("Not Found", { status: 404 });
+  }
+
+  if (is_get_surah && page.status) {
+    const page_ayah = page.data[0].page;
+    return redirect(`/muslim/quran/${page_ayah}`);
+  }
+
   const ayat = await api.get(`ayat/page/${id}`).json();
 
   if (!ayat.status) {
-    throw new Response("Not Found", { status: 404 });
-  }
-  const last_ayat = ayat.data[ayat.data.length - 1].surah;
-  const surat = await api.get(`surat/${last_ayat}`).json();
-
-  // Validasi respons
-  if (!surat.status) {
     throw new Response("Not Found", { status: 404 });
   }
 
@@ -448,3 +455,33 @@ function ActionItem(props: MenuItemProps) {
     />
   );
 }
+
+// Fungsi untuk mengonversi angka ke format Arab
+const toArabicNumber = (number: number) => {
+  const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+  return number
+    .toString()
+    .split("")
+    .map((digit) => arabicDigits[parseInt(digit)])
+    .join("");
+};
+
+const AyatList: React.FC<{ ayats: { number: number; text: string }[] }> = ({
+  ayats,
+}) => {
+  return (
+    <div className="mt-4">
+      {ayats.map((ayat) => (
+        <div
+          key={ayat.number}
+          className="flex items-center gap-2 border-b py-2"
+        >
+          <span className="text-xl font-bold">
+            {toArabicNumber(ayat.number)}
+          </span>
+          <p className="text-right text-lg font-serif">{ayat.text}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
