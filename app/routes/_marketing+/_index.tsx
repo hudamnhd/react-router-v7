@@ -7,7 +7,7 @@ export default function Example() {
   const data = [...muslimLinks, ...toolsLinks];
   const navigate = useNavigate();
   return (
-    <div className="px-4 border-x h-[calc(100vh-56px)]">
+    <div className="px-4 border-x h-[calc(100vh-60px)]">
       <div className="text-center py-3">
         <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
           Apps
@@ -36,7 +36,9 @@ export default function Example() {
               </Button>
             </div>
             <div>
-              <h2 className="mb-1 font-semibold">{action.title}</h2>
+              <h2 className="mb-1 font-semibold cursor-pointer">
+                {action.title}
+              </h2>
               <p className="line-clamp-2 text-gray-500">{action.description}</p>
             </div>
           </div>

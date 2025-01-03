@@ -89,6 +89,7 @@
     "ky": "^1.7.4",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
+    "lru-cache": "^11.0.2",
     "lucide-react": "^0.465.0",
     "morgan": "^1.10.0",
     "react": "^19.0.0",

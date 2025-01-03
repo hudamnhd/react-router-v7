@@ -3,6 +3,8 @@ import { Button } from "#app/components/ui/button";
 import { json } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 
+import cache from "#app/utils/cache-server.ts";
+
 export const action = async () => {
   const headers = new Headers();
   headers.append("Clear-Site-Data", '"cache", "cookies", "storage"');

@@ -41,12 +41,21 @@ export function headers() {
   };
 }
 
+import cache from "#app/utils/cache-server.ts";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
 
   const url = new URL(request.url);
   const intent = url.searchParams.get("intent") || "page";
   const { id } = params;
+
+  const cacheKey = `quran-page-${id}`;
+  const cacheData = cache.get(cacheKey);
+
+  if (cacheData) {
+    return cacheData;
+  }
+
   const is_get_surah = intent === "surat";
   const page = is_get_surah ? await api.get(`ayat/${id}/1`).json() : null;
 
@@ -85,6 +94,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     id,
   };
 
+  cache.set(cacheKey, data);
   return json(data, {
     headers: {
       "Cache-Control": "public, max-age=31560000",

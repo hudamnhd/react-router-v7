@@ -5,7 +5,7 @@ import Loader from "#app/components/ui/loader";
 import { Spinner } from "#app/components/ui/spinner-circle";
 import { useLoaderData } from "@remix-run/react";
 import ky from "ky";
-import { json, type ClientLoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   BookOpen,
   Search as SearchIcon,
@@ -29,6 +29,7 @@ import {
 } from "react-aria-components";
 import { cn } from "#app/utils/misc.tsx";
 import { Button } from "#app/components/ui/button";
+import cache from "#app/utils/cache-server.ts";
 
 export function headers() {
   return {
@@ -36,6 +37,12 @@ export function headers() {
   };
 }
 export async function loader() {
+  const cacheKey = `doa-lengkap`;
+  const cacheData = cache.get(cacheKey);
+
+  if (cacheData) {
+    return cacheData;
+  }
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/doa/sumber" });
   const sumber = [
     "quran",
@@ -48,35 +55,13 @@ export async function loader() {
   ];
   const data = await Promise.all(sumber.map((item) => api.get(item).json()));
 
-  // Validasi respons
-  // Gabungkan data
+  cache.set(cacheKey, data);
   return json(data, {
     headers: {
       "Cache-Control": "public, max-age=31560000",
     },
   });
 }
-
-import { getCache, setCache, constructKey } from "#app/utils/cache-client.ts";
-
-export async function clientLoader({
-  request,
-  serverLoader,
-}: ClientLoaderFunctionArgs) {
-  const key = constructKey(request);
-
-  const cachedData = await getCache(key);
-
-  if (cachedData) {
-    return cachedData; // (3)
-  }
-
-  const serverData = await serverLoader();
-  await setCache(key, serverData);
-  return serverData;
-}
-
-clientLoader.hydrate = true;
 
 const sumberIcons = {
   quran: BookOpen,
@@ -88,10 +73,9 @@ const sumberIcons = {
   lainnya: Circle,
 };
 
-export default function Route() {
+function Doa() {
   const loaderData = useLoaderData();
 
-  // Filter data hanya yang memiliki status `true`
   const filteredData = React.useMemo(
     () => loaderData?.filter((item) => item.status === true),
     [loaderData],
@@ -107,10 +91,10 @@ export default function Route() {
       })),
     [filteredData],
   );
-  // Format data doa harian
+
   return (
     <React.Fragment>
-      <div className="border-x border-b pb-4 rounded-b-xl max-w-4xl mx-auto">
+      <div className="border-x border-b pb-1 rounded-b-xl max-w-4xl mx-auto">
         <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize my-2">
           Do'a
         </h1>
@@ -306,8 +290,8 @@ function TabDemo({ result }) {
           })}
         </TabsContent>
       ))}
-      <TabsContent value="search" className="p-0 m-0 px-4 pt-1">
-        <SurahView result={combinedData} />
+      <TabsContent value="search" className="p-0 m-0">
+        <SearchView result={combinedData} />
       </TabsContent>
     </Tabs>
   );
@@ -339,9 +323,10 @@ function SearchHandler<T>({ data, searchKey, query, render }: SearchProps<T>) {
 
   return render(filteredData);
 }
+
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-function SurahView({ result }) {
+function SearchView({ result }) {
   const [input, setInput] = useState("");
   const [query, setQuery] = useState("");
 
@@ -361,7 +346,7 @@ function SurahView({ result }) {
   };
 
   return (
-    <div className="border rounded-lg">
+    <div className="border-t">
       <div className="relative">
         <input
           id="input-26"
@@ -465,3 +450,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
     </React.Fragment>
   );
 };
+
+export default function Route() {
+  return <ClientOnly fallback={<Loader />}>{() => <Doa />}</ClientOnly>;
+}

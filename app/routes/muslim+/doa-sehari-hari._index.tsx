@@ -20,8 +20,6 @@ export function headers() {
 }
 
 export async function loader() {
-  // Validasi respons
-  // Gabungkan data
   return json(data_doa, {
     headers: {
       "Cache-Control": "public, max-age=31560000",

@@ -12,10 +12,10 @@ export default function Sholawat() {
   const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
   return (
     <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
-      <div className="m-1.5 flex justify-end">
+      <div className="p-1.5 flex justify-end">
         <DisplaySetting opts={opts} />
       </div>
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-4">
+      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize">
         Sholawat
       </h1>
 
