@@ -1,0 +1,166 @@
+---
+title: Panduan Belajar Regex di Neovim
+description: Panduan Belajar Regex di Neovim
+published: 2024-12-15
+featured: true
+---
+
+# {frontmatter.title}
+
+Berikut adalah beberapa konsep dasar regex yang sering digunakan di Neovim untuk mengganti teks dengan cara yang lebih fleksibel dan powerful.
+
+#### 1. **Batas Kata: `\<` dan `\>`**
+
+- **`\`\<**: Menandakan awal kata.
+- **`\`>`**: Menandakan akhir kata.
+
+**Contoh**:
+
+- `:s/\<Select\>/Replaced/g`
+  Mengganti kata `Select` yang berdiri sendiri, bukan bagian dari kata lain seperti `Selected`.
+
+---
+
+#### 2. **Titik (`.`)**
+
+- Mewakili **satu karakter apapun**, kecuali newline.
+
+**Contoh**:
+
+- `:s/a.c/xyz/g`
+  Mengganti kata yang dimulai dengan `a`, diikuti satu karakter apapun, dan diakhiri dengan `c`, seperti `abc`, `axc`, dll.
+
+---
+
+#### 3. **Bintang (`*`)**
+
+- **`*`** cocok dengan **nol atau lebih karakter** dari elemen sebelumnya.
+
+**Contoh**:
+
+- `:s/a.*c/xyz/g`
+  Mengganti kata yang dimulai dengan `a`, diikuti oleh nol atau lebih karakter apapun, dan diakhiri dengan `c`, seperti `ac`, `abc`, `axxxc`, dll.
+
+---
+
+#### 4. **Plus (`+`)**
+
+- **`+`** cocok dengan **satu atau lebih karakter** dari elemen sebelumnya (harus ada minimal satu karakter).
+
+**Contoh**:
+
+- `:s/a.+c/xyz/g`
+  Mengganti kata yang dimulai dengan `a`, diikuti oleh satu atau lebih karakter apapun, dan diakhiri dengan `c`.
+
+---
+
+#### 5. **Tanda Tanya (`?`)**
+
+- **`?`** cocok dengan **nol atau satu karakter** dari elemen sebelumnya.
+
+**Contoh**:
+
+- `:s/a?b/xyz/g`
+  Mengganti kata `b` atau `ab` menjadi `xyz`.
+
+---
+
+#### 6. **Karakter Pilihan (`[]`)**
+
+- **`[]`** digunakan untuk mencocokkan **salah satu karakter** di dalam tanda kurung.
+
+**Contoh**:
+
+- `:s/a[bcd]e/xyz/g`
+  Mengganti `abe`, `ace`, atau `ade` menjadi `xyz`.
+
+---
+
+#### 7. **Karakter Negasi (`[^]`)**
+
+- **`[^]`** mencocokkan karakter **apa saja kecuali** yang ada di dalam tanda kurung.
+
+**Contoh**:
+
+- `:s/a[^b]*e/xyz/g`
+  Mengganti kata yang dimulai dengan `a`, diikuti oleh karakter apapun kecuali `b`, dan diakhiri dengan `e`.
+
+---
+
+#### 8. **Grup dan Referensi Kembali (`\(...\)` dan `\1`, `\2`, ...)**
+
+- **`\(...\)`** digunakan untuk membuat **grup** yang dapat dirujuk kembali.
+- **`\1`, `\2`, dll** adalah referensi untuk grup pertama, kedua, dll.
+
+**Contoh**:
+
+- `:s/\(Select\)/\1Radix/g`
+  Mengganti `Select` dengan `SelectRadix`.
+
+- `:s/\(abc\)\(123\)/\2\1/g`
+  Membalikkan urutan antara `abc` dan `123`, menjadi `123abc`.
+
+---
+
+#### 9. **Menangkap Semua Karakter dalam Tanda Kurung (`\([^)]*\)`)**
+
+- **`\([^)]*\)`** menangkap semua karakter di dalam tanda kurung `()`.
+
+**Contoh**:
+
+- `:s/(\([^)]*\))/\1Replaced/g`
+  Mengganti teks yang ada di dalam tanda kurung, seperti `Select(Item)` menjadi `ItemReplaced`.
+
+---
+
+#### 10. **Awal dan Akhir Baris (`^` dan `$`)**
+
+- **`^`** cocok dengan **awal baris**.
+- **`$`** cocok dengan **akhir baris**.
+
+**Contoh**:
+
+- `:s/^Select/Begin/g`
+  Mengganti `Select` yang berada di awal baris menjadi `Begin`.
+
+- `:s/End$/Finish/g`
+  Mengganti `End` yang berada di akhir baris menjadi `Finish`.
+
+---
+
+#### 11. **Substitusi di Semua Baris (`%`)**
+
+- **`%`** digunakan untuk mengganti di **seluruh file**.
+
+**Contoh**:
+
+- `:%s/Select/Modified/g`
+  Mengganti semua kata `Select` di seluruh file menjadi `Modified`.
+
+---
+
+#### 12. **Menambahkan Teks dengan Grup Referensi**
+
+- Menambahkan teks baru setelah kata yang cocok menggunakan grup referensi.
+
+**Contoh**:
+
+- `:s/\(Select\)\(Item\)/\1Radix\2/g`
+  Mengganti `SelectItem` menjadi `SelectRadixItem`.
+
+---
+
+#### 13. **Substitusi di Baris Tertentu**
+
+- Kamu bisa menentukan **baris tertentu** untuk mengganti teks, misalnya baris 3 sampai 5:
+
+**Contoh**:
+
+- `:3,5s/old/new/g`
+  Mengganti kata `old` dengan `new` hanya di baris 3 sampai 5.
+
+---
+
+#### Kesimpulan
+
+Dengan memahami dan menguasai pola-pola regex ini, kamu bisa melakukan pencarian dan penggantian yang lebih canggih di Neovim. Cobalah eksperimen dengan pola-pola ini dan lihat bagaimana fleksibilitas regex dapat membantu dalam pemrosesan teks.

@@ -67,9 +67,10 @@ export default function DzikrView() {
       <div className="p-1.5 flex justify-end">
         <DisplaySetting opts={opts} />
       </div>
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize mb-4">
-        Dzikir {time}
-      </h1>
+      <div className="flex items-center gap-x-3 justify-center text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
+        <span>Dzikir {time}</span>
+        {time === "pagi" ? <Sun /> : <Moon />}
+      </div>
 
       {time === "pagi" ? (
         <div>
@@ -92,7 +93,7 @@ export default function DzikrView() {
                   className="group tasbih-counter-container relative p-4 sm:p-5 border-t"
                 >
                   <div>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       <div className="font-medium leading-none">
                         {ayat.title}
                       </div>
@@ -196,7 +197,7 @@ export default function DzikrView() {
                   className="group tasbih-counter-container relative p-4 sm:p-5 border-t"
                 >
                   <div>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       <div className="font-medium leading-none">
                         {ayat.title}
                       </div>

@@ -1,13 +1,5 @@
 import { cn } from "#app/utils/misc.tsx";
-import {
-  useFetcher,
-  Link,
-  useParams,
-  useNavigate,
-  useLoaderData,
-  useRouteLoaderData,
-} from "@remix-run/react";
-
+import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import {
   Dialog,
   Heading,
@@ -26,11 +18,9 @@ import {
   Ellipsis,
   Dot,
   Minus,
-  Plus,
   X,
   BookOpen,
 } from "lucide-react";
-import Loader from "#app/components/ui/loader";
 import ky from "ky";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
@@ -42,6 +32,7 @@ export function headers() {
 }
 
 import cache from "#app/utils/cache-server.ts";
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
 

@@ -257,19 +257,19 @@ const Calculator: React.FC = () => {
   return (
     <div
       className={cn(
-        "relative flex flex-col gap-2 justify-between bg-background w-full p-2.5 sm:p-4 shadow-lg  sm:max-w-sm mx-auto",
-        "h-[calc(100vh-70px)]",
+        "relative flex flex-col gap-2 justify-between bg-background w-full sm:max-w-sm mx-auto border-x",
+        "h-[calc(100vh-57px)]",
       )}
     >
       <Popover>
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full flex items-center justify-between border-b px-2.5 sm:px-3 py-1">
           <div>
-            <h1 className="mr-2 inline-block  uppercase text-xl my-2 font-sans font-bold">
+            <p className="mr-2 inline-block uppercase my-1 font-sans font-bold">
               Calculator
-            </h1>
+            </p>
           </div>
-          <PopoverTrigger className="flex items-center gap-x-2">
-            <History className="w-5 h-5" /> Riwayat
+          <PopoverTrigger className="flex items-center gap-x-1.5">
+            <History className="w-4 h-4" /> Riwayat
           </PopoverTrigger>
         </div>
         <PopoverContent className="w-full mb-4 overflow-y-auto divide-y divide-gray-300 max-h-[80vh]">
@@ -332,8 +332,11 @@ const Calculator: React.FC = () => {
                                     )}
                                   >
                                     <div className="gap-x-3 flex items-center">
-                                      <span className="text-[16px] w-4 text-start">
-                                        {index === 0 ? "" : index / 2 + 1}.
+                                      <span className="text-[16px] w-2.5 text-start flex items-center">
+                                        <span>
+                                          {index === 0 ? "" : index / 2 + 1}
+                                        </span>
+                                        <span>.</span>
                                       </span>
                                       <span className="text-2xl px-2">
                                         {
@@ -380,7 +383,7 @@ const Calculator: React.FC = () => {
         <div
           ref={expressionRef}
           className={cn(
-            "space-y-1 text-2xl font-semibold  overflow-y-auto pr-3 mb-2",
+            "space-y-1 text-2xl font-semibold  overflow-y-auto mb-2 p-2.5 sm:p-3",
             "max-h-[calc(100vh-350px)]",
           )}
         >
@@ -462,32 +465,30 @@ const Calculator: React.FC = () => {
             </div>
           </div>
         </div>
-        {/*{JSON.stringify(currentInput, null, 2)}*/}
-        {/* Calculator Buttons */}
         {/*biome-ignore format: the code should not be formatted*/}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2 p-2.5 sm:p-3">
             <Button size="lg" className="font-normal text-3xl" onPress={handleClear}>C</Button>
-            <Button size="lg" className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-chart-2"  onPress={() => handleOperatorClick("*")}><X strokeWidth={2} /></Button>
-            <Button size="lg" className="transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-chart-2" onPress={() => handleOperatorClick("/")}><div className="text-3xl font-medium pb-1">÷</div></Button>
-            <Button size="lg" variant="destructive" className="[&_svg]:size-6 transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-chart-2"  onPress={handleBackspace}><Delete strokeWidth={2} /></Button>
+            <Button size="lg" className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2"  onPress={() => handleOperatorClick("*")}><X strokeWidth={2} /></Button>
+            <Button size="lg" className="transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2" onPress={() => handleOperatorClick("/")}><div className="text-3xl font-medium pb-1">÷</div></Button>
+            <Button size="lg" variant="destructive" className="[&_svg]:size-6 transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2"  onPress={handleBackspace}><Delete strokeWidth={2} /></Button>
 
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("7")}>7</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("8")}>8</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("9")}>9</Button>
-            <Button className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-chart-2"  size="lg"  onPress={() => handleOperatorClick("-")}><Minus strokeWidth={2} /></Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("4")}>4</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("5")}>5</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("6")}>6</Button>
-            <Button className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-chart-2"  size="lg"  onPress={() => handleOperatorClick("+")}><Plus strokeWidth={2} /></Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("7")}>7</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("8")}>8</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("9")}>9</Button>
+            <Button className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2"  size="lg"  onPress={() => handleOperatorClick("-")}><Minus strokeWidth={2} /></Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("4")}>4</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("5")}>5</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("6")}>6</Button>
+            <Button className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2"  size="lg"  onPress={() => handleOperatorClick("+")}><Plus strokeWidth={2} /></Button>
 
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("1")}>1</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("2")}>2</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("3")}>3</Button>
-            <Button className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-chart-2"  size="lg"   onPress={handleEvaluate}><Equal strokeWidth={2} /></Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("0")}>0</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("00")}>00</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("000")}>000</Button>
-            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[110%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress(".")}>.</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("1")}>1</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("2")}>2</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("3")}>3</Button>
+            <Button className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2"  size="lg"   onPress={handleEvaluate}><Equal strokeWidth={2} /></Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("0")}>0</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("00")}>00</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("000")}>000</Button>
+            <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress(".")}>.</Button>
         </div>
         {/*biome-ignore format: the code should not be formatted*/}
       </div>

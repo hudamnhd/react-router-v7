@@ -1,6 +1,6 @@
 ---
-title: Sistem Manajemen Magang Berbasis SmartContract
-description: Sistem Manajemen Magang Berbasis SmartContract
+title: Sistem Manajemen Magang Berbasis Smart Contract
+description: Sistem Manajemen Magang Berbasis Smart Contract
 published: 2024-11-18
 featured: true
 ---
@@ -8,8 +8,6 @@ featured: true
 # {frontmatter.title}
 
 Dokumentasi ini menjelaskan alur kerja dan arsitektur sistem manajemen magang yang menggunakan blockchain untuk menyimpan hasil akhir dan database tradisional untuk data sementara.
-
----
 
 ## Gambaran Umum
 
@@ -20,8 +18,6 @@ Sistem ini dirancang untuk mengelola pengajuan dan penilaian magang dengan pende
 3. **Proses Magang**: Mahasiswa mengajukan pengajuan magang, yang ditinjau dan diproses oleh admin.
 4. **Penyimpanan Hasil Akhir**: Penilaian akhir dihitung oleh admin, disimpan di MySQL, dan blockchain.
 5. **Sertifikat Digital**: Mahasiswa dapat mengakses sertifikat berbasis blockchain dengan kode QR yang mengarah ke data yang disimpan di blockchain.
-
----
 
 ## Alur Kerja
 
@@ -45,8 +41,6 @@ Sistem ini dirancang untuk mengelola pengajuan dan penilaian magang dengan pende
   - **Dashboard Admin**
   - **Dashboard Mahasiswa**
 
----
-
 ### 4. **Fitur Peran Mahasiswa**
 
 #### a. **Ajukan Pengajuan Magang**
@@ -69,8 +63,6 @@ Alur kerja pengajuan magang mencakup langkah-langkah berikut:
   - **Nilai Penilaian**: Data diambil dari MySQL.
   - **Sertifikat Digital**: Data berbasis blockchain yang dapat diakses melalui kode QR.
 
----
-
 ### 5. **Fitur Peran Admin**
 
 #### a. **Kelola Pengajuan Magang**
@@ -87,8 +79,6 @@ Admin dapat:
   - Detail penilaian disimpan di **MySQL**.
   - Hasil akhir dan data sertifikat digital disimpan di **blockchain**.
 
----
-
 ## Integrasi Blockchain
 
 1. **Penyimpanan Hasil Akhir**:
@@ -100,8 +90,6 @@ Admin dapat:
    - Mahasiswa dapat melihat sertifikat mereka melalui dashboard.
    - Sertifikat mencakup kode QR yang mengarah ke catatan blockchain berdasarkan ID unik yang disimpan di MySQL.
 
----
-
 ## Teknologi yang Digunakan
 
 - **Frontend**: React + Tailwind CSS
@@ -112,14 +100,10 @@ Admin dapat:
 - **Alat Tambahan**:
   - Generator Kode QR untuk sertifikat digital.
 
----
-
 ## Alur Database dan Blockchain
 
 1. **Data Sementara**: Disimpan di **PlanetScale** menggunakan **Prisma ORM** selama tahap pengajuan dan peninjauan.
 2. **Data Akhir**: Disimpan di **blockchain** untuk pencatatan yang tidak dapat diubah dan transparan.
-
----
 
 ## Pengembangan di Masa Depan
 
@@ -131,12 +115,8 @@ Admin dapat:
 3. **Pelaporan dan Analitik**:
    - Laporan detail untuk admin tentang pengajuan magang dan hasilnya.
 
----
-
 ## Contoh Sertifikat QR
 
 Kode QR pada sertifikat digital akan mengarahkan ke halaman web yang menampilkan data yang disimpan di blockchain untuk verifikasi.
 
 Tautan yang dienkode dalam kode QR mengambil data dari blockchain berdasarkan hash transaksi.
-
----

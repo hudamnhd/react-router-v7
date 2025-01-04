@@ -57,7 +57,7 @@ export function DisplaySetting({ opts }) {
   const fetcher = useFetcher();
   // Mengelola state untuk font weight
   const [fontWeight] = useState<string>(opts?.font_weight || "400"); // Default ke "Normal"
-  const [fontSize] = useState<string>(opts?.font_size || "2.25rem"); // Default ke "Normal"
+  const [fontSize] = useState<string>(opts?.font_size || "text-2xl"); // Default ke "Normal"
   const [showTranslation] = useState<boolean>(
     opts?.font_translation && opts?.font_translation === "on" ? true : false,
   ); // Default ke "Normal"
@@ -81,9 +81,9 @@ export function DisplaySetting({ opts }) {
                 Manage your display settings here.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="space-y-3 w-full">
-                <div className="space-y-1 w-full">
+            <CardContent className="grid gap-5">
+              <div className="space-y-4 w-full">
+                <div className="w-full">
                   <Label>Font Weight</Label>
                   <Select name="font_weight" defaultValue={fontWeight}>
                     <SelectTrigger>
@@ -100,7 +100,7 @@ export function DisplaySetting({ opts }) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-1 w-full">
+                <div className="w-full">
                   <Label>Font Size</Label>
                   <Select name="font_size" defaultValue={fontSize}>
                     <SelectTrigger>
@@ -118,10 +118,10 @@ export function DisplaySetting({ opts }) {
                 <div className="flex items-center justify-between space-x-2">
                   <Label
                     htmlFor="translationtext"
-                    className="flex flex-col space-y-1"
+                    className="flex flex-col space-y-0.5"
                   >
                     <span>Display translation text</span>
-                    <span className="font-normal leading-snug text-muted-foreground">
+                    <span className="font-normal text-sm leading-snug text-muted-foreground">
                       Display or hide translation text.
                     </span>
                   </Label>
@@ -134,7 +134,7 @@ export function DisplaySetting({ opts }) {
                 <div className="flex items-center justify-between space-x-2">
                   <Label
                     htmlFor="latintext"
-                    className="flex flex-col space-y-1"
+                    className="flex flex-col space-y-0.5"
                   >
                     <span>Display latin text</span>
                     <span className="font-normal leading-snug text-muted-foreground">

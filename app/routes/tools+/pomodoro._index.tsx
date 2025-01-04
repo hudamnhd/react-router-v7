@@ -238,15 +238,16 @@ export default function Route() {
     <ClientOnly fallback={<Loader />}>
       {() => (
         <React.Fragment>
-          <Example />
-          <App />
+          <Example>
+            <App />
+          </Example>
         </React.Fragment>
       )}
     </ClientOnly>
   );
 }
 
-function Example() {
+function Example({ children }) {
   return (
     <div className="relative sm:py-4 bg-background overflow-hidden">
       <div className="relative px-4 sm:px-6 lg:px-8">
@@ -256,17 +257,46 @@ function Example() {
               Pomodoro
             </span>
           </h1>
-          <p className="sm:block hidden sm:mt-4 sm:text-lg leading-8 text-primary/80">
-            Kata <strong>pomodoro</strong> berasal dari bahasa Italia yang
-            berarti <strong>tomat</strong>. Metode Pomodoro Technique dinamai
-            demikian karena Francesco Cirillo, pencipta metode ini, awalnya
-            menggunakan timer dapur berbentuk tomat untuk mengatur waktu
-            kerjanya. Pomodoro Technique Ini adalah teknik manajemen waktu yang
-            membagi waktu kerja menjadi interval fokus (biasanya{" "}
-            <strong>25 menit</strong>), yang disebut <strong>pomodoros</strong>,
-            diikuti dengan istirahat singkat (biasanya <strong>5 menit</strong>
-            ).
-          </p>
+
+          {children}
+          <div className="space-y-4 mt-2">
+            <details
+              className="group [&_summary::-webkit-details-marker]:hidden"
+              open
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-2.5">
+                <h2 className="font-medium">Apa itu Pomodoro ?</h2>
+
+                <svg
+                  className="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </summary>
+
+              <p className="text-muted-foreground px-4 py-2.5">
+                Kata <strong>pomodoro</strong> berasal dari bahasa Italia yang
+                berarti <strong>tomat</strong>. Metode Pomodoro Technique
+                dinamai demikian karena Francesco Cirillo, pencipta metode ini,
+                awalnya menggunakan timer dapur berbentuk tomat untuk mengatur
+                waktu kerjanya. Pomodoro Technique Ini adalah teknik manajemen
+                waktu yang membagi waktu kerja menjadi interval fokus (biasanya{" "}
+                <strong>25 menit</strong>), yang disebut{" "}
+                <strong>pomodoros</strong>, diikuti dengan istirahat singkat
+                (biasanya <strong>5 menit</strong>
+                ).
+              </p>
+            </details>
+          </div>
         </div>
       </div>
     </div>

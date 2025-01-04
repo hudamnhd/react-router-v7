@@ -62,16 +62,16 @@ const toolsLinks: {
   icon: SVGSVGElement;
 }[] = [
   {
-    title: "Daily tasks",
-    href: "/tools/daily-tasks",
-    description: "Daily tasks with pomodoro",
-    icon: List,
-  },
-  {
     title: "Kalkulator",
     href: "/tools/calculator",
     description: "Simple Kalkulator",
     icon: Calculator,
+  },
+  {
+    title: "Daily tasks",
+    href: "/tools/daily-tasks",
+    description: "Daily tasks with pomodoro",
+    icon: List,
   },
   {
     title: "Pomodoro",

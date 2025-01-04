@@ -26,7 +26,7 @@ export const SelectContent = <T extends object>({
   return (
     <ReactAria.Popover
       className={cn(
-        "min-w-[--trigger-width] overflow-auto rounded-md border border-slate-200 bg-white p-1 shadow-md dark:border-slate-700 dark:bg-slate-800",
+        "min-w-[--trigger-width] overflow-auto rounded-md border border-slate-200 bg-white p-1 shadow-md dark:border-border dark:bg-background",
         // Entering
         "entering:animate-in entering:fade-in",
         // Exiting
@@ -53,19 +53,16 @@ export const SelectItem = ({
     <ReactAria.ListBoxItem
       className={cn(
         "group",
-        "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-black outline-none transition-colors dark:text-white",
+        "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-foreground outline-none transition-colors dark:text-foreground",
         // Focus
-        "focus:bg-slate-100 dark:focus:bg-slate-700",
+        "focus:bg-accent dark:focus:bg-accent",
+        "[&_svg]:data-[selected=true]:visible",
         className,
       )}
       {...props}
     >
       <>
-        <Check
-          aria-hidden="true"
-          strokeWidth="3"
-          className="invisible h-4 w-4 group-selected:visible"
-        />
+        <Check strokeWidth="3" className="invisible h-4 w-4" />
         {children}
       </>
     </ReactAria.ListBoxItem>

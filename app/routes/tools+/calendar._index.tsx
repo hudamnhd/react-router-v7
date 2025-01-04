@@ -46,7 +46,7 @@ const generateRandomEvents = (numEvents: number) => {
 export default function Page() {
   return (
     <Calendar events={generateRandomEvents(10)}>
-      <div className="h-dvh px-6 flex flex-col">
+      <div className="h-dvh px-6 flex flex-col mt-4">
         <div className="flex px-6 items-center gap-2 mb-6">
           <CalendarViewTrigger
             className="aria-[current=true]:bg-accent"

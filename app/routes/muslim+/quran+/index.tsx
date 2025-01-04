@@ -341,9 +341,9 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
             >
               <Link
                 to={to}
-                className="relative flex cursor-default select-none items-start rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm"
+                className="relative flex cursor-default select-none items-start gap-x-2 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm"
               >
-                <Scroll className="h-5 w-5 fill-muted mt-1" />
+                <Scroll className="h-5 w-5 fill-muted mt-0.5" />
                 <div>
                   <span className="font-semibold">{item.name}</span>
                   <div className="flex items-center text-sm text-muted-foreground gap-1">

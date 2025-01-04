@@ -34,7 +34,6 @@ import { ClientHintCheck, getHints, useHints } from "./utils/client-hints.tsx";
 import { getEnv } from "./utils/env.server.ts";
 import { honeypot } from "./utils/honeypot.server.ts";
 import { getDomainUrl } from "./utils/misc.tsx";
-import { useNonce } from "./utils/nonce-provider.ts";
 import { useRequestInfo } from "./utils/request-info.ts";
 import { type Theme, setTheme, getTheme } from "./utils/theme.server.ts";
 import { getToast } from "./utils/toast.server.ts";
@@ -229,17 +228,13 @@ export function ErrorBoundary() {
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
-  navigationMenuTriggerStyle,
 } from "#app/components/ui/navigation-menu";
 
 import { Button } from "#app/components/ui/button";
-import { Separator } from "#app/components/ui/separator";
 import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
 
 function Navbar({ children }) {
@@ -346,12 +341,10 @@ import { TimerReset, Menu, Frame } from "lucide-react";
 import { cn } from "#app/utils/misc.tsx";
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandShortcut,
   CommandList,
   CommandSeparator,
 } from "#app/components/ui/command";
@@ -410,14 +403,11 @@ function NavbarMobile() {
                         className={({ isActive }) =>
                           [
                             isActive ? "font-semibold bg-muted" : "",
-                            "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-1.5",
+                            "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-2",
                           ].join(" ")
                         }
                       >
-                        <item.icon
-                          size={20}
-                          className="flex-none translate-y-[2px]"
-                        />
+                        <item.icon size={16} className="flex-none" />
                         <span>{item.title}</span>
                       </NavLink>
                     ))}
@@ -624,7 +614,7 @@ const CommandMenu = () => {
                                 close();
                               }}
                             >
-                              <navItem.icon />
+                              <navItem.icon className="w-4 h-4" />
                               <span>{navItem.title}</span>
                             </CommandItem>
                           ),
@@ -636,7 +626,7 @@ const CommandMenu = () => {
                             close();
                           }}
                         >
-                          <TimerReset />
+                          <TimerReset className="w-4 h-4" />
                           <span>Reset data</span>
                         </CommandItem>
                       </CommandGroup>

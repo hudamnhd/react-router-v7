@@ -1,0 +1,147 @@
+---
+title: Panduan Regex di Vim/Neovim
+description: Example case Regex di Vim/Neovim
+published: 2024-12-15
+featured: true
+---
+
+# {frontmatter.title}
+
+Tutorial menggunakan regex di vim/neovim.
+
+
+### Karakter Spesial
+
+- `.` : Mewakili karakter tunggal apa saja kecuali newline.
+- `\d` : Mewakili digit (angka), sama dengan `[0-9]`.
+- `\w` : Mewakili karakter kata (huruf, angka, dan underscore), sama dengan `[a-zA-Z0-9_]`.
+- `\s` : Mewakili karakter spasi (termasuk tab dan newline).
+
+### Penambahan dan Pengulangan
+
+- `*` : Mewakili nol atau lebih dari karakter sebelumnya.
+- `+` : Mewakili satu atau lebih dari karakter sebelumnya.
+- `?` : Mewakili nol atau satu dari karakter sebelumnya.
+- `{n}` : Mewakili tepat `n` kali karakter sebelumnya.
+- `{n,}` : Mewakili setidaknya `n` kali karakter sebelumnya.
+- `{n,m}` : Mewakili antara `n` dan `m` kali karakter sebelumnya.
+
+### Grup dan Alternasi
+
+- `(abc)` : Grup tangkap yang menyimpan teks yang cocok dengan pola `abc`.
+- `|` : Alternasi atau "or", seperti `abc|def` yang cocok dengan `abc` atau `def`.
+
+### Anchor
+
+- `^` : Anchors ke awal baris.
+- `$` : Anchors ke akhir baris.
+- `\b` : Batas kata.
+- `\B` : Tidak pada batas kata.
+
+### Contoh Pola Regex Beserta Penjelasan
+
+1. **Mencari Kata yang Dimulai dengan Huruf Besar:**
+
+   ```vim
+   /\v\<[A-Z]\w*\>
+   ```
+
+   - `\<` : Awal kata.
+   - `[A-Z]` : Huruf kapital.
+   - `\w*` : Nol atau lebih karakter kata.
+   - `\>` : Akhir kata.
+
+2. **Mengganti Semua Angka dengan `#`:**
+
+   ```vim
+   :%s/\v\d+/#/g
+   ```
+
+   - `\v` : Very magic mode.
+   - `\d+` : Satu atau lebih digit.
+   - `#` : Teks pengganti.
+
+3. **Mengganti Spasi Ganda dengan Spasi Tunggal:**
+
+   ```vim
+   :%s/\v\s+/ /g
+   ```
+
+   - `\v` : Very magic mode.
+   - `\s+` : Satu atau lebih karakter spasi.
+   - ` ` : Spasi tunggal.
+
+4. **Menemukan Kalimat yang Dimulai dengan Kata "The":**
+
+   ```vim
+   /\v^The\s.*
+   ```
+
+   - `\v` : Very magic mode.
+   - `^The` : "The" di awal baris.
+   - `\s` : Spasi.
+   - `.*` : Nol atau lebih karakter apa saja.
+
+5. **Menemukan Kata yang Diapit oleh Kurung:**
+
+   ```vim
+   /\v\(\w+\)
+   ```
+
+   - `\v` : Very magic mode.
+   - `\(` : Kurung buka literal.
+   - `\w+` : Satu atau lebih karakter kata.
+   - `\)` : Kurung tutup literal.
+
+6. **Mencari atau Mengganti Semua Huruf Kecil:**
+
+   ```vim
+   /\v[a-z]+
+   ```
+
+   - `\v` : Very magic mode.
+   - `[a-z]+` : Satu atau lebih huruf kecil.
+
+7. **Mencari atau Mengganti Semua Huruf Besar:**
+
+   ```vim
+   /\v[A-Z]+
+   ```
+
+   - `\v` : Very magic mode.
+   - `[A-Z]+` : Satu atau lebih huruf besar.
+
+8. **Mencari atau Mengganti Kombinasi Huruf dan Angka:**
+
+   ```vim
+   /\v\w+
+   ```
+
+   - `\v` : Very magic mode.
+   - `\w+` : Satu atau lebih karakter kata (huruf, angka, dan underscore).
+
+9. **Mencari atau Mengganti Semua Teks dalam Tanda Kutip:**
+
+   ```vim
+   /\v".*"
+   ```
+
+   - `\v` : Very magic mode.
+   - `".*"` : Teks di dalam tanda kutip ganda.
+
+10. **Mencari atau Mengganti Email:**
+
+    ```vim
+    /\v[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}
+    ```
+
+    - `\v` : Very magic mode.
+    - `[a-zA-Z0-9._%+-]+` : Satu atau lebih karakter kata, angka, atau simbol umum dalam email.
+    - `@` : Simbol at.
+    - `[a-zA-Z0-9.-]+` : Satu atau lebih karakter kata, angka, titik, atau tanda hubung.
+    - `\.` : Titik literal.
+    - `[a-zA-Z]{2,4}` : Dua hingga empat huruf (domain tingkat atas).
+
+Dengan pola-pola regex ini, Anda dapat melakukan pencarian dan penggantian teks yang kompleks dengan lebih efisien di Vim atau Neovim.
+
+---

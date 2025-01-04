@@ -618,14 +618,14 @@ const TaskApp = ({
           </PopoverContent>
         </Popover>
         <div className="flex-none flex items-center gap-2">
-          <Link
+          {/*<Link
             to="./garden"
             className={cn(
               buttonVariants({ size: "icon", variant: "secondary" }),
             )}
           >
             <Trees />
-          </Link>
+          </Link>*/}
 
           <Popover>
             <PopoverTrigger

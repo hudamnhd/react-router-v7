@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "#app/components/ui/tooltip.tsx";
 import React from "react";
-import { Button } from "#app/components/ui/button";
+import { Button } from "#app/components/ui/button-shadcn";
 import { cn } from "#app/utils/misc.tsx";
 import { VariantProps, cva } from "class-variance-authority";
 import {

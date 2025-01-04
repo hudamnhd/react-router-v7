@@ -15,9 +15,9 @@ export default function Sholawat() {
       <div className="p-1.5 flex justify-end">
         <DisplaySetting opts={opts} />
       </div>
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize">
+      <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
         Sholawat
-      </h1>
+      </div>
 
       {sholawat.map((ayat, index) => {
         return (
@@ -25,7 +25,7 @@ export default function Sholawat() {
             key={index}
             className="group relative px-4 pb-4 sm:px-5 rounded-md border-t"
           >
-            <h4 className="font-bold mb-2 text-lg">{ayat.nama}</h4>
+            <div className="pt-3 font-bold text-lg">{ayat.nama}</div>
             <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
               <div
                 className={cn(

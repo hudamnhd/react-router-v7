@@ -1,13 +1,6 @@
 import { cn } from "#app/utils/misc.tsx";
-import {
-  useFetcher,
-  Link,
-  useParams,
-  useNavigate,
-  useLoaderData,
-  useRouteLoaderData,
-} from "@remix-run/react";
-
+import cache from "#app/utils/cache-server.ts";
+import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import {
   Dialog,
   Heading,
@@ -20,16 +13,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Button, buttonVariants } from "#app/components/ui/button";
-import {
-  Bookmark,
-  Heart,
-  Ellipsis,
-  Dot,
-  Minus,
-  Plus,
-  X,
-  BookOpen,
-} from "lucide-react";
+import { Dot, Minus, X } from "lucide-react";
+
 import Loader from "#app/components/ui/loader";
 import ky from "ky";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
@@ -47,6 +32,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const intent = url.searchParams.get("intent") || "page";
   const { id } = params;
+
+  const cacheKey = `quran-page-${id}`;
+  const cacheData = cache.get(cacheKey);
+
+  if (cacheData) {
+    return cacheData;
+  }
+
   const is_get_surah = intent === "surat";
   const page = is_get_surah ? await api.get(`ayat/${id}/1`).json() : null;
 
@@ -85,6 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     id,
   };
 
+  cache.set(cacheKey, data);
   return json(data, {
     headers: {
       "Cache-Control": "public, max-age=31560000",
@@ -92,83 +86,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 }
 
-import { getCache, setCache } from "#app/utils/cache-client.ts";
-
-const FAVORITES_KEY = "FAVORITES";
-const LASTVISIT_KEY = "LASTVISIT";
-const LASTREAD_KEY = "LASTREAD";
-
 import { fontSizeOpt } from "#/app/constants/prefs";
 
 export default function Index() {
   const { group_surat, id } = useLoaderData();
   const loaderRoot = useRouteLoaderData("root");
   const opts = loaderRoot?.opts || {};
-  const [favorites, setFavorites] = useState<Array>([]);
-  const [lastRead, setLastRead] = useState<number | null>(null);
-
-  useEffect(() => {
-    // fetcher.load(`/resources/quran/page/${params.id}`);
-    const loadFavorites = async () => {
-      // if (surat) {
-      //   await setCache(LASTVISIT_KEY, surat);
-      // }
-
-      const storedFavorites = await getCache(FAVORITES_KEY);
-      if (storedFavorites) {
-        setFavorites(storedFavorites);
-      }
-    };
-
-    const loadLastRead = async () => {
-      const storedLastRead = await getCache(LASTREAD_KEY);
-      if (storedLastRead !== null) {
-        setLastRead(storedLastRead);
-      }
-    };
-
-    loadFavorites();
-    loadLastRead();
-  }, [id]);
-
-  // Simpan data favorit ke localForage
-  useEffect(() => {
-    const saveFavorites = async (favorites) => {
-      await setCache(FAVORITES_KEY, favorites);
-    };
-    saveFavorites(favorites);
-  }, [favorites]);
-
-  // Simpan ayat terakhir dibaca ke localForage
-
-  useEffect(() => {
-    if (lastRead !== null) {
-      const saveLastRead = async (lastRead) => {
-        await setCache(LASTREAD_KEY, lastRead);
-      };
-      saveLastRead(lastRead);
-    }
-  }, [lastRead]);
-
-  // Fungsi untuk toggle favorit
-  const toggleFavorite = (ayat) => {
-    const isFavorite = favorites.some((fav) => fav.id === ayat.id);
-
-    if (isFavorite) {
-      // Hapus ayat dari favorites
-      setFavorites(favorites.filter((fav) => fav.id !== ayat.id));
-    } else {
-      // Tambahkan ayat ke favorites
-      setFavorites([...favorites, ayat]);
-    }
-  };
-
-  // Tandai ayat sebagai terakhir dibaca
-  const handleRead = (ayat) => {
-    setLastRead(ayat); // Set ayat yang terakhir dibaca
-  };
-
   const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
+
   return (
     <div className="prose dark:prose-invert max-w-xl mx-auto border-x divide-y">
       <div className="p-1.5 flex justify-end">
@@ -359,24 +284,4 @@ const toArabicNumber = (number: number) => {
     .split("")
     .map((digit) => arabicDigits[parseInt(digit)])
     .join("");
-};
-
-const AyatList: React.FC<{ ayats: { number: number; text: string }[] }> = ({
-  ayats,
-}) => {
-  return (
-    <div className="mt-4">
-      {ayats.map((ayat) => (
-        <div
-          key={ayat.number}
-          className="flex items-center gap-2 border-b py-2"
-        >
-          <span className="text-xl font-bold">
-            {toArabicNumber(ayat.number)}
-          </span>
-          <p className="text-right text-lg font-serif">{ayat.text}</p>
-        </div>
-      ))}
-    </div>
-  );
 };

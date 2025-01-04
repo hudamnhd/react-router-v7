@@ -18,7 +18,6 @@ import {
   MapPin,
   Search,
 } from "lucide-react";
-
 import {
   Dialog,
   Heading,
@@ -36,6 +35,7 @@ export function headers() {
     "Cache-Control": "public, max-age=31560000, immutable",
   };
 }
+
 export async function loader() {
   const cacheKey = `doa-lengkap`;
   const cacheData = cache.get(cacheKey);
@@ -95,9 +95,9 @@ function Doa() {
   return (
     <React.Fragment>
       <div className="border-x border-b pb-1 rounded-b-xl max-w-4xl mx-auto">
-        <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize my-2">
+        <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-2">
           Do'a
-        </h1>
+        </div>
 
         <TabDemo result={result} />
       </div>
@@ -212,6 +212,7 @@ function TabDemo({ result }) {
       })),
     [data],
   );
+
   return (
     <Tabs defaultValue="quran">
       <ScrollArea className="max-w-4xl mx-auto">
@@ -260,34 +261,9 @@ function TabDemo({ result }) {
         <TabsContent
           key={d.label}
           value={d.source}
-          className="max-w-4xl mx-auto"
+          className="max-w-4xl mx-auto p-0 m-0"
         >
-          {d.data.map((doa, index) => {
-            const trimmedJudul = doa.judul.replace(/\s+/g, " ").trim();
-            return (
-              <div key={index} className="w-full border-b">
-                <div className="group relative py-4 px-2 sm:px-4 rounded-md w-full">
-                  <div className="font-medium text-lg mb-2">{trimmedJudul}</div>
-                  <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                    <p
-                      className="relative mt-2 font-lpmq text-right text-primary"
-                      dangerouslySetInnerHTML={{
-                        __html: doa.arab,
-                      }}
-                    />
-                  </div>
-                  <div className="mt-3 space-y-3">
-                    <div
-                      className="translation-text prose-sm text-muted-foreground max-w-none"
-                      dangerouslySetInnerHTML={{
-                        __html: doa.indo,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          <DoaView items={d.data} />
         </TabsContent>
       ))}
       <TabsContent value="search" className="p-0 m-0">
@@ -296,6 +272,75 @@ function TabDemo({ result }) {
     </Tabs>
   );
 }
+
+export const DoaView = ({ items }) => {
+  const parentRef = React.useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: items.length, // Jumlah total item
+    getScrollElement: () => parentRef.current, // Elemen tempat scrolling
+    estimateSize: () => 35,
+  });
+  return (
+    <div
+      ref={parentRef}
+      style={{
+        overflow: "auto",
+      }}
+      className="h-[calc(100vh-175px)]"
+    >
+      <div>
+        <div
+          className="space-y-0.5 py-2"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const doa = items[virtualRow.index];
+            return (
+              <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <div key={virtualRow.index} className="w-full border-b">
+                  <div className="group relative py-4 px-2 sm:px-4 rounded-md w-full">
+                    <div className="font-medium text-lg mb-2">{doa.judul}</div>
+                    <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
+                      <p
+                        className="relative mt-2 font-lpmq text-right text-primary"
+                        dangerouslySetInnerHTML={{
+                          __html: doa.arab,
+                        }}
+                      />
+                    </div>
+                    <div className="mt-3 space-y-3">
+                      <div
+                        className="translation-text prose-sm text-muted-foreground max-w-none"
+                        dangerouslySetInnerHTML={{
+                          __html: doa.indo,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 import React, { JSX, useMemo, useState } from "react";
 import lodash from "lodash";
@@ -380,7 +425,6 @@ function SearchView({ result }) {
 const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
-  // Gunakan useVirtualizer
   const rowVirtualizer = useVirtualizer({
     count: items.length, // Jumlah total item
     getScrollElement: () => parentRef.current, // Elemen tempat scrolling
@@ -423,7 +467,8 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
             return (
               <div
                 key={virtualRow.key}
-                ref={virtualRow.measureElement}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
                 style={{
                   position: "absolute",
                   top: 0,
@@ -440,7 +485,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
                 <div className="relative flex cursor-default select-none items-center gap-x-2.5 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground">
                   <Icon className="h-[20px] w-[20px] flex-none sm:flex hidden" />
                   <span className="flex-none sm:hidden flex">·</span>
-                  <span className="mr-auto line-clamp-1">{item.judul}</span>
+                  <div className="mr-auto line-clamp-3">{item.judul}</div>
                 </div>
               </div>
             );
