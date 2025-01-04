@@ -261,7 +261,7 @@ function TabDemo({ result }) {
         <TabsContent
           key={d.label}
           value={d.source}
-          className="max-w-4xl mx-auto p-0 m-0"
+          className="max-w-4xl mx-auto p-0 m-0 px-2.5"
         >
           <DoaView items={d.data} />
         </TabsContent>

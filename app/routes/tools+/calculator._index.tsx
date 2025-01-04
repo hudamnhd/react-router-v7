@@ -15,7 +15,7 @@ import {
 } from "#app/components/ui/collapsible";
 import { ClientOnly } from "remix-utils/client-only";
 import { Spinner } from "#app/components/ui/spinner";
-
+import { ChevronDown } from "lucide-react";
 const SpinnerFull = () => {
   return (
     <div className="absolute h-full w-full flex items-center justify-center bottom-0 left-1/2 transform -translate-x-1/2  z-20 backdrop-blur-[1px] rounded-xl">
@@ -262,15 +262,23 @@ const Calculator: React.FC = () => {
       )}
     >
       <Popover>
-        <div className="w-full flex items-center justify-between border-b px-2.5 sm:px-3 py-1">
-          <div>
-            <p className="mr-2 inline-block uppercase my-1 font-sans font-bold">
-              Calculator
-            </p>
+        <div>
+          <div className="w-full flex items-center justify-between border-b px-2.5 sm:px-3 py-1">
+            <div>
+              <p className="mr-2 inline-block uppercase my-1 font-sans font-bold">
+                Calculator
+              </p>
+            </div>
+            <PopoverTrigger className="flex items-center gap-x-1.5">
+              <History className="w-4 h-4" /> Riwayat
+            </PopoverTrigger>
           </div>
-          <PopoverTrigger className="flex items-center gap-x-1.5">
-            <History className="w-4 h-4" /> Riwayat
-          </PopoverTrigger>
+
+          <div className="flex items-center justify-between bg-muted/50 px-2 border-b">
+            <span className="text-xl font-bold text-right text-foreground/80">
+              {currentInput?.slice(-28)}
+            </span>
+          </div>
         </div>
         <PopoverContent className="w-full mb-4 overflow-y-auto divide-y divide-gray-300 max-h-[80vh]">
           {history.map((d, index) => (
@@ -379,94 +387,97 @@ const Calculator: React.FC = () => {
           ))}
         </PopoverContent>
       </Popover>
+
       <div>
-        <div
-          ref={expressionRef}
-          className={cn(
-            "space-y-1 text-2xl font-semibold  overflow-y-auto mb-2 p-2.5 sm:p-3",
-            "max-h-[calc(100vh-350px)]",
-          )}
-        >
-          {splitExpression(currentInput).map((item, index, arr) => {
-            const lastIndex = findLastEvenIndex(arr);
-            // Menampilkan angka
-            if (index % 2 === 0) {
-              return (
-                <div key={index} className="text-right">
-                  {index === 0 ? (
-                    // Menampilkan angka pertama dengan warna biru
-                    <div className="flex items-center justify-between border-b border-dashed border-gray-400 px-1">
-                      <div className="gap-x-4 flex items-center text-[16px] w-3 text-start text-muted-foreground">
-                        <span>{index === 0 && "1."}</span>
-                      </div>
-                      <span className="text-2xl font-semibold">
-                        {formatRupiah(parseFloat(item))}
-                      </span>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Menampilkan operator setelah angka */}
-                      <div
-                        className={`${index === lastIndex ? "" : " border-b border-dashed border-muted-foreground"} flex items-center justify-between gap-2 items-center justify-end py-0.5 px-1`}
-                      >
-                        <div className="gap-x-3 flex items-center">
-                          <span className="text-[16px] w-3 text-start text-muted-foreground">
-                            {index === 0 ? "" : index / 2 + 1}.
-                          </span>
-                          <span className="text-2xl px-2">
-                            {splitExpression(currentInput)[index - 1]}
+        <Collapsible defaultOpen={true} className="m-0 p-0">
+          <CollapsibleTrigger className="[&[data-state=open]>svg]:rotate-180 [&[data-state=open]>.child]:max-h-[calc(100vh-400px)] [&[data-state=closed]>.child]:max-h-[calc(100vh-183px)] flex flex-col items-center justify-center w-full p-0 m-0">
+            <div
+              ref={expressionRef}
+              className={cn(
+                "child space-y-1 text-2xl font-semibold  overflow-y-auto px-2.5 sm:px-3 w-full",
+                // "max-h-[calc(100vh-183px)]",
+              )}
+            >
+              {splitExpression(currentInput).map((item, index, arr) => {
+                const lastIndex = findLastEvenIndex(arr);
+                // Menampilkan angka
+                if (index % 2 === 0) {
+                  return (
+                    <div key={index} className="text-right">
+                      {index === 0 ? (
+                        // Menampilkan angka pertama dengan warna biru
+                        <div className="flex items-center justify-between border-b border-dashed border-gray-400 px-1">
+                          <div className="gap-x-4 flex items-center text-[16px] w-3 text-start text-muted-foreground">
+                            <span>{index === 0 && "1."}</span>
+                          </div>
+                          <span className="text-2xl font-semibold">
+                            {formatRupiah(parseFloat(item))}
                           </span>
                         </div>
-                        <span
-                          className={`${index === lastIndex ? "relative" : ""} text-2xl font-semibold `}
-                        >
-                          {index === lastIndex ? (
-                            <span className="relative flex justify-end">
-                              <span className="animate-ping absolute inline-flex h-[23px] w-[12px] rounded bg-sky-400 opacity-90"></span>
-                              <span className="text-2xl font-semibold">
-                                {formatRupiah(parseFloat(item))}
+                      ) : (
+                        <>
+                          {/* Menampilkan operator setelah angka */}
+                          <div
+                            className={`${index === lastIndex ? "" : " border-b border-dashed border-muted-foreground"} flex items-center justify-between gap-2 items-center justify-end py-0.5 px-1`}
+                          >
+                            <div className="gap-x-3 flex items-center">
+                              <span className="text-[16px] w-3 text-start text-muted-foreground">
+                                {index === 0 ? "" : index / 2 + 1}.
                               </span>
+                              <span className="text-2xl px-2">
+                                {splitExpression(currentInput)[index - 1]}
+                              </span>
+                            </div>
+                            <span
+                              className={`${index === lastIndex ? "relative" : ""} text-2xl font-semibold `}
+                            >
+                              {index === lastIndex ? (
+                                <span className="relative flex justify-end">
+                                  <span className="animate-ping absolute inline-flex h-[23px] w-[12px] rounded bg-sky-400 opacity-90"></span>
+                                  <span className="text-2xl font-semibold">
+                                    {formatRupiah(parseFloat(item))}
+                                  </span>
+                                </span>
+                              ) : (
+                                formatRupiah(parseFloat(item))
+                              )}
                             </span>
-                          ) : (
-                            formatRupiah(parseFloat(item))
-                          )}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            } else {
-              return null;
-            }
-          })}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
+              })}
 
-          <div className="bg-background sticky bottom-0 z-10 border-t-2 border-primary">
-            <div className="bg-background flex items-center justify-between border-t-2 border-primary">
-              <div className="py-2 text-xl font-bold text-right">TOTAL </div>
-              <div className="flex items-center gap-3 py-1">
-                {lastOperator !== "" && (
-                  <span className="relative flex justify-end">
-                    <span className="text-2xl font-semibold pb-1">
-                      {lastOperator}
+              <div className="bg-background sticky bottom-0  border-t-2 border-primary">
+                <div className="bg-background flex items-center justify-between border-t-2 border-primary">
+                  <div className="py-2 text-xl font-bold text-right">
+                    TOTAL{" "}
+                  </div>
+                  <div className="flex items-center gap-3 py-1">
+                    {lastOperator !== "" && (
+                      <span className="relative flex justify-end">
+                        <span className="text-2xl font-semibold pb-1">
+                          {lastOperator}
+                        </span>
+                      </span>
+                    )}
+                    <span className="text-2xl font-bold text-right">
+                      {/*{formatRupiah(evaluateInput(currentInput))}*/}
+                      {formatRupiah(evaluateInputSequential(currentInput))}
                     </span>
-                  </span>
-                )}
-                <span className="text-2xl font-bold text-right">
-                  {/*{formatRupiah(evaluateInput(currentInput))}*/}
-                  {formatRupiah(evaluateInputSequential(currentInput))}
-                </span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="bg-background flex items-center justify-between bg-muted px-2">
-              <span className="text-xl font-bold text-right text-foreground/80">
-                {currentInput?.slice(-29)}
-              </span>
-            </div>
-          </div>
-        </div>
-        {/*biome-ignore format: the code should not be formatted*/}
-        <div className="grid grid-cols-4 gap-2 p-2.5 sm:p-3">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="p-0 m-0">
+            {/*biome-ignore format: the code should not be formatted*/}
+
+            <div className="grid grid-cols-4 gap-2 px-2.5 sm:px-3 pb-2.5 sm:pb-3">
             <Button size="lg" className="font-normal text-3xl" onPress={handleClear}>C</Button>
             <Button size="lg" className="[&_svg]:size-7 transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2"  onPress={() => handleOperatorClick("*")}><X strokeWidth={2} /></Button>
             <Button size="lg" className="transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-chart-2" onPress={() => handleOperatorClick("/")}><div className="text-3xl font-medium pb-1">÷</div></Button>
@@ -490,7 +501,9 @@ const Calculator: React.FC = () => {
             <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress("000")}>000</Button>
             <Button className="font-medium text-3xl transform transition duration-300 ease-in-out focus:scale-[105%] focus:bg-primary/30" size="lg" variant="outline" onPress={() => handleButtonPress(".")}>.</Button>
         </div>
-        {/*biome-ignore format: the code should not be formatted*/}
+            {/*biome-ignore format: the code should not be formatted*/}
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </div>
   );

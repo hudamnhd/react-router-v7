@@ -437,7 +437,7 @@ const Layout = () => {
 
   if (!initial_data) {
     return (
-      <div className="mx-auto max-w-3xl w-full h-[100vh] border-x p-2.5 sm:p-4">
+      <div className="mx-auto max-w-3xl w-full h-[calc(100vh-57px)] overflow-y-auto border-x p-2.5 sm:p-4">
         {/*<Debug data={todos} />*/}
         <TodoNavigator data={todos} />
       </div>
