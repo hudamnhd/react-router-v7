@@ -6,7 +6,7 @@ export const Post = ({ slug, frontmatter }: PostMeta) => {
   return (
     <article className="space-y-2">
       <Link to={`/notes/${slug}`}>
-        <h3 className="text-3xl font-bold">{frontmatter.title}</h3>
+        <div className="text-3xl font-bold">{frontmatter.title}</div>
       </Link>
       <p className="text-accent-foreground">{frontmatter.description}</p>
       <time

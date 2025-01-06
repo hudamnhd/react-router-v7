@@ -56,22 +56,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 }
 
-// import { getCache, setCache, constructKey } from "#app/utils/cache-client.ts";
+// import { get_cache, set_cache, construct_key } from "#app/utils/cache-client.ts";
 
 // export async function clientLoader({
 //   request,
 //   serverLoader,
 // }: ClientLoaderFunctionArgs) {
-//   const key = constructKey(request);
+//   const key = construct_key(request);
 //
-//   const cachedData = await getCache(key);
+//   const cachedData = await get_cache(key);
 //
 //   if (cachedData) {
 //     return cachedData; // (3)
 //   }
 //
 //   const serverData = await serverLoader();
-//   await setCache(key, serverData);
+//   await set_cache(key, serverData);
 //   return serverData;
 // }
 

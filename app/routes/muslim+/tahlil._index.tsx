@@ -4,6 +4,10 @@ import { useRouteLoaderData } from "@remix-run/react";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { cn } from "#app/utils/misc.tsx";
 
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Tahlil | Doti App" }];
+
 export default function Route() {
   const loaderRoot = useRouteLoaderData("root");
   const opts = loaderRoot?.opts || {};
@@ -28,7 +32,7 @@ export default function Route() {
             className="group relative px-4 py-4 sm:py-4 sm:px-5 rounded-md border-t"
           >
             <div>
-              <div className="font-medium leading-none text-lg leading-6">
+              <div className="font-semibold text-lg leading-6">
                 {ayat.title}
               </div>
             </div>

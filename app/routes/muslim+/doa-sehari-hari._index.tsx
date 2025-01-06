@@ -11,6 +11,12 @@ import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [
+  { title: "Doa Sehari-hari | Doti App" },
+];
+
 export function headers() {
   return {
     "Cache-Control": "public, max-age=31560000, immutable",

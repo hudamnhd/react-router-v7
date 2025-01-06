@@ -76,11 +76,16 @@ import { cn } from "#app/utils/misc";
 import { Button, buttonVariants } from "#app/components/ui/button-shadcn";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Daily Tasks | Doti App" }];
+
 let initial_data = true;
+
 async function load_data_daily_tasks() {
   const data_tasks = localStorage.getItem("daily-tasks");
   const initialTasks = data_tasks ? JSON.parse(data_tasks) : {};
-  // const initialTasks = await getCache("daily-tasks");
+  // const initialTasks = await get_cache("daily-tasks");
   const now = new Date();
 
   // Fungsi untuk memperbarui status
@@ -245,9 +250,7 @@ const TodoNavigator = ({ data }) => {
           streak_data={streak_data}
         />
       </div>
-
       <Unload data={data} date={date_key} active_task={active_task} />
-      {/*<Debug data={todos} />*/}
     </div>
   );
 };
@@ -429,7 +432,6 @@ const importTodos = (event, data) => {
 const Layout = () => {
   const todos = useAppSelector((state) => state.tasks.tasks);
 
-  console.warn("DEBUGPRINT[25]: privacy.tsx:2: lodash=", lodash.debounce);
   React.useEffect(() => {
     load_data_daily_tasks();
     askNotificationPermission();
@@ -446,12 +448,9 @@ const Layout = () => {
 };
 
 const Unload = ({ data }) => {
-  useBeforeUnload(
-    React.useCallback(() => {
-      localStorage.setItem("daily-tasks", JSON.stringify(data));
-    }, [data]),
-  );
-
+  React.useEffect(() => {
+    localStorage.setItem("daily-tasks", JSON.stringify(data));
+  }, [data]);
   return null;
 };
 
@@ -631,6 +630,22 @@ const TaskApp = ({
             <PopoverTrigger
               className={cn(
                 buttonVariants({ size: "icon", variant: "secondary" }),
+                "relative",
+              )}
+            >
+              <Flame />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto">
+              <CalendarWeek
+                total_sessions={all_session}
+                streak_data={streak_data}
+              />
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger
+              className={cn(
+                buttonVariants({ size: "icon", variant: "secondary" }),
               )}
             >
               <Activity />
@@ -644,19 +659,32 @@ const TaskApp = ({
             <PopoverTrigger
               className={cn(
                 buttonVariants({ size: "icon", variant: "secondary" }),
-                "relative",
               )}
             >
-              <Flame />
-              <Badge className="absolute px-1.5 -top-2 -right-2">
-                {streak_data?.current_streak}
-              </Badge>
+              <Info />
             </PopoverTrigger>
-            <PopoverContent className="w-auto">
-              <CalendarWeek
-                total_sessions={all_session}
-                streak_data={streak_data}
-              />
+            <PopoverContent className="w-auto p-4">
+              <div className="grid gap-2">
+                <label
+                  htmlFor="upload-file"
+                  className={cn(buttonVariants({ variant: "outline" }))}
+                >
+                  <Upload /> Import
+                  <input
+                    id="upload-file"
+                    type="file"
+                    className="hidden"
+                    accept=".json"
+                    onChange={(e) => importTodos(e, data)}
+                  />
+                </label>
+
+                <Button variant="outline" onClick={() => exportTodos(data)}>
+                  <Download /> Export
+                </Button>
+
+                <LocalStorageProgressBar />
+              </div>
             </PopoverContent>
           </Popover>
         </div>
@@ -667,13 +695,13 @@ const TaskApp = ({
       <div>
         <div
           style={{ animationDelay: `0.1s` }}
-          className="animate-roll-reveal [animation-fill-mode:backwards] flex flex-col items-end"
+          className="animate-slide-top [animation-fill-mode:backwards] flex flex-col items-end"
         >
           <div className="flex items-center gap-x-1">{date.q}</div>
         </div>
         <div
           style={{ animationDelay: `0.1s` }}
-          className="animate-roll-reveal [animation-fill-mode:backwards] ml-auto flex w-full items-center  bg-gradient-to-r from-background to-accent py-2 pr-2 mt-1 mb-2 rounded-md"
+          className="animate-slide-top [animation-fill-mode:backwards] ml-auto flex w-full items-center  bg-gradient-to-r from-background to-accent py-2 pr-2 mt-1 mb-2 rounded-md"
         >
           <div className="mb-1 mt-3 flex justify-end">
             <div className="text-sm md:text-sm ml-3">
@@ -710,7 +738,7 @@ const ProgressBarIndicator = ({
     <React.Fragment>
       <div
         style={{ animationDelay: `0.1s` }}
-        className="animate-roll-reveal [animation-fill-mode:backwards] mb-3 rounded-md transition-all duration-500 ease-in-out"
+        className="animate-slide-top [animation-fill-mode:backwards] mb-3 rounded-md transition-all duration-500 ease-in-out"
       >
         <div className="relative h-8 w-full rounded-md bg-muted">
           <div className="flex h-8 items-center justify-end gap-1 px-2">
@@ -886,9 +914,7 @@ const TodoTimer = ({
             const notif = {
               title: "Saatnya istirahat",
               description:
-                "Sesion " +
-                (active_task.sessions.length + 1) +
-                " has completed",
+                "Sesion " + active_task.sessions.length + " has completed",
             };
             showNotification(notif.title, notif.description);
 
@@ -1180,7 +1206,7 @@ const TodoTimer = ({
                   const notif = {
                     title: "Saatnya istirahat",
                     description:
-                      "Sesion " + (sessionData.length + 1) + " has completed",
+                      "Sesion " + sessionData.length + " has completed",
                   };
                   showNotification(notif.title, notif.description);
 
@@ -1280,7 +1306,7 @@ const TodoTimer = ({
                   const notif = {
                     title: "Saatnya istirahat",
                     description:
-                      "Sesion " + (sessionData.length + 1) + " has completed",
+                      "Sesion " + sessionData.length + " has completed",
                   };
                   showNotification(notif.title, notif.description);
                   dispatch(
@@ -1517,7 +1543,7 @@ const CalendarWeek = ({ total_sessions, streak_data }) => {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="lucide lucide-flame-kindling text-orange-400"
+                className="lucide lucide-flame-kindling dark:text-orange-400 text-orange-500"
               >
                 <path d="M12 2c1 3 2.5 3.5 3.5 4.5A5 5 0 0 1 17 10a5 5 0 1 1-10 0c0-.3 0-.6.1-.9a2 2 0 1 0 3.3-2C8 4.5 11 2 12 2Z" />
                 <path d="m5 22 14-4" />
@@ -1525,7 +1551,7 @@ const CalendarWeek = ({ total_sessions, streak_data }) => {
               </svg>
             </div>
           </div>
-          <div className="grid grid-cols-7 justify-center gap-5 rounded-lg bg-orange-400 p-2 px-3 text-white">
+          <div className="grid grid-cols-7 justify-center gap-5 rounded-lg dark:bg-orange-400 bg-orange-500 p-2 px-3 text-white">
             <div>Mo</div>
             <div>Tu</div>
             <div>We</div>
@@ -1950,35 +1976,6 @@ function SelectFilter({ data, date, setValue, tasks }) {
     <div className="flex items-center w-full justify-between mb-2">
       {(date.is_today || date.is_tomorrow) && <AddTodo date={date} />}
       <div className="flex items-center gap-x-2">
-        <Popover>
-          <PopoverTrigger>
-            <Info className="w-4 h-4 text-muted-foreground" />
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-4">
-            <div className="grid gap-2">
-              <label
-                htmlFor="upload-file"
-                className={cn(buttonVariants({ variant: "outline" }))}
-              >
-                <Upload /> Import
-                <input
-                  id="upload-file"
-                  type="file"
-                  className="hidden"
-                  accept=".json"
-                  onChange={(e) => importTodos(e, data)}
-                />
-              </label>
-
-              <Button variant="outline" onClick={() => exportTodos(data)}>
-                <Download /> Export
-              </Button>
-
-              <LocalStorageProgressBar />
-            </div>
-          </PopoverContent>
-        </Popover>
-
         <ComboboxPopoverFilter data={mergedCategories} handler={setValue} />
       </div>
     </div>
@@ -2602,7 +2599,7 @@ const DropdownMenuTask = ({ todo, date, active_task }) => {
                 const notif = {
                   title: "Saatnya istirahat",
                   description:
-                    "Sesion " + (sessionData.length + 1) + " has completed",
+                    "Sesion " + sessionData.length + " has completed",
                 };
                 showNotification(notif.title, notif.description);
 

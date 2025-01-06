@@ -9,6 +9,7 @@ import {
   Calculator,
   Timer,
   Repeat,
+  Info,
 } from "lucide-react";
 
 const muslimLinks: {
@@ -17,6 +18,12 @@ const muslimLinks: {
   description: string;
   icon: SVGSVGElement;
 }[] = [
+  {
+    title: "Bookmarks",
+    href: "/tools/bookmarks",
+    description: "List Bookmark ayah, doa and anymore.",
+    icon: Heart,
+  },
   {
     title: "Al Qur'an",
     href: "/muslim/quran",
@@ -84,6 +91,12 @@ const toolsLinks: {
     href: "/tools/habit",
     description: "Simple Habit tracker",
     icon: Repeat,
+  },
+  {
+    title: "About",
+    href: "/about",
+    description: "About this application",
+    icon: Info,
   },
 ];
 

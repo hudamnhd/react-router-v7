@@ -4,36 +4,24 @@ import {
   addMonths,
   eachDayOfInterval,
   endOfMonth,
-  endOfWeek,
   format,
   getDay,
-  isSameDay,
-  isSameMonth,
   isToday,
-  isTomorrow,
   isWeekend,
-  isYesterday,
   isBefore,
   startOfMonth,
-  startOfWeek,
   subDays,
   addDays,
   subMonths,
-  subWeeks,
 } from "date-fns";
 import { Button } from "#app/components/ui/button-shadcn";
 import { Input } from "#app/components/ui/input";
-
-import {
-  Circle,
-  Plus,
-  PencilLine,
-  Trash2,
-  Check,
-  CircleCheckBig,
-  X,
-} from "lucide-react";
+import { Plus, PencilLine, Trash2, Check, X } from "lucide-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Habit | Doti App" }];
 
 type Habit = {
   id: number;
@@ -163,7 +151,7 @@ const HabitTracker: React.FC = () => {
   // Hitung statistik
   const statistics = getStatistics(habits);
   return (
-    <div className="grid xl:grid-cols-2 gap-5 sm:p-4 place-items-center max-w-4xl sm:max-w-full  w-full">
+    <div className="grid xl:grid-cols-2 gap-5 sm:p-4 place-items-start max-w-4xl sm:max-w-full  w-full">
       <div className="max-w-md w-full">
         <h1 className="text-2xl font-bold mt-2 mb-4 sm:text-start text-center">
           {monthName}
@@ -193,93 +181,99 @@ const HabitTracker: React.FC = () => {
             })}
           </React.Fragment>
 
-          {habits.map((habit, index) => {
-            const last_index = habits.length - 1 === index;
-            return (
-              <React.Fragment key={habit.id}>
-                <div
-                  className={cn(
-                    "group col-span-3 p-2 border-r-2 border-b",
-                    last_index && "border-b-0",
-                  )}
-                >
-                  <div className="group-hover:hidden block">{habit.name}</div>
-                  <div className="group-hover:flex hidden gap-x-2 text-center justify-center">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => handleEditHabit(habit.id)}
-                    >
-                      <PencilLine />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      className="h-6 w-6"
-                      onClick={() => deleteHabit(habit.id)}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </div>
-                </div>
-                {currentWeek.map((date) => {
-                  const formattedDate = format(date, "yyyy-MM-dd");
-                  const isCompleted = habit.dates[formattedDate] || false;
-
-                  const td = new Date();
-                  const todayStart = new Date(
-                    td.getFullYear(),
-                    td.getMonth(),
-                    td.getDate(),
-                  );
-                  const yesterday = isBefore(date, todayStart);
-                  const today = isToday(date);
-
-                  return (
-                    <div
-                      key={formattedDate}
-                      className={cn(
-                        "p-2 border-b ",
-                        today && "bg-accent",
-                        last_index && "border-b-0",
-                      )}
-                    >
-                      <div className="group flex flex-col items-center gap-y-2 relative transition-all duration-500 ease-in-out">
-                        <button
-                          disabled={!today}
-                          onClick={() =>
-                            toggleHabitCompletion(habit.id, formattedDate)
-                          }
-                          className={cn(
-                            "flex h-6 w-6 items-center justify-center rounded-full",
-                            !isCompleted &&
-                              "bg-gray-300 dark:bg-gray-700 text-white",
-                            today && "bg-foreground/50 dark:bg-foreground",
-                            isCompleted &&
-                              "bg-green-500 dark:bg-green-500 text-white",
-                            yesterday &&
-                              !isCompleted &&
-                              "bg-red-500 dark:bg-red-500 text-white",
-                          )}
-                        >
-                          <span>
-                            {isCompleted ? (
-                              <Check />
-                            ) : yesterday && !isCompleted ? (
-                              <X />
-                            ) : (
-                              ""
-                            )}
-                          </span>
-                        </button>
-                      </div>
+          {habits.length > 0 ? (
+            habits.map((habit, index) => {
+              const last_index = habits.length - 1 === index;
+              return (
+                <React.Fragment key={habit.id}>
+                  <div
+                    className={cn(
+                      "group col-span-3 p-2 border-r-2 border-b",
+                      last_index && "border-b-0",
+                    )}
+                  >
+                    <div className="group-hover:hidden block">{habit.name}</div>
+                    <div className="group-hover:flex hidden gap-x-2 text-center justify-center">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleEditHabit(habit.id)}
+                      >
+                        <PencilLine />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className="h-6 w-6"
+                        onClick={() => deleteHabit(habit.id)}
+                      >
+                        <Trash2 />
+                      </Button>
                     </div>
-                  );
-                })}
-              </React.Fragment>
-            );
-          })}
+                  </div>
+                  {currentWeek.map((date) => {
+                    const formattedDate = format(date, "yyyy-MM-dd");
+                    const isCompleted = habit.dates[formattedDate] || false;
+
+                    const td = new Date();
+                    const todayStart = new Date(
+                      td.getFullYear(),
+                      td.getMonth(),
+                      td.getDate(),
+                    );
+                    const yesterday = isBefore(date, todayStart);
+                    const today = isToday(date);
+
+                    return (
+                      <div
+                        key={formattedDate}
+                        className={cn(
+                          "p-2 border-b ",
+                          today && "bg-accent",
+                          last_index && "border-b-0",
+                        )}
+                      >
+                        <div className="group flex flex-col items-center gap-y-2 relative transition-all duration-500 ease-in-out">
+                          <button
+                            disabled={!today}
+                            onClick={() =>
+                              toggleHabitCompletion(habit.id, formattedDate)
+                            }
+                            className={cn(
+                              "flex h-6 w-6 items-center justify-center rounded-full",
+                              !isCompleted &&
+                                "bg-gray-300 dark:bg-gray-700 text-white",
+                              today && "bg-foreground/50 dark:bg-foreground",
+                              isCompleted &&
+                                "bg-green-500 dark:bg-green-500 text-white",
+                              yesterday &&
+                                !isCompleted &&
+                                "bg-red-500 dark:bg-red-500 text-white",
+                            )}
+                          >
+                            <span>
+                              {isCompleted ? (
+                                <Check />
+                              ) : yesterday && !isCompleted ? (
+                                <X />
+                              ) : (
+                                ""
+                              )}
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })
+          ) : (
+            <div className="col-span-7 text-center p-2 text-sm text-muted-foreground">
+              No data
+            </div>
+          )}
         </div>
         {/* Add Habit Input */}
         <div className="flex gap-2 mt-4 w-full">
@@ -289,7 +283,7 @@ const HabitTracker: React.FC = () => {
             onChange={(e) => setNewHabit(e.target.value)}
             placeholder="Enter a new habit"
           />
-          <Button size="icon" variant="outline" onClick={addHabit}>
+          <Button size="icon" disabled={newHabit.lengh == 0} onClick={addHabit}>
             <Plus />
           </Button>
         </div>
@@ -534,7 +528,6 @@ const FocusList = () => {
   );
 };
 
-import { useBeforeUnload } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
 export default function Route() {

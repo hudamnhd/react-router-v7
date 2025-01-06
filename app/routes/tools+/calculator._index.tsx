@@ -15,7 +15,11 @@ import {
 } from "#app/components/ui/collapsible";
 import { ClientOnly } from "remix-utils/client-only";
 import { Spinner } from "#app/components/ui/spinner";
-import { ChevronDown } from "lucide-react";
+
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Calculator | Doti App" }];
+
 const SpinnerFull = () => {
   return (
     <div className="absolute h-full w-full flex items-center justify-center bottom-0 left-1/2 transform -translate-x-1/2  z-20 backdrop-blur-[1px] rounded-xl">

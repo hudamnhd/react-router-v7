@@ -8,6 +8,10 @@ import { cn } from "#app/utils/misc.tsx";
 import { Sun, Moon, Plus } from "lucide-react";
 import { json } from "@remix-run/node";
 
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Dzikir | Doti App" }];
+
 function getWaktuSekarang(): string {
   const currentHour = new Date().getHours(); // Mendapatkan jam saat ini (0-23)
 

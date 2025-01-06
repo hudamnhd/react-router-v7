@@ -1,3 +1,4 @@
+import cache from "#app/utils/cache-server.ts";
 import { cn } from "#app/utils/misc.tsx";
 import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import {
@@ -8,7 +9,7 @@ import {
   Modal,
   ModalOverlay,
 } from "react-aria-components";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Button, buttonVariants } from "#app/components/ui/button";
@@ -24,14 +25,21 @@ import {
 import ky from "ky";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
+import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
+
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = ({ data }) => {
+  const { group_surat } = data;
+  const surah_name = Object.values(group_surat)[0].surah?.name_id;
+  return [{ title: surah_name + " | Doti App" }];
+};
 
 export function headers() {
   return {
     "Cache-Control": "public, max-age=31560000, immutable",
   };
 }
-
-import cache from "#app/utils/cache-server.ts";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
@@ -93,89 +101,119 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 }
 
-import { getCache, setCache } from "#app/utils/cache-client.ts";
+import { get_cache, set_cache } from "#app/utils/cache-client.ts";
 
 const FAVORITES_KEY = "FAVORITES";
-const LASTVISIT_KEY = "LASTVISIT";
+const BOOKMARK_KEY = "BOOKMARK";
 const LASTREAD_KEY = "LASTREAD";
 
 import { fontSizeOpt } from "#/app/constants/prefs";
 
 export default function Index() {
+  const renderCount = React.useRef(0);
+  renderCount.current++;
   const { group_surat, id } = useLoaderData();
   const loaderRoot = useRouteLoaderData("root");
   const opts = loaderRoot?.opts || {};
-  const [favorites, setFavorites] = useState<Array>([]);
   const [lastRead, setLastRead] = useState<number | null>(null);
+  const [bookmarks, setBookmarks] = React.useState<Bookmark[]>([]);
 
-  useEffect(() => {
-    // fetcher.load(`/resources/quran/page/${params.id}`);
-    const loadFavorites = async () => {
-      // if (surat) {
-      //   await setCache(LASTVISIT_KEY, surat);
-      // }
-
-      const storedFavorites = await getCache(FAVORITES_KEY);
-      if (storedFavorites) {
-        setFavorites(storedFavorites);
-      }
-    };
-
-    const loadLastRead = async () => {
-      const storedLastRead = await getCache(LASTREAD_KEY);
+  React.useEffect(() => {
+    const load_bookmark_from_lf = async () => {
+      const storedBookmarks = await get_cache(BOOKMARK_KEY);
+      const storedLastRead = await get_cache(LASTREAD_KEY);
       if (storedLastRead !== null) {
         setLastRead(storedLastRead);
       }
+      if (storedBookmarks) {
+        setBookmarks(storedBookmarks);
+      }
     };
 
-    loadFavorites();
-    loadLastRead();
-  }, [id]);
+    load_bookmark_from_lf();
+  }, []);
 
-  // Simpan data favorit ke localForage
-  useEffect(() => {
-    const saveFavorites = async (favorites) => {
-      await setCache(FAVORITES_KEY, favorites);
+  const bookmarks_ayah = bookmarks
+    .filter((item) => item.type === "ayat") // Hanya ambil item dengan type "ayat"
+    .map((item) => {
+      const params = new URLSearchParams(item.source.split("?")[1]); // Ambil query string setelah "?"
+      return {
+        created_at: item.created_at,
+        id: params.get("ayat"),
+      }; // Ambil nilai "ayat"
+    });
+
+  React.useEffect(() => {
+    const save_bookmark_to_lf = async (bookmarks) => {
+      await set_cache(BOOKMARK_KEY, bookmarks);
     };
-    saveFavorites(favorites);
-  }, [favorites]);
+    save_bookmark_to_lf(bookmarks);
+  }, [bookmarks]);
 
   // Simpan ayat terakhir dibaca ke localForage
 
   useEffect(() => {
     if (lastRead !== null) {
       const saveLastRead = async (lastRead) => {
-        await setCache(LASTREAD_KEY, lastRead);
+        await set_cache(LASTREAD_KEY, lastRead);
       };
       saveLastRead(lastRead);
     }
   }, [lastRead]);
 
   // Fungsi untuk toggle favorit
-  const toggleFavorite = (ayat) => {
-    const isFavorite = favorites.some((fav) => fav.id === ayat.id);
+  const toggleBookmark = (ayat) => {
+    const newBookmarks = save_bookmarks(
+      "ayat",
+      {
+        title: `${ayat.surah_name}:${ayat.id}`,
+        arab: ayat.arab,
+        latin: ayat.latin,
+        translation: ayat.text,
+        source: `/muslim/quran/${ayat.page}?ayat=${ayat.id}&surah=${ayat.surah}&juz=${ayat.juz}`,
+      },
+      [...bookmarks],
+    );
 
-    if (isFavorite) {
-      // Hapus ayat dari favorites
-      setFavorites(favorites.filter((fav) => fav.id !== ayat.id));
+    const is_saved = bookmarks_ayah.find((fav) => fav.id === ayat.id);
+
+    if (is_saved) {
+      const newBookmarks = bookmarks?.filter(
+        (d) => d.created_at !== is_saved.created_at,
+      );
+      setBookmarks(newBookmarks);
     } else {
-      // Tambahkan ayat ke favorites
-      setFavorites([...favorites, ayat]);
+      setBookmarks(newBookmarks);
     }
   };
 
   // Tandai ayat sebagai terakhir dibaca
   const handleRead = (ayat) => {
-    setLastRead(ayat); // Set ayat yang terakhir dibaca
+    const isLastRead = lastRead?.id === ayat.id;
+    if (isLastRead) {
+      setLastRead(null);
+    } else {
+      setLastRead(ayat);
+    }
   };
-
   const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
+
   return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x divide-y">
-      <div className="m-1.5 flex justify-end">
+    <div className="prose dark:prose-invert xl:max-w-6xl max-w-4xl mx-auto w-full border-x divide-y">
+      <div className="p-1.5 flex xl:justify-end justify-between gap-x-3">
+        <Link
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "xl:hidden flex",
+          )}
+          to="/muslim/quran/"
+        >
+          <BookOpen size={16} strokeWidth={2} aria-hidden="true" />
+          <span>List</span>
+        </Link>
         <DisplaySetting opts={opts} />
       </div>
-
+      {/*{renderCount.current}*/}
       {Object.values(group_surat).map((d) => {
         const first_ayah = d.ayat[0]?.ayah;
         const last_ayah = d.ayat[d.ayat.length - 1]?.ayah;
@@ -296,8 +334,15 @@ export default function Index() {
               </React.Fragment>
 
               <div className="">
-                {d.ayat.map((dt) => {
-                  const isFavorite = favorites.some((fav) => fav.id === dt.id);
+                {d.ayat.map((_dt) => {
+                  const surah_name = d.surah.name_id;
+                  const dt = {
+                    ..._dt,
+                    surah_name,
+                  };
+                  const isFavorite = bookmarks_ayah.some(
+                    (fav) => fav.id === dt.id,
+                  );
                   const isLastRead = lastRead?.id === dt.id;
 
                   return (
@@ -306,14 +351,18 @@ export default function Index() {
                         className={cn(
                           "group relative py-4 px-4 sm:px-5",
                           isFavorite &&
-                            "bg-gradient-to-b from-background via-background to-pink-400/50 dark:to-pink-600/50",
+                            "shadow-md shadow-pink-500 bg-gradient-to-bl from-background via-background to-pink-400/50 dark:to-pink-600/50",
                           isLastRead &&
-                            "bg-gradient-to-b from-background via-background to-lime-400/50 dark:to-lime-600/50",
+                            "shadow-md shadow-blue-500 bg-gradient-to-bl from-background via-background to-blue-400/50 dark:to-blue-600/50",
                         )}
                       >
                         <div className="w-full text-right flex gap-x-2.5 items-center justify-between">
                           <div className="flex items-center gap-x-3">
-                            {isFavorite ? (
+                            {isLastRead ? (
+                              <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl">
+                                <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                              </div>
+                            ) : isFavorite ? (
                               <div className="bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl">
                                 <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                               </div>
@@ -332,17 +381,18 @@ export default function Index() {
                             </div>
                           </div>
                           <div className="flex items-center gap-x-2">
-                            {isLastRead && (
-                              <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl">
-                                <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                              </div>
-                            )}
                             <MenuTrigger>
                               <Button
                                 aria-label="Menu"
                                 variant="secondary"
                                 size="icon"
-                                className="[&_svg]:size-5 rounded-xl h-9 w-9"
+                                className={cn(
+                                  "[&_svg]:size-5 rounded-xl h-9 w-9",
+                                  isFavorite &&
+                                    "bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl text-rose-600 dark:text-rose-400",
+                                  isLastRead &&
+                                    "bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl text-blue-600 dark:text-blue-400",
+                                )}
                               >
                                 <Ellipsis />
                               </Button>
@@ -350,15 +400,28 @@ export default function Index() {
                                 <Menu className="outline-none">
                                   <ActionItem
                                     id="new"
-                                    onAction={() => toggleFavorite(dt)}
+                                    onAction={() => toggleBookmark(dt)}
                                   >
-                                    <Heart className="mr-2 w-4 h-4" /> Favorite
+                                    <Heart
+                                      className={cn(
+                                        "mr-1 w-4 h-4",
+                                        isFavorite &&
+                                          "fill-rose-500 text-rose-500",
+                                      )}
+                                    />
+                                    Bookmark
                                   </ActionItem>
                                   <ActionItem
                                     id="open"
                                     onAction={() => handleRead(dt)}
                                   >
-                                    <Bookmark className="mr-2 w-4 h-4" />{" "}
+                                    <Bookmark
+                                      className={cn(
+                                        "mr-1 w-4 h-4",
+                                        isLastRead &&
+                                          "fill-blue-500 text-blue-500",
+                                      )}
+                                    />
                                     Terakhir Baca
                                   </ActionItem>
                                 </Menu>
@@ -416,10 +479,7 @@ export default function Index() {
       {/* Pagination Controls */}
       <div className="ml-auto flex items-center justify-center gap-3 py-5 border-t ">
         <Link
-          className={cn(
-            buttonVariants({ size: "icon", variant: "outline" }),
-            "mt-2 sm:mt-0",
-          )}
+          className={cn(buttonVariants({ size: "icon", variant: "outline" }))}
           to={`/muslim/quran/${parseInt(id) - 1}`}
           disabled={parseInt(id) === 1}
         >
@@ -427,14 +487,11 @@ export default function Index() {
           <ChevronLeftIcon />
         </Link>
 
-        <span className="text-accent-foreground">
+        <span className="text-accent-foreground text-sm">
           Halaman <strong>{id}</strong> dari <strong>604</strong>
         </span>
         <Link
-          className={cn(
-            buttonVariants({ size: "icon", variant: "outline" }),
-            "mt-2 sm:mt-0",
-          )}
+          className={cn(buttonVariants({ size: "icon", variant: "outline" }))}
           to={`/muslim/quran/${parseInt(id) + 1}`}
           disabled={parseInt(id) === 604}
         >

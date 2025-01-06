@@ -10,22 +10,12 @@ export default function Component() {
     <div className="relative bg-background overflow-hidden  px-4 sm:px-6 pt-4 pb-20">
       <div className="fixed grid grid-cols-2 gap-x-2 items-center justify-center bottom-3 left-1/2 transform -translate-x-1/2  z-20">
         <Button variant="outline" onClick={() => navigate(-1)}>
-          <ChevronLeft
-            className="me-1"
-            size={16}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
-          Go back
+          <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
+          Back
         </Button>
         <Button onClick={() => navigate("/")}>
-          <House
-            className="me-1"
-            size={16}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
-          Go Home
+          <House size={16} strokeWidth={2} aria-hidden="true" />
+          Home
         </Button>
       </div>
       <div className="relative">

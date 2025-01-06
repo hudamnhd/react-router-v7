@@ -6,6 +6,9 @@ import { Button } from "#app/components/ui/button";
 import { useBeforeUnload } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Pomodoro | Doti App" }];
 
 enum MODE {
   POMO = "Pomo",
@@ -259,16 +262,13 @@ function Example({ children }) {
           </h1>
 
           {children}
-          <div className="space-y-4 mt-2">
-            <details
-              className="group [&_summary::-webkit-details-marker]:hidden"
-              open
-            >
+          <div className="space-y-4 mt-3">
+            <details className="group [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-2.5">
-                <h2 className="font-medium">Apa itu Pomodoro ?</h2>
+                <p className="font-medium text-sm">Apa itu Pomodoro ?</p>
 
                 <svg
-                  className="size-5 shrink-0 transition duration-300 group-open:-rotate-180"
+                  className="size-4 shrink-0 transition duration-300 group-open:-rotate-180"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -283,7 +283,7 @@ function Example({ children }) {
                 </svg>
               </summary>
 
-              <p className="text-muted-foreground px-4 py-2.5">
+              <p className="text-muted-foreground px-4 py-2.5 text-sm">
                 Kata <strong>pomodoro</strong> berasal dari bahasa Italia yang
                 berarti <strong>tomat</strong>. Metode Pomodoro Technique
                 dinamai demikian karena Francesco Cirillo, pencipta metode ini,

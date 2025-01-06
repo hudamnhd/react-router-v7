@@ -4,15 +4,15 @@ const app_store = localforage.createInstance({
   name: "epic-app",
 });
 
-export const constructKey = (request: Request) => {
+export const construct_key = (request: Request) => {
   const url = new URL(request.url);
   return url.pathname + url.search + url.hash;
 };
 // Fungsi untuk menyimpan data ke cache dengan waktu kedaluwarsa (default 3 menit)
-export const setCache = async (
+export const set_cache = async (
   key: string,
   value: any,
-  ttl: number = 180000,
+  ttl: number = 31560000,
 ) => {
   try {
     const expiresAt = Date.now() + ttl;
@@ -24,7 +24,7 @@ export const setCache = async (
 };
 
 // Fungsi untuk mengambil data dari cache dan memvalidasi waktu kedaluwarsa
-export const getCache = async (key: string) => {
+export const get_cache = async (key: string) => {
   try {
     const cacheData: { value: any; expiresAt: number } | null =
       await app_store.getItem(key);
@@ -34,7 +34,7 @@ export const getCache = async (key: string) => {
         return value;
       } else {
         // Hapus cache jika sudah kedaluwarsa
-        await deleteCache(key);
+        await delete_cache(key);
         return null;
       }
     }
@@ -46,7 +46,7 @@ export const getCache = async (key: string) => {
 };
 
 // Fungsi untuk menghapus data dari cache
-export const deleteCache = async (key: string) => {
+export const delete_cache = async (key: string) => {
   try {
     await app_store.removeItem(key);
   } catch (error) {
@@ -54,7 +54,7 @@ export const deleteCache = async (key: string) => {
   }
 };
 
-export const deleteMultipleCaches = async (keys: string[]) => {
+export const delete_multiple_caches = async (keys: string[]) => {
   try {
     const deletePromises = keys.map((key) => app_store.removeItem(key));
     await Promise.all(deletePromises);
@@ -65,7 +65,7 @@ export const deleteMultipleCaches = async (keys: string[]) => {
 };
 
 // Fungsi untuk menghapus semua data dari cache
-export const deleteAllCache = async () => {
+export const delete_all_cache = async () => {
   try {
     await app_store.clear();
   } catch (error) {
@@ -74,7 +74,7 @@ export const deleteAllCache = async () => {
 };
 
 // Fungsi untuk menghapus cache berdasarkan kategori (prefix tertentu)
-export const deleteCacheByCategory = async (categoryPrefix: string) => {
+export const delete_cache_by_category = async (categoryPrefix: string) => {
   try {
     await app_store.iterate((value, key) => {
       if (key.startsWith(categoryPrefix)) {
@@ -92,7 +92,7 @@ export const mutateCache = async (
   mutator: (value: any) => any,
 ): Promise<{ success: boolean; error: string | null }> => {
   try {
-    const currentValue = await getCache(key);
+    const currentValue = await get_cache(key);
 
     // Jika data tidak ada di cache, kembalikan status gagal
     if (!currentValue) {
@@ -103,7 +103,7 @@ export const mutateCache = async (
     const newValue = mutator(currentValue);
 
     // Simpan nilai baru ke cache
-    await setCache(key, newValue);
+    await set_cache(key, newValue);
 
     // Kembalikan status berhasil
     return { success: true, error: null };
@@ -120,7 +120,7 @@ export const findInCache = async (
   try {
     const keys = await app_store.keys();
     for (const key of keys) {
-      const value = await getCache(key);
+      const value = await get_cache(key);
       if (predicate(value, key)) {
         return { key, value };
       }

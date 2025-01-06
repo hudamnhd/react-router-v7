@@ -1,96 +1,149 @@
+import { Link } from "@remix-run/react";
 import { type MetaFunction } from "@remix-run/node";
-import Loader from "#app/components/ui/loader";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "#app/components/ui/tooltip.tsx";
-import { cn } from "#app/utils/misc.tsx";
-import { logos } from "./logos/logos.ts";
 
-export const meta: MetaFunction = () => [{ title: "Doti App" }];
-
-// Tailwind Grid cell classes lookup
-const columnClasses: Record<(typeof logos)[number]["column"], string> = {
-  1: "xl:col-start-1",
-  2: "xl:col-start-2",
-  3: "xl:col-start-3",
-  4: "xl:col-start-4",
-  5: "xl:col-start-5",
-};
-const rowClasses: Record<(typeof logos)[number]["row"], string> = {
-  1: "xl:row-start-1",
-  2: "xl:row-start-2",
-  3: "xl:row-start-3",
-  4: "xl:row-start-4",
-  5: "xl:row-start-5",
-  6: "xl:row-start-6",
-};
+export const meta: MetaFunction = () => [{ title: "About | Doti App" }];
 
 export default function Index() {
   return (
-    <main className="grid h-full place-items-center">
-      <div className="grid place-items-center px-4 py-16 xl:grid-cols-2 xl:gap-24">
-        <div className="flex max-w-md flex-col items-center text-center xl:order-2 xl:items-start xl:text-left">
-          <a
-            href="https://www.epicweb.dev/stack"
-            className="animate-slide-top [animation-fill-mode:backwards] xl:animate-slide-left xl:[animation-delay:0.5s] xl:[animation-fill-mode:backwards]"
-          >
-            <svg
-              className="size-20 text-foreground xl:-mt-4"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 65 65"
-            >
-              <path
-                fill="currentColor"
-                d="M39.445 25.555 37 17.163 65 0 47.821 28l-8.376-2.445Zm-13.89 0L28 17.163 0 0l17.179 28 8.376-2.445Zm13.89 13.89L37 47.837 65 65 47.821 37l-8.376 2.445Zm-13.89 0L28 47.837 0 65l17.179-28 8.376 2.445Z"
-              ></path>
-            </svg>
-          </a>
-          <h1
-            data-heading
-            className="mt-8 animate-slide-top text-4xl font-medium text-foreground [animation-fill-mode:backwards] [animation-delay:0.3s] md:text-5xl xl:mt-4 xl:animate-slide-left xl:text-6xl xl:[animation-fill-mode:backwards] xl:[animation-delay:0.8s]"
-          >
-            <a href="https://www.epicweb.dev/stack">Doti App</a>
-          </h1>
-          <p
-            data-paragraph
-            className="mt-6 animate-slide-top text-xl/7 text-muted-foreground [animation-fill-mode:backwards] [animation-delay:0.8s] xl:mt-8 xl:animate-slide-left xl:text-xl/6 xl:leading-10 xl:[animation-fill-mode:backwards] xl:[animation-delay:1s]"
-          >
-            Thanks to Github, Vercel, Epic Stack, Remix, Shadcn UI, Radix UI and
-            Tailwind
-          </p>
-        </div>
-        <ul className="mt-16 flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-4 xl:mt-0 xl:grid xl:grid-flow-col xl:grid-cols-5 xl:grid-rows-6">
-          <TooltipProvider>
-            {logos.map((logo, i) => (
-              <li
-                key={logo.href}
-                className={cn(
-                  columnClasses[logo.column],
-                  rowClasses[logo.row],
-                  "animate-roll-reveal [animation-fill-mode:backwards]",
-                )}
-                style={{ animationDelay: `${i * 0.07}s` }}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a
-                      href={logo.href}
-                      className="grid size-20 place-items-center rounded-2xl bg-violet-600/10 p-4 transition hover:-rotate-6 hover:bg-violet-600/15 dark:bg-violet-200 dark:hover:bg-violet-100 sm:size-24"
-                    >
-                      <img src={logo.src} alt="" />
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent>{logo.alt}</TooltipContent>
-                </Tooltip>
-              </li>
-            ))}
-          </TooltipProvider>
-        </ul>
+    <div className="bg-background overflow-hidden rounded-md mt-4 max-w-4xl mx-auto border mb-4">
+      <div className="p-4">
+        <h3 className="text-lg leading-6 font-medium text-foreground">
+          Application Information
+        </h3>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Information details
+        </p>
       </div>
-    </main>
+      <div className="border-t border-border px-4 py-5 sm:p-0">
+        <dl className="sm:divide-y sm:divide-border">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Developer
+            </dt>
+            <dd className="mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              Huda
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">Name</dt>
+            <dd className="mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              Doti App
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Description
+            </dt>
+            <dd className="mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              Simple application for everyday
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Source Api Quran
+            </dt>
+            <dd className="mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              <ul className="list-disc list-inside">
+                <li>
+                  <Link to="https://api.myquran.com/v2/quran">
+                    https://api.myquran.com/v2/quran
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://api.myquran.com/v2/doa">
+                    https://api.myquran.com/v2/doa
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://gist.github.com/autotrof/172eb06313bebaefbc88ec1b04da4fef">
+                    https://gist.github.com/autotrof/172eb06313bebaefbc88ec1b04da4fef
+                  </Link>
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Font Quran Kemenag (LPMQ)
+            </dt>
+            <dd className="mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              <Link to="https://lajnah.kemenag.go.id/unduhan.html">
+                https://lajnah.kemenag.go.id/unduhan.html
+              </Link>
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">Stack</dt>
+            <dd className="flex items-center flex-wrap mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              <ul className="list-disc list-inside">
+                <li>
+                  <Link to="https://react.dev/">React</Link>
+                </li>
+                <li>
+                  <Link to="https://remix.run">Remix</Link>
+                </li>
+                <li>
+                  <Link to="https://github.com/epicweb-dev/epic-stack">
+                    Epic Stack
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://vite.dev/">React</Link>
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Dependencies
+            </dt>
+
+            <dd className="flex items-center flex-wrap mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
+              <ul className="list-disc list-inside">
+                <li>
+                  <Link to="https://tailwindcss.com/">Tailwind CSS</Link>
+                </li>
+                <li>
+                  <Link to="https://www.radix-ui.com/primitives">Radix UI</Link>
+                </li>
+                <li>
+                  <Link to="https://ui.shadcn.com/">Shadcn UI</Link>
+                </li>
+                <li>
+                  <Link to="https://react-spectrum.adobe.com/react-aria/index.html">
+                    React Aria Components
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://tanstack.com/virtual/latest">
+                    Tanstack Virtual
+                  </Link>
+                </li>
+                <li>
+                  <Link to="https://github.com/sindresorhus/ky">Ky</Link>
+                </li>
+                <li>
+                  <Link to="https://lucide.dev/">Lucide React</Link>
+                </li>
+                <li>
+                  <Link to="https://www.fusejs.io/">Fuse.js</Link>
+                </li>
+                <li>
+                  <Link to="https://redux.js.org/">Redux.js</Link>
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Deploy
+            </dt>
+            <dd className="mt-1 text-sm sm:mt-0 sm:col-span-2">
+              <Link to="https://vercel.com/">Vercel</Link>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
   );
 }

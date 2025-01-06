@@ -1,8 +1,15 @@
 import ky from "ky";
+import { cn } from "#app/utils/misc.tsx";
 import Fuse from "fuse.js";
 import { Search as SearchIcon } from "lucide-react";
-import { useLoaderData, Link } from "@remix-run/react";
-import { json, type ClientLoaderFunctionArgs } from "@remix-run/node";
+import {
+  Outlet,
+  useLoaderData,
+  useRouteLoaderData,
+  useParams,
+  Link,
+} from "@remix-run/react";
+import { json } from "@remix-run/node";
 import { Scroll, Minus, Dot } from "lucide-react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
@@ -14,16 +21,10 @@ import {
   TabsTrigger,
 } from "#app/components/ui/tabs";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
-import * as React from "react";
 
-import { ChevronDown } from "lucide-react";
-import {
-  Select,
-  SelectButton,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "#app/components/ui/select-aria";
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Quran | Doti App" }];
 
 export function headers() {
   return {
@@ -31,7 +32,8 @@ export function headers() {
   };
 }
 
-export async function loader() {
+export async function loader({ params }) {
+  const { id } = params;
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/quran" });
 
   const juz = await api.get("juz/semua").json();
@@ -43,6 +45,7 @@ export async function loader() {
 
   // Gabungkan data
   const data = {
+    id,
     juz: juz.data,
     surat: daftar_surat,
   };
@@ -54,83 +57,41 @@ export async function loader() {
   });
 }
 
-import {
-  get_cache,
-  set_cache,
-  construct_key,
-} from "#app/utils/cache-client.ts";
+function App() {
+  const { id } = useParams();
+  let [version] = React.useState("v1");
+  const is_desktop = window.innerWidth > 1279;
 
-export async function clientLoader({
-  request,
-  serverLoader,
-}: ClientLoaderFunctionArgs) {
-  const key = construct_key(request);
-
-  const cachedData = await get_cache(key);
-
-  if (cachedData) {
-    return cachedData; // (3)
-  }
-
-  const serverData = await serverLoader();
-  await set_cache(key, serverData);
-  return serverData;
-}
-
-export function App() {
-  let [version, setVersion] = React.useState("v1");
   return (
-    <div className="mt-2 max-w-md mx-auto py-1 w-full">
-      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
-        Al-Qur'an
-      </h1>
-
-      <Tabs
-        defaultValue="juz"
-        className="flex flex-col items-center mt-2 mx-auto"
-      >
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="juz">Juz</TabsTrigger>
-          <TabsTrigger value="surat">Surat</TabsTrigger>
-        </TabsList>
-        <TabsContent value="surat" className="w-full tab-content" forceMount>
-          <SurahView version={version} />
-        </TabsContent>
-        <TabsContent
-          value="juz"
-          className="w-full h-full tab-content"
-          forceMount
-        >
-          <JuzView version={version} />
-        </TabsContent>
-      </Tabs>
-
-      <div>
-        <Select
-          aria-label="Select Version"
-          selectedKey={version}
-          onSelectionChange={(selected) => setVersion(selected)}
-          id="select-version"
-          className="my-2 max-w-[100px] mx-auto"
-        >
-          <SelectButton variant="outline">
-            <SelectValue>
-              {({ selectedText }) => {
-                return <span>{selectedText || "Version"}</span>;
-              }}
-            </SelectValue>
-            <ChevronDown size="16" strokeWidth="3" />
-          </SelectButton>
-          <SelectContent>
-            <SelectItem id="v1" textValue="v1">
-              v1
-            </SelectItem>
-            <SelectItem id="v2" textValue="v2">
-              v2
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex items-start gap-x-3">
+      {id && is_desktop && (
+        <div className="xl:block hidden max-w-sm mx-auto py-1 w-full sticky top-[60px]">
+          <Tabs
+            defaultValue="surat"
+            className="flex flex-col items-center mt-2 mx-auto"
+          >
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="juz">Juz</TabsTrigger>
+              <TabsTrigger value="surat">Surat</TabsTrigger>
+            </TabsList>
+            <TabsContent
+              value="surat"
+              className="w-full tab-content"
+              forceMount
+            >
+              <SurahView version={version} />
+            </TabsContent>
+            <TabsContent
+              value="juz"
+              className="w-full h-full tab-content"
+              forceMount
+            >
+              <JuzView version={version} />
+            </TabsContent>
+          </Tabs>
+        </div>
+      )}
+      <Outlet />
     </div>
   );
 }
@@ -165,6 +126,12 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 function SurahView({ version }) {
   const { surat } = useLoaderData();
+  const childLoaderData = useRouteLoaderData("routes/muslim+/quran+/$id");
+  const child_data = childLoaderData
+    ? Object.values(childLoaderData.group_surat)
+    : [];
+  const is_surat =
+    child_data.length > 0 ? child_data.map((d) => d.surah.number) : [];
   const [input, setInput] = useState("");
   const [query, setQuery] = useState("");
 
@@ -184,11 +151,11 @@ function SurahView({ version }) {
   };
 
   return (
-    <div className="max-w-md mx-auto border rounded-lg">
+    <div className="max-w-sm mx-auto border rounded-lg">
       <div className="relative">
         <input
           id="input-26"
-          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full px-3 py-5 bg-background"
+          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full px-3 py-5 bg-background text-sm"
           placeholder="Cari Surat..."
           type="search"
           value={input}
@@ -210,7 +177,11 @@ function SurahView({ version }) {
         searchKey={["name_id", "number", "translation_id"]}
         query={query}
         render={(filteredData) => (
-          <VirtualizedListSurah items={filteredData} version={version} />
+          <VirtualizedListSurah
+            items={filteredData}
+            version={version}
+            id={is_surat}
+          />
         )}
       />
     </div>
@@ -220,6 +191,7 @@ function SurahView({ version }) {
 const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
   items,
   version,
+  id,
 }) => {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -233,9 +205,8 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
   return (
     <div
       ref={parentRef}
-      className="py-2"
+      className="py-2 h-[calc(100vh-170px)]"
       style={{
-        height: "300px",
         overflow: "auto",
       }}
     >
@@ -266,7 +237,10 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
             >
               <Link
                 to={to}
-                className="relative flex cursor-default select-none items-start rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm"
+                className={cn(
+                  "relative flex cursor-default select-none items-start rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm",
+                  id.includes(item.number) && "bg-accent",
+                )}
               >
                 {item.number}.
                 <div>
@@ -292,7 +266,11 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
   );
 };
 
-const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
+const VirtualizedListJuz: React.FC<{ items: any[] }> = ({
+  items,
+  version,
+  is_juz,
+}) => {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
   // Gunakan useVirtualizer
@@ -305,9 +283,8 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
   return (
     <div
       ref={parentRef}
-      className="py-2"
+      className="py-2 h-[calc(100vh-170px)]"
       style={{
-        height: "300px",
         overflow: "auto",
       }}
     >
@@ -341,7 +318,10 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
             >
               <Link
                 to={to}
-                className="relative flex cursor-default select-none items-start gap-x-2 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm"
+                className={cn(
+                  "relative flex cursor-default select-none items-start gap-x-2 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm",
+                  is_juz === item.number && "bg-accent",
+                )}
               >
                 <Scroll className="h-5 w-5 fill-muted mt-0.5" />
                 <div>
@@ -369,6 +349,12 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
 function JuzView({ version }) {
   const { juz } = useLoaderData();
 
+  const childLoaderData = useRouteLoaderData("routes/muslim+/quran+/$id");
+  const child_data = childLoaderData
+    ? Object.values(childLoaderData.group_surat)
+    : [];
+  const is_ayat = child_data.length > 0 ? child_data[0].ayat[0].juz : null;
+
   const [input, setInput] = useState(""); // Input langsung dari user
   const [query, setQuery] = useState(""); // Query untuk pencarian (didebounce)
   // Debounced setter untuk query
@@ -389,11 +375,11 @@ function JuzView({ version }) {
   };
 
   return (
-    <div className="max-w-md mx-auto border rounded-lg">
+    <div className="max-w-sm mx-auto border rounded-lg">
       <div className="relative">
         <input
           id="input-26"
-          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full px-3 py-5 bg-background"
+          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full px-3 py-5 bg-background text-sm"
           placeholder="Cari Juz..."
           type="search"
           value={input}
@@ -415,7 +401,11 @@ function JuzView({ version }) {
         searchKey={["name", "number", "name_start_id", "name_end_id"]}
         query={query}
         render={(filteredData) => (
-          <VirtualizedListJuz items={filteredData} version={version} />
+          <VirtualizedListJuz
+            items={filteredData}
+            version={version}
+            is_juz={is_ayat}
+          />
         )}
       />
     </div>

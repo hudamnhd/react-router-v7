@@ -32,13 +32,24 @@ export default function ResetPage() {
           <pre className="text-sm mb-2">
             {JSON.stringify(fetcher.data, null, 2)}
           </pre>
-          {fetcher.state !== "idle" ? (
-            <strong>Resetting data...</strong>
-          ) : (
-            <Button onClick={resetData} className="reset-button">
-              Reset All Data
+          <div className="flex items-center gap-x-2">
+            <Button
+              disabled={fetcher.state !== "idle"}
+              onClick={resetData}
+              className="reset-button"
+              variant="destructive"
+            >
+              {fetcher.state !== "idle" ? (
+                <strong>Resetting data...</strong>
+              ) : (
+                "Reset All Data"
+              )}
             </Button>
-          )}
+
+            <Button onClick={resetData} className="reset-button">
+              Go Home
+            </Button>
+          </div>
         </div>
       </div>
     </div>

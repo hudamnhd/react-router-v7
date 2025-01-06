@@ -30,6 +30,10 @@ import { cn } from "#app/utils/misc.tsx";
 import { Button } from "#app/components/ui/button";
 import cache from "#app/utils/cache-server.ts";
 
+import { type MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => [{ title: "Doa | Doti App" }];
+
 export function headers() {
   return {
     "Cache-Control": "public, max-age=31560000, immutable",
@@ -72,6 +76,8 @@ const sumberIcons = {
   haji: MapPin,
   lainnya: Circle,
 };
+
+const BOOKMARK_KEY = "BOOKMARK";
 
 function Doa() {
   const loaderData = useLoaderData();
@@ -261,9 +267,9 @@ function TabDemo({ result }) {
         <TabsContent
           key={d.label}
           value={d.source}
-          className="max-w-4xl mx-auto p-0 m-0 px-2.5"
+          className="max-w-4xl mx-auto p-0 m-0"
         >
-          <DoaView items={d.data} />
+          <DoaView source={d.source} items={d.data} />
         </TabsContent>
       ))}
       <TabsContent value="search" className="p-0 m-0">
@@ -273,72 +279,214 @@ function TabDemo({ result }) {
   );
 }
 
-export const DoaView = ({ items }) => {
+import { get_cache, set_cache } from "#app/utils/cache-client.ts";
+import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
+
+import React from "react";
+import * as ScrollAreaRadix from "@radix-ui/react-scroll-area";
+
+const TAGS = Array.from({ length: 50 }).map(
+  (_, i, a) => `v1.2.0-beta.${a.length - i}`,
+);
+
+const ScrollAreaDemo = () => (
+  <ScrollAreaRadix.Root className="h-[225px] w-[200px] overflow-hidden rounded bg-background shadow-[0_2px_10px] shadow-black">
+    <ScrollAreaRadix.Viewport className="size-full rounded">
+      <div className="px-5 py-[15px]">
+        <div className="text-[15px] font-medium leading-[18px] text-primary">
+          Tags
+        </div>
+        {TAGS.map((tag) => (
+          <div
+            className="mt-2.5 border-t border-t-mauve6 pt-2.5 text-[13px] leading-[18px] text-muted-foreground"
+            key={tag}
+          >
+            {tag}
+          </div>
+        ))}
+      </div>
+    </ScrollAreaRadix.Viewport>
+    <ScrollAreaRadix.Scrollbar
+      className="flex touch-none select-none bg-background p-0.5 transition-colors duration-[160ms] ease-out hover:bg-border data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
+      orientation="vertical"
+    >
+      <ScrollAreaRadix.Thumb className="relative flex-1 rounded-[10px] bg-gray-400/80 before:absolute before:left-1/2 before:top-1/2 before:size-full before:min-h-11 before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2" />
+    </ScrollAreaRadix.Scrollbar>
+    <ScrollAreaRadix.Scrollbar
+      className="flex touch-none select-none bg-primary p-0.5 transition-colors duration-[160ms] ease-out hover:bg-primary data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
+      orientation="horizontal"
+    >
+      <ScrollAreaRadix.Thumb className="relative flex-1 rounded-[10px] bg-foreground before:absolute before:left-1/2 before:top-1/2 before:size-full before:min-h-[44px] before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2" />
+    </ScrollAreaRadix.Scrollbar>
+    <ScrollAreaRadix.Corner className="bg-border" />
+  </ScrollAreaRadix.Root>
+);
+
+const DoaView = ({ items }) => {
   const parentRef = React.useRef<HTMLDivElement>(null);
+
+  const [bookmarks, setBookmarks] = React.useState<Bookmark[]>([]);
+
+  React.useEffect(() => {
+    const load_bookmark_from_lf = async () => {
+      const storedBookmarks = await get_cache(BOOKMARK_KEY);
+      if (storedBookmarks) {
+        setBookmarks(storedBookmarks);
+      }
+    };
+
+    load_bookmark_from_lf();
+  }, []);
+
+  const bookmarks_ayah = bookmarks
+    .filter((item) => item.type === "doa")
+    .map((item) => {
+      const params = new URLSearchParams(item.source.split("?")[1]);
+      return {
+        created_at: item.created_at,
+        id: params.get("index"),
+        source: item.source,
+      }; // Ambil nilai "ayat"
+    });
+
+  const toggleBookmark = (doa) => {
+    const newBookmarks = save_bookmarks(
+      "doa",
+      {
+        title: doa.judul,
+        arab: doa.arab,
+        latin: null,
+        translation: doa.indo,
+        source: `/muslim/doa?index=${doa.index}&source=${doa.source}`,
+      },
+      [...bookmarks],
+    );
+
+    const is_saved = bookmarks_ayah.find((fav) => fav.id === doa.index);
+
+    if (is_saved) {
+      const newBookmarks = bookmarks?.filter(
+        (d) => d.created_at !== is_saved.created_at,
+      );
+      setBookmarks(newBookmarks);
+    } else {
+      setBookmarks(newBookmarks);
+    }
+  };
+
+  React.useEffect(() => {
+    const save_bookmark_to_lf = async (bookmarks) => {
+      await set_cache(BOOKMARK_KEY, bookmarks);
+    };
+    save_bookmark_to_lf(bookmarks);
+  }, [bookmarks]);
 
   const rowVirtualizer = useVirtualizer({
     count: items.length, // Jumlah total item
     getScrollElement: () => parentRef.current, // Elemen tempat scrolling
     estimateSize: () => 35,
   });
+
   return (
-    <div
-      ref={parentRef}
-      style={{
-        overflow: "auto",
-      }}
-      className="h-[calc(100vh-175px)]"
-    >
-      <div>
-        <div
-          className="space-y-0.5 py-2"
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            position: "relative",
-          }}
-        >
-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const doa = items[virtualRow.index];
-            return (
-              <div
-                key={virtualRow.key}
-                data-index={virtualRow.index}
-                ref={rowVirtualizer.measureElement}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              >
-                <div key={virtualRow.index} className="w-full border-b">
-                  <div className="group relative py-4 px-2 sm:px-4 rounded-md w-full">
-                    <div className="font-medium text-lg mb-2">{doa.judul}</div>
-                    <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                      <p
-                        className="relative mt-2 font-lpmq text-right text-primary"
-                        dangerouslySetInnerHTML={{
-                          __html: doa.arab,
-                        }}
-                      />
-                    </div>
-                    <div className="mt-3 space-y-3">
-                      <div
-                        className="translation-text prose-sm text-muted-foreground max-w-none"
-                        dangerouslySetInnerHTML={{
-                          __html: doa.indo,
-                        }}
-                      />
+    <ScrollAreaRadix.Root>
+      <ScrollAreaRadix.Viewport
+        ref={parentRef}
+        className="px-2.5 h-[calc(100vh-175px)]"
+      >
+        <div>
+          <div
+            className="space-y-0.5 py-2"
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              position: "relative",
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const d = items[virtualRow.index];
+              const doa = {
+                ...d,
+                index: virtualRow.index.toString(),
+              };
+
+              const _source = `/muslim/doa?index=${doa.index}&source=${doa.source}`;
+
+              const isFavorite = bookmarks_ayah.some(
+                (fav) => fav.source === _source,
+              );
+              return (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={rowVirtualizer.measureElement}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <div key={virtualRow.index} className="w-full border-b">
+                    <div className="group relative py-4 px-2 rounded-md w-full">
+                      <div className="flex items-center sm:items-start sm:justify-between gap-x-2 mb-2">
+                        <div className="font-medium text-lg sm:order-first order-last">
+                          {doa.judul}
+                        </div>
+
+                        <button
+                          onClick={() => toggleBookmark(doa)}
+                          className={cn(
+                            "order-0 sm:order-1 bg-gradient-to-br from-muted to-accent p-3 rounded-xl",
+                            isFavorite &&
+                              "from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20",
+                          )}
+                        >
+                          <Heart
+                            className={cn(
+                              "w-5 h-5 text-muted-foreground",
+                              isFavorite && "text-rose-600 dark:text-rose-400",
+                            )}
+                          />
+                        </button>
+                      </div>
+                      <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
+                        <p
+                          className="relative mt-2 font-lpmq text-right text-primary"
+                          dangerouslySetInnerHTML={{
+                            __html: doa.arab,
+                          }}
+                        />
+                      </div>
+                      <div className="mt-3 space-y-3">
+                        <div
+                          className="translation-text prose-sm text-muted-foreground max-w-none"
+                          dangerouslySetInnerHTML={{
+                            __html: doa.indo,
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </div>
+      </ScrollAreaRadix.Viewport>
+      <ScrollAreaRadix.Scrollbar
+        className="flex touch-none select-none transition-colors h-full w-2.5 border-l border-l-transparent p-[1px]"
+        orientation="vertical"
+      >
+        <ScrollAreaRadix.Thumb className="relative flex-1 rounded-full bg-border" />
+      </ScrollAreaRadix.Scrollbar>
+      <ScrollAreaRadix.Scrollbar
+        className="flex touch-none select-none transition-colors h-2.5 flex-col border-t border-t-transparent p-[1px]"
+        orientation="horizontal"
+      >
+        <ScrollAreaRadix.Thumb className="relative flex-1 rounded-full bg-border" />
+      </ScrollAreaRadix.Scrollbar>
+      <ScrollAreaRadix.Corner className="bg-border" />
+    </ScrollAreaRadix.Root>
   );
 };
 
