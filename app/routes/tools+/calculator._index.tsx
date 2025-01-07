@@ -42,8 +42,12 @@ interface HistoryItem {
 }
 
 const Calculator: React.FC = () => {
-  const [currentInput, setCurrentInput] = useState<string>("");
   const [total, setTotal] = useState<number>(0); // Total kumulatif
+  const [currentInput, setCurrentInput] = useState<string>(() => {
+    // Ambil currentInput dari localStorage jika ada
+    const savedCurrentInput = localStorage.getItem("calcCurrentInput");
+    return savedCurrentInput ? JSON.parse(savedCurrentInput) : "";
+  });
   const [history, setHistory] = useState<HistoryItem[]>(() => {
     // Ambil history dari localStorage jika ada
     const savedHistory = localStorage.getItem("calcHistory");
@@ -58,6 +62,8 @@ const Calculator: React.FC = () => {
     if (expressionRef.current) {
       expressionRef.current.scrollTop = expressionRef.current.scrollHeight;
     }
+
+    localStorage.setItem("calcCurrentInput", JSON.stringify(currentInput));
   }, [currentInput]); //
 
   const getLastOperator = (input: string): string | null => {
@@ -437,7 +443,22 @@ const Calculator: React.FC = () => {
                             >
                               {index === lastIndex ? (
                                 <span className="relative flex justify-end">
-                                  <span className="animate-ping absolute inline-flex h-[23px] w-[12px] rounded bg-sky-400 opacity-90"></span>
+                                  <span className="absolute -right-1 text-2xl blink-cursor border-l-2 border-muted-foreground h-8"></span>
+                                  <style jsx>{`
+                                        .blink-cursor {
+                                            display: inline-block;
+                                            animation: blink 1.5s steps(2, start) infinite;
+                                        }
+
+                                        @keyframes blink {
+                                            0%, 100% {
+                                            opacity: 1;
+                                            }
+                                            50% {
+                                            opacity: 0;
+                                            }
+                                        }
+                                        `}</style>
                                   <span className="text-2xl font-semibold">
                                     {formatRupiah(parseFloat(item))}
                                   </span>

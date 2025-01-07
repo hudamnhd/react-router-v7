@@ -19,7 +19,11 @@ export default function Example() {
 
       <ul role="list" className="sm:hidden grid grid-cols-1 gap-3 pb-4">
         {data.map((action, actionIdx) => (
-          <li key={actionIdx} className="col-span-1 flex shadow-sm rounded-md">
+          <li
+            onClick={() => navigate(action.href)}
+            key={actionIdx}
+            className="col-span-1 flex shadow-sm rounded-md"
+          >
             <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
               <action.icon className="h-5 w-5" aria-hidden="true" />
             </div>

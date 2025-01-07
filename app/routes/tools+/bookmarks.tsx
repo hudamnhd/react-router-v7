@@ -179,7 +179,13 @@ const App: React.FC = () => {
           </div>
         </React.Fragment>
       )}
-      <div className="bg-gradient-to-b from-background via-background to-pink-400/50 dark:to-pink-600/50 text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
+      <div
+        className={cn(
+          "border-b text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3",
+          bookmarks?.length > 3 &&
+            "bg-gradient-to-b from-background via-background to-pink-400/50 dark:to-pink-600/50 ",
+        )}
+      >
         Bookmarks
       </div>
       <div>
@@ -267,7 +273,7 @@ const App: React.FC = () => {
             }
           })
         ) : (
-          <div className="text-center text-muted-foreground pb-3">
+          <div className="text-center text-muted-foreground py-6">
             You don't have any bookmarks yet
           </div>
         )}

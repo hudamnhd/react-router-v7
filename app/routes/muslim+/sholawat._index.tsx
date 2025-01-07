@@ -98,7 +98,7 @@ export default function Sholawat() {
             className="group relative px-4 py-4 sm:px-5 rounded-md border-t"
           >
             <div className="flex items-center sm:items-start sm:justify-between gap-x-2 mb-2">
-              <div className="font-medium text-lg sm:order-first order-last">
+              <div className="text-primary font-medium text-lg sm:order-first order-last">
                 {ayat.nama}
               </div>
 

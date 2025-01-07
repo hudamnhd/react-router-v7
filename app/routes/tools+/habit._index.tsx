@@ -236,7 +236,7 @@ const HabitTracker: React.FC = () => {
                       >
                         <div className="group flex flex-col items-center gap-y-2 relative transition-all duration-500 ease-in-out">
                           <button
-                            disabled={!today}
+                            // disabled={!today}
                             onClick={() =>
                               toggleHabitCompletion(habit.id, formattedDate)
                             }
