@@ -10,10 +10,11 @@ import {
   ModalOverlay,
 } from "react-aria-components";
 import React, { useState, useEffect } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import {
+  ChevronLeft,
+  ChevronRight,
   Bookmark,
   Heart,
   Ellipsis,
@@ -484,7 +485,7 @@ export default function Index() {
           disabled={parseInt(id) === 1}
         >
           <span className="sr-only">Go to previous page</span>
-          <ChevronLeftIcon />
+          <ChevronLeft />
         </Link>
 
         <span className="text-accent-foreground text-sm">
@@ -496,7 +497,7 @@ export default function Index() {
           disabled={parseInt(id) === 604}
         >
           <span className="sr-only">Go to next page</span>
-          <ChevronRightIcon />
+          <ChevronRight />
         </Link>
       </div>
     </div>

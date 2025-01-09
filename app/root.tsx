@@ -218,11 +218,6 @@ export function ErrorBoundary() {
   // to give the user a better UX.
 
   return <GeneralErrorBoundary />;
-  // return (
-  //   <Document nonce={nonce}>
-  //     <GeneralErrorBoundary />
-  //   </Document>
-  // );
 }
 
 import {
@@ -264,7 +259,7 @@ function Navbar({ children }) {
                               <NavLink
                                 to={component.href}
                                 className={cn(
-                                  "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                  "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-sm",
                                 )}
                               >
                                 <component.icon
@@ -298,7 +293,7 @@ function Navbar({ children }) {
                               <NavLink
                                 to={component.href}
                                 className={cn(
-                                  "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                  "flex gap-1.5 select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-sm",
                                 )}
                               >
                                 <component.icon
@@ -495,16 +490,18 @@ function App() {
   useToast(data.toast);
 
   return (
-    <React.Fragment>
-      <Navbar>
-        <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
-      </Navbar>
-      <div className="px-3 2xl:px-0 2xl:container">
-        <Outlet />
-      </div>
-      <EpicToaster closeButton position="top-center" theme={theme} />
-      <EpicProgress />
-    </React.Fragment>
+    <div className="">
+      <React.Fragment>
+        <Navbar>
+          <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
+        </Navbar>
+        <div id="container-outlet" className="px-3 2xl:px-0 2xl:container">
+          <Outlet />
+        </div>
+        <EpicToaster closeButton position="top-center" theme={theme} />
+        <EpicProgress />
+      </React.Fragment>
+    </div>
   );
 }
 
@@ -569,6 +566,16 @@ import {
 
 const CommandMenu = () => {
   const navigate = useNavigate();
+  const navigate_link = [
+    ...muslimLinks,
+    ...toolsLinks,
+    {
+      title: "Reset data",
+      href: "/resources/reset",
+      description: "Reset data local",
+      icon: TimerReset,
+    },
+  ];
   return (
     <KeyboardModalTrigger keyboardShortcut="/">
       <ModalOverlay
@@ -590,7 +597,11 @@ const CommandMenu = () => {
             )
           }
         >
-          <Dialog role="alertdialog" className="outline-none relative">
+          <Dialog
+            aria-label="Command Menu"
+            role="alertdialog"
+            className="outline-none relative"
+          >
             {({ close }) => (
               <>
                 <div>
@@ -603,32 +614,20 @@ const CommandMenu = () => {
                       <CommandEmpty>No results found.</CommandEmpty>
                       <CommandSeparator />
                       <CommandGroup heading="Daftar menu">
-                        {[...muslimLinks, ...toolsLinks].map(
-                          (navItem, index) => (
-                            <CommandItem
-                              key={index}
-                              value={index}
-                              className="flex items-center gap-2.5 p-2.5"
-                              onSelect={() => {
-                                navigate(navItem.href as string);
-                                close();
-                              }}
-                            >
-                              <navItem.icon className="w-4 h-4" />
-                              <span>{navItem.title}</span>
-                            </CommandItem>
-                          ),
-                        )}
-                        <CommandItem
-                          className="flex items-center gap-2.5 p-2.5"
-                          onSelect={() => {
-                            navigate("/resources/reset" as string);
-                            close();
-                          }}
-                        >
-                          <TimerReset className="w-4 h-4" />
-                          <span>Reset data</span>
-                        </CommandItem>
+                        {navigate_link.map((navItem, index) => (
+                          <CommandItem
+                            key={index}
+                            value={index}
+                            className="flex items-center gap-2.5 p-2.5"
+                            onSelect={() => {
+                              close();
+                              navigate(navItem.href as string);
+                            }}
+                          >
+                            <navItem.icon className="w-4 h-4" />
+                            <span>{navItem.title}</span>
+                          </CommandItem>
+                        ))}
                       </CommandGroup>
                     </CommandList>
                   </Command>

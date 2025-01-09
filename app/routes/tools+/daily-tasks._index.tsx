@@ -1,21 +1,17 @@
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import lodash from "lodash";
-import React, { useMemo, useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
-import { Link, useBeforeUnload } from "@remix-run/react";
 import { toast } from "sonner";
 import { Badge } from "#app/components/ui/badge";
 import { Label } from "#app/components/ui/label";
 import { useAppSelector, useAppDispatch } from "#app/store/hooks";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "#app/components/ui/dropdown-menu";
-
+  Menu,
+  MenuItem,
+  MenuPopover,
+  MenuTrigger,
+} from "#app/components/ui/menu";
 import {
   addTask,
   copyTask,
@@ -37,11 +33,9 @@ import {
   Upload,
   EllipsisVertical,
   Activity,
-  Trees,
   Plus,
   Coffee,
   Flame,
-  Badge as BadgeIcon,
   Play,
   Pause,
   Rocket,
@@ -51,15 +45,17 @@ import {
   Crosshair,
   Circle,
   CircleCheckBig,
-  CirclePlus,
-  Squircle,
   Trash2,
-  History,
   Check,
   ChevronRight,
   ChevronLeft,
   MoreHorizontal,
   CheckCircle2,
+  Badge as BadgeIcon,
+  CirclePlus,
+  Squircle,
+  History,
+  Trees,
 } from "lucide-react";
 import {
   Collapsible,
@@ -68,13 +64,12 @@ import {
 } from "#app/components/ui/collapsible";
 import {
   Popover,
-  PopoverContent,
+  PopoverDialog,
   PopoverTrigger,
 } from "#app/components/ui/popover";
 import { AutosizeTextarea } from "#app/components/ui/autosize-textarea";
 import { cn } from "#app/utils/misc";
-import { Button, buttonVariants } from "#app/components/ui/button-shadcn";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import { Button, buttonVariants } from "#app/components/ui/button";
 
 import { type MetaFunction } from "@remix-run/node";
 
@@ -229,6 +224,7 @@ const TodoNavigator = ({ data }) => {
   return (
     <div className="pb-6">
       <TaskApp
+        data={data}
         todos={todos}
         goToNextDate={goToNextDate}
         goToPreviousDate={goToPreviousDate}
@@ -538,6 +534,7 @@ const formatFocusTime = (milliseconds: number): string => {
 };
 
 const TaskApp = ({
+  data,
   todos,
   date,
   goToNextDate,
@@ -608,14 +605,17 @@ const TaskApp = ({
     <div className="">
       {/*<RenderTracker name="TASK APP" stateName={totalTargetSessions} />*/}
       <section className="relative mx-auto flex items-center justify-between w-full items-center mb-4">
-        <Popover>
-          <PopoverTrigger className="rounded-lg lg p-1 border">
+        <PopoverTrigger>
+          <Button variant="ghost" size="icon">
             <FocusDisplay total_sessions={total_sessions} isBtn={true} />
-          </PopoverTrigger>
-          <PopoverContent className="w-auto">
-            <CalendarMonth total_sessions={all_session} />
-          </PopoverContent>
-        </Popover>
+          </Button>
+
+          <Popover placement="bottom">
+            <PopoverDialog>
+              <CalendarMonth total_sessions={all_session} />
+            </PopoverDialog>
+          </Popover>
+        </PopoverTrigger>
         <div className="flex-none flex items-center gap-2">
           {/*<Link
             to="./garden"
@@ -626,67 +626,62 @@ const TaskApp = ({
             <Trees />
           </Link>*/}
 
-          <Popover>
-            <PopoverTrigger
-              className={cn(
-                buttonVariants({ size: "icon", variant: "secondary" }),
-                "relative",
-              )}
-            >
+          <PopoverTrigger>
+            <Button variant="secondary" size="icon">
               <Flame />
-            </PopoverTrigger>
-            <PopoverContent className="w-auto">
-              <CalendarWeek
-                total_sessions={all_session}
-                streak_data={streak_data}
-              />
-            </PopoverContent>
-          </Popover>
-          <Popover>
-            <PopoverTrigger
-              className={cn(
-                buttonVariants({ size: "icon", variant: "secondary" }),
-              )}
-            >
+            </Button>
+
+            <Popover placement="bottom">
+              <PopoverDialog>
+                <CalendarWeek
+                  total_sessions={all_session}
+                  streak_data={streak_data}
+                />
+              </PopoverDialog>
+            </Popover>
+          </PopoverTrigger>
+          <PopoverTrigger>
+            <Button variant="secondary" size="icon">
               <Activity />
-            </PopoverTrigger>
-            <PopoverContent className="w-fit p-0">
-              <List03 tasks={todos} />
-            </PopoverContent>
-          </Popover>
+            </Button>
 
-          <Popover>
-            <PopoverTrigger
-              className={cn(
-                buttonVariants({ size: "icon", variant: "secondary" }),
-              )}
-            >
+            <Popover placement="bottom">
+              <PopoverDialog>
+                <List03 tasks={todos} />
+              </PopoverDialog>
+            </Popover>
+          </PopoverTrigger>
+          <PopoverTrigger>
+            <Button variant="secondary" size="icon">
               <Info />
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-4">
-              <div className="grid gap-2">
-                <label
-                  htmlFor="upload-file"
-                  className={cn(buttonVariants({ variant: "outline" }))}
-                >
-                  <Upload /> Import
-                  <input
-                    id="upload-file"
-                    type="file"
-                    className="hidden"
-                    accept=".json"
-                    onChange={(e) => importTodos(e, data)}
-                  />
-                </label>
+            </Button>
 
-                <Button variant="outline" onClick={() => exportTodos(data)}>
-                  <Download /> Export
-                </Button>
+            <Popover placement="bottom">
+              <PopoverDialog>
+                <div className="grid gap-2">
+                  <label
+                    htmlFor="upload-file"
+                    className={cn(buttonVariants({ variant: "outline" }))}
+                  >
+                    <Upload /> Import
+                    <input
+                      id="upload-file"
+                      type="file"
+                      className="hidden"
+                      accept=".json"
+                      onChange={(e) => importTodos(e, data)}
+                    />
+                  </label>
 
-                <LocalStorageProgressBar />
-              </div>
-            </PopoverContent>
-          </Popover>
+                  <Button variant="outline" onPress={() => exportTodos(data)}>
+                    <Download /> Export
+                  </Button>
+
+                  <LocalStorageProgressBar />
+                </div>
+              </PopoverDialog>
+            </Popover>
+          </PopoverTrigger>
         </div>
       </section>
 
@@ -697,7 +692,7 @@ const TaskApp = ({
           style={{ animationDelay: `0.1s` }}
           className="animate-slide-top [animation-fill-mode:backwards] flex flex-col items-end"
         >
-          <div className="flex items-center gap-x-1">{date.q}</div>
+          <div className="text-sm flex items-center gap-x-1">{date.q}</div>
         </div>
         <div
           style={{ animationDelay: `0.1s` }}
@@ -711,10 +706,10 @@ const TaskApp = ({
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <Button onClick={goToPreviousDate} variant="outline" size="icon">
+            <Button onPress={goToPreviousDate} variant="outline" size="icon">
               <ChevronLeft />
             </Button>
-            <Button onClick={goToNextDate} variant="outline" size="icon">
+            <Button onPress={goToNextDate} variant="outline" size="icon">
               <ChevronRight />
             </Button>
           </div>
@@ -738,7 +733,7 @@ const ProgressBarIndicator = ({
     <React.Fragment>
       <div
         style={{ animationDelay: `0.1s` }}
-        className="animate-slide-top [animation-fill-mode:backwards] mb-3 rounded-md transition-all duration-500 ease-in-out"
+        className="animate-slide-top [animation-fill-mode:backwards] mb-3 rounded-md transition-all duration-500 ease-in-out text-sm"
       >
         <div className="relative h-8 w-full rounded-md bg-muted">
           <div className="flex h-8 items-center justify-end gap-1 px-2">
@@ -794,7 +789,7 @@ const AddTodo = ({ date }) => {
   const dispatch = useAppDispatch();
   return (
     <Button
-      onClick={() => dispatch(addTask({ key: date.timestamp }))}
+      onPress={() => dispatch(addTask({ key: date.timestamp }))}
       variant="link"
     >
       <Plus /> Add Task
@@ -1026,7 +1021,7 @@ const TodoTimer = ({
                       variant="ghost"
                       size="icon"
                       className={`[&_svg]:size-6 transition-all duration-500 ease-in-out animate-roll-reveal [animation-fill-mode:backwards] z-10 mx-auto p-0 rounded-full`}
-                      onClick={
+                      onPress={
                         active_task
                           ? () => {
                               const last_session_index =
@@ -1199,7 +1194,7 @@ const TodoTimer = ({
             <div className="mt-2 flex w-full flex-col gap-2 pr-14 md:flex-row md:items-center md:pr-0">
               <Button
                 className="bg-chart-2 hover:bg-chart-2/90"
-                onClick={() => {
+                onPress={() => {
                   const todo = active_task as Task;
                   const sessionData = todo.sessions ? [...todo.sessions] : []; // Copy the old sessions array, or start with an empty array
 
@@ -1299,7 +1294,7 @@ const TodoTimer = ({
             <div className="mt-2 flex w-full flex-col gap-2 pr-14 md:flex-row md:items-center md:pr-0">
               <Button
                 className="bg-chart-2 hover:bg-chart-2/90"
-                onClick={() => {
+                onPress={() => {
                   const todo = activeTaskRef.current as Task;
                   const sessionData = todo.sessions ? [...todo.sessions] : []; // Copy the old sessions array, or start with an empty array
 
@@ -1326,7 +1321,7 @@ const TodoTimer = ({
                 Mark as Done
               </Button>
               <Button
-                onClick={() => set_break_time(Date.now())}
+                onPress={() => set_break_time(Date.now())}
                 variant="destructive"
               >
                 <Coffee /> 5 mins
@@ -1419,20 +1414,20 @@ const CalendarMonth = ({ total_sessions }) => {
           {format(currentMonth, "MMMM yyyy")}
         </h2>
         <Button
-          onClick={handlePreviousMonth}
+          onPress={handlePreviousMonth}
           variant="outline"
           className="h-8 w-8 p-0"
         >
           <span className="sr-only">Go to previous page</span>
-          <ChevronLeftIcon className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
         <Button
-          onClick={handleNextMonth}
+          onPress={handleNextMonth}
           variant="outline"
           className="h-8 w-8 p-0"
         >
           <span className="sr-only">Go to next page</span>
-          <ChevronRightIcon className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
       <div className="flex gap-10">
@@ -1596,7 +1591,7 @@ const CalendarWeek = ({ total_sessions, streak_data }) => {
               );
             })}
           </div>
-          <div className="mt-2 text-gray-500 dark:text-gray-400">
+          <div className="mt-2 text-muted-foreground text-sm">
             *Weekend is not affecting streak calculation
           </div>
         </div>
@@ -2069,7 +2064,7 @@ const MainTaskCard = React.memo(
           >
             <div
               className={cn(
-                "p-6 px-3 py-1.5 space-between flex gap-4 items-center flex-row border-b-2 border-secondary relative rounded-t-md",
+                "p-6 px-2 py-1.5 space-between flex gap-4 items-center flex-row border-b-2 border-secondary relative rounded-t-md",
                 active_task && todo.status === "progress"
                   ? " bg-gradient-to-r from-accent to-muted"
                   : " bg-gradient-to-l from-background to-secondary",
@@ -2294,17 +2289,19 @@ const MainTaskCard = React.memo(
                     <div className="flex items-center gap-x-1.5">
                       {task.status !== "progress" &&
                         task.sessions.length > 0 && (
-                          <Popover>
-                            <PopoverTrigger>
+                          <PopoverTrigger>
+                            <Button variant="link" size="icon">
                               <History className="w-4 h-4 text-muted-foreground" />
-                            </PopoverTrigger>
-                            <PopoverContent className="max-h-[40vh] overflow-y-auto py-0">
-                              <TimelineInfo
-                                sessions={task.sessions}
-                                completed_at={task.completed_at}
-                              />
-                            </PopoverContent>
-                          </Popover>
+                            </Button>
+                            <Popover placement="bottom">
+                              <PopoverDialog>
+                                <TimelineInfo
+                                  sessions={task.sessions}
+                                  completed_at={task.completed_at}
+                                />
+                              </PopoverDialog>
+                            </Popover>
+                          </PopoverTrigger>
                         )}
                       <div className="text-sm">
                         {new Date(totalSessionTime).toISOString().substr(11, 8)}
@@ -2339,7 +2336,7 @@ const MainTaskCard = React.memo(
 
         {todo.sub_tasks.length > 0 && (
           <div>
-            <CollapsibleContent className="space-y-2 text-text font-base mt-1">
+            <CollapsibleContent className="space-y-2 text-text font-base mt-1 mb-3">
               <DragDropListSubTask
                 task={task}
                 sub_tasks={todo.sub_tasks}
@@ -2527,17 +2524,13 @@ const TimelineInfo: React.FC<{ sessions: any[] }> = ({
     <div>
       <ul
         role="list"
-        className="divide-y divide-gray-200 bg-background p-2 rounded-md"
+        className="divide-y divide-gray-200 bg-background rounded-md"
       >
         {adjustedSessions.map((sessionInfo, index) => (
           <li key={index} className="py-2">
-            <div className="flex space-x-3">
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium">Session {index + 1}</h3>
-                  <p className="text-sm ">{sessionInfo}</p>
-                </div>
-              </div>
+            <div className="flex space-x-3 items-center justify-between">
+              <h3 className="text-sm font-medium">Session {index + 1}</h3>
+              <p className="text-sm ">{sessionInfo}</p>
             </div>
           </li>
         ))}
@@ -2556,139 +2549,143 @@ import {
 } from "#app/components/ui/command";
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "#app/components/ui/alert-dialog";
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from "#app/components/ui/dialog";
 
+import { ModalContext } from "react-aria-components";
 const DropdownMenuTask = ({ todo, date, active_task }) => {
-  const [showDropdownMenu, setShowDropdownMenu] = useState(false);
+  let [isOpen, setOpen] = React.useState(false);
   const dispatch = useAppDispatch();
+
   return (
-    <DropdownMenu
-      open={showDropdownMenu}
-      modal={false}
-      onOpenChange={(change) => setShowDropdownMenu(change)}
-    >
-      <DropdownMenuTrigger asChild>
-        <Button aria-haspopup="true" size="icon" variant="ghost">
+    <React.Fragment>
+      <ModalContext.Provider value={{ isOpen, onOpenChange: setOpen }}>
+        <DialogOverlay isDismissable>
+          <DialogContent role="alertdialog" className="sm:max-w-[425px]">
+            {({ close }) => (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Are you absolutely sure?</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your task
+                </DialogDescription>
+                <DialogFooter>
+                  <Button variant="outline" onPress={close}>
+                    <X />
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onPress={() => {
+                      dispatch(
+                        deleteTask({
+                          id: todo.id,
+                          key: date.timestamp,
+                          title: todo.title,
+                        }),
+                      );
+                      close();
+                    }}
+                  >
+                    <Trash2 />
+                    Delete
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </DialogOverlay>
+      </ModalContext.Provider>
+      <MenuTrigger>
+        <Button variant="link" size="icon">
           <EllipsisVertical className="w-4 h-4" />
-          <span className="sr-only">Toggle menu</span>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="flex flex-col">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <MenuPopover>
+          <Menu>
+            <MenuItem onAction={() => dispatch(addSubTask({ id: todo.id }))}>
+              <Plus className="w-4 h-4" /> Add Subtask
+            </MenuItem>
+            {todo.status !== "completed" ? (
+              <MenuItem
+                className="text-green-600 focus:text-green-600 dark:text-green-400 dark:focus:text-white focus:bg-green-100 dark:focus:bg-green-900"
+                onAction={() => {
+                  if (active_task) {
+                    const todo = active_task as Task;
+                    const sessionData = todo.sessions ? [...todo.sessions] : []; // Copy the old sessions array, or start with an empty array
 
-        <DropdownMenuItem onClick={() => dispatch(addSubTask({ id: todo.id }))}>
-          <Plus /> Add Subtask
-        </DropdownMenuItem>
-        {todo.status !== "completed" ? (
-          <DropdownMenuItem
-            className="text-green-600 focus:text-green-600 dark:text-green-400 dark:focus:text-white focus:bg-green-100 dark:focus:bg-green-900"
-            onClick={() => {
-              if (active_task) {
-                const todo = active_task as Task;
-                const sessionData = todo.sessions ? [...todo.sessions] : []; // Copy the old sessions array, or start with an empty array
+                    const notif = {
+                      title: "Saatnya istirahat",
+                      description:
+                        "Sesion " + sessionData.length + " has completed",
+                    };
+                    showNotification(notif.title, notif.description);
 
-                const notif = {
-                  title: "Saatnya istirahat",
-                  description:
-                    "Sesion " + sessionData.length + " has completed",
-                };
-                showNotification(notif.title, notif.description);
-
-                dispatch(
-                  updateTask({
-                    id: todo.current.id,
-                    key: date.timestamp,
-                    updated_task: {
-                      title: todo.current.title,
-                      status: "completed",
-                      completed_at: new Date().toISOString(),
-                    },
-                  }),
-                );
-              }
-              dispatch(
-                updateTask({
-                  id: todo.id,
-                  key: date.timestamp,
-                  updated_task: {
-                    title: todo.title,
-                    status: "completed",
-                    completed_at: new Date().toISOString(),
-                  },
-                }),
-              );
-            }}
-          >
-            <CircleCheckBig className="w-5 h-5" />
-            Mark as done
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem
-            onClick={() => {
-              dispatch(
-                updateTask({
-                  id: todo.id,
-                  key: date.timestamp,
-                  updated_task: {
-                    title: todo.title,
-                    status: "pending",
-                    completed_at: null,
-                  },
-                }),
-              );
-            }}
-          >
-            <CirclePlus className="rotate-45 w-5 h-5" />
-            Unmark as done
-          </DropdownMenuItem>
-        )}
-        <AlertDialog onOpenChange={(change) => setShowDropdownMenu(change)}>
-          <AlertDialogTrigger asChild>
-            <DropdownMenuItem
-              className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-white focus:bg-red-100 dark:focus:bg-red-900"
-              onSelect={(e) => e.preventDefault()}
-            >
-              <Trash2 />
-              Delete task
-            </DropdownMenuItem>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                task
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
+                    dispatch(
+                      updateTask({
+                        id: todo.current.id,
+                        key: date.timestamp,
+                        updated_task: {
+                          title: todo.current.title,
+                          status: "completed",
+                          completed_at: new Date().toISOString(),
+                        },
+                      }),
+                    );
+                  }
                   dispatch(
-                    deleteTask({
+                    updateTask({
                       id: todo.id,
                       key: date.timestamp,
-                      title: todo.title,
+                      updated_task: {
+                        title: todo.title,
+                        status: "completed",
+                        completed_at: new Date().toISOString(),
+                      },
                     }),
                   );
                 }}
               >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                <CircleCheckBig className="w-4 h-4" />
+                Mark as done
+              </MenuItem>
+            ) : (
+              <MenuItem
+                onAction={() => {
+                  dispatch(
+                    updateTask({
+                      id: todo.id,
+                      key: date.timestamp,
+                      updated_task: {
+                        title: todo.title,
+                        status: "pending",
+                        completed_at: null,
+                      },
+                    }),
+                  );
+                }}
+              >
+                <X className="w-4 h-4" />
+                Unmark as done
+              </MenuItem>
+            )}
+            <MenuItem
+              onAction={() => setOpen(true)}
+              className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-white focus:bg-red-100 dark:focus:bg-red-900"
+            >
+              <Trash2 />
+              Delete
+            </MenuItem>
+          </Menu>
+        </MenuPopover>
+      </MenuTrigger>
+    </React.Fragment>
   );
 };
 
@@ -2707,63 +2704,74 @@ const DropdownMenuSubTask = ({
 }) => {
   const [showDropdownMenu, setShowDropdownMenu] = useState(false);
   const dispatch = useAppDispatch();
-  return (
-    <DropdownMenu
-      open={showDropdownMenu}
-      modal={false}
-      onOpenChange={(change) => setShowDropdownMenu(change)}
-    >
-      <DropdownMenuTrigger asChild>
-        <Button aria-haspopup="true" size="icon" variant="ghost">
-          <EllipsisVertical className="w-4 h-4" />
-          <span className="sr-only">Toggle menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="flex flex-col">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  let [isOpen, setOpen] = React.useState(false);
 
-        <AlertDialog onOpenChange={(change) => setShowDropdownMenu(change)}>
-          <AlertDialogTrigger asChild>
-            <DropdownMenuItem
+  return (
+    <React.Fragment>
+      <ModalContext.Provider value={{ isOpen, onOpenChange: setOpen }}>
+        <DialogOverlay isDismissable>
+          <DialogContent role="alertdialog" className="sm:max-w-[425px]">
+            {({ close }) => (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Are you absolutely sure?</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your task
+                </DialogDescription>
+                <DialogFooter>
+                  <Button variant="outline" onPress={close}>
+                    <X />
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onPress={() => {
+                      dispatch(
+                        deleteSubTask({
+                          id: task_id,
+                          key: timestamp,
+                          sub_task_id,
+                          title: task_title,
+                          sub_task_title,
+                        }),
+                      );
+                      close();
+                    }}
+                  >
+                    <Trash2 />
+                    Delete
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </DialogOverlay>
+      </ModalContext.Provider>
+      <MenuTrigger>
+        <Button variant="link" size="icon">
+          <EllipsisVertical className="w-4 h-4" />
+        </Button>
+        <MenuPopover>
+          <Menu>
+            <MenuItem
+              onAction={() => setOpen(true)}
               className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-white focus:bg-red-100 dark:focus:bg-red-900"
-              onSelect={(e) => e.preventDefault()}
             >
               <Trash2 />
               Delete subtask
-            </DropdownMenuItem>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                task
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  dispatch(
-                    deleteSubTask({
-                      id: task_id,
-                      key: timestamp,
-                      sub_task_id,
-                      title: task_title,
-                      sub_task_title,
-                    }),
-                  );
-                }}
-              >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            </MenuItem>
+          </Menu>
+        </MenuPopover>
+      </MenuTrigger>
+    </React.Fragment>
   );
 };
+
+const TAGS = Array.from({ length: 50 }).map(
+  (_, i, a) => `v1.2.0-beta.${a.length - i}`,
+);
 
 const taskCategories = [
   { label: "Urgent", color: "#e11d48" },
@@ -2790,94 +2798,97 @@ const taskCategories = [
 
 function ComboboxPopover({ task, subtask, date }: { task: Task }) {
   const dispatch = useAppDispatch();
-  const [open, setOpen] = React.useState(false);
   const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(
     subtask ? subtask.category.color : task.category.color,
   );
-
   return (
     <div className="flex items-center space-x-4">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="[&_svg]:size-5 p-0 h-auto w-auto"
-          >
-            {selectedStatus ? (
-              <>
-                <Squircle fill={selectedStatus} color={selectedStatus} />
-              </>
-            ) : (
-              <Squircle className="fill-primary text-primary" />
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="p-0" side="right" align="start">
-          <Command>
-            <CommandInput placeholder="Change category..." />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup>
-                {taskCategories.map((item) => (
-                  <CommandItem
-                    key={item.color}
-                    value={item.color}
-                    onSelect={(color) => {
-                      setSelectedStatus(color);
+      <PopoverTrigger>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="[&_svg]:size-5 p-0 h-auto w-auto"
+        >
+          {selectedStatus ? (
+            <>
+              <Squircle fill={selectedStatus} color={selectedStatus} />
+            </>
+          ) : (
+            <Squircle className="fill-primary text-primary" />
+          )}
+        </Button>
+        <Popover placement="bottom">
+          <PopoverDialog className="p-0 max-w-[220px]">
+            <Command>
+              <CommandInput placeholder="Change category..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup>
+                  {taskCategories.map((item) => (
+                    <CommandItem
+                      key={item.color}
+                      value={item.color}
+                      onSelect={(color) => {
+                        setSelectedStatus(color);
 
-                      const _category = taskCategories.find(
-                        (item) => item.color === color,
-                      );
-                      if (subtask) {
-                        dispatch(
-                          updateSubTask({
-                            id: task.id,
-                            sub_task_id: subtask.id,
-                            updated_sub_task: {
-                              category: _category,
-                            },
-                          }),
+                        const _category = taskCategories.find(
+                          (item) => item.color === color,
                         );
-                      } else {
-                        dispatch(
-                          updateTask({
-                            id: task.id,
-                            key: date.timestamp,
-                            updated_task: {
-                              title: task.title,
-                              category: _category,
-                            },
-                          }),
-                        );
-                      }
-                      setOpen(false);
-                    }}
-                  >
-                    <Squircle
-                      fill={item.color}
-                      color={item.color}
-                      className={cn(
-                        "mr-2 h-5 w-5",
-                        item.value === selectedStatus?.value
-                          ? "opacity-100"
-                          : "opacity-40",
+                        if (subtask) {
+                          dispatch(
+                            updateSubTask({
+                              id: task.id,
+                              sub_task_id: subtask.id,
+                              updated_sub_task: {
+                                category: _category,
+                              },
+                            }),
+                          );
+                        } else {
+                          dispatch(
+                            updateTask({
+                              id: task.id,
+                              key: date.timestamp,
+                              updated_task: {
+                                title: task.title,
+                                category: _category,
+                              },
+                            }),
+                          );
+                        }
+                      }}
+                    >
+                      <Squircle
+                        fill={item.color}
+                        color={item.color}
+                        className={cn(
+                          "mr-2 h-5 w-5",
+                          item.value === selectedStatus?.value
+                            ? "opacity-100"
+                            : "opacity-40",
+                        )}
+                      />
+                      <span>{item.label}</span>
+
+                      {selectedStatus === item.color && (
+                        <Check
+                          className="ml-auto size-3.5 text-primary"
+                          strokeWidth={3}
+                        />
                       )}
-                    />
-                    <span>{item.label}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverDialog>
+        </Popover>
+      </PopoverTrigger>
     </div>
   );
 }
 
 function ComboboxPopoverFilter({ data, handler }) {
-  const [open, setOpen] = React.useState(false);
   const [selectedStatus, setSelectedStatus] = React.useState<String | null>(
     null,
   );
@@ -2887,76 +2898,73 @@ function ComboboxPopoverFilter({ data, handler }) {
   );
   return (
     <div className="flex items-center space-x-4">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" className="[&_svg]:size-4">
-            {selectedStatus ? (
-              <>
-                <span className="pb-0.5 font-medium">
-                  {selected_category?.label}
-                </span>
-                <Squircle fill={selectedStatus} color={selectedStatus} />
-              </>
-            ) : (
-              <React.Fragment>
-                <span className="pb-0.5 font-medium">Filter task</span>
-                <ChevronsUpDown className="text-muted-foreground" />
-              </React.Fragment>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="p-0" side="right" align="start">
-          <Command>
-            <CommandInput placeholder="Change category..." />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup>
-                {data.map((item) => (
-                  <CommandItem
-                    key={item.color}
-                    value={item.color}
-                    onSelect={(color) => {
-                      setSelectedStatus(color);
-                      handler(color);
+      <PopoverTrigger>
+        <Button variant="ghost" className="[&_svg]:size-4">
+          {selectedStatus ? (
+            <>
+              <span className="pb-0.5 font-medium">
+                {selected_category?.label}
+              </span>
+              <Squircle fill={selectedStatus} color={selectedStatus} />
+            </>
+          ) : (
+            <React.Fragment>
+              <span className="pb-0.5 font-medium">Filter task</span>
+              <ChevronsUpDown className="text-muted-foreground" />
+            </React.Fragment>
+          )}
+        </Button>
+        <Popover placement="bottom">
+          <PopoverDialog className="p-0 max-w-[220px]">
+            <Command>
+              <CommandInput placeholder="Change category..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup>
+                  {data.map((item) => (
+                    <CommandItem
+                      key={item.color}
+                      value={item.color}
+                      onSelect={(color) => {
+                        setSelectedStatus(color);
+                        handler(color);
 
-                      const _category = taskCategories.find(
-                        (item) => item.color === color,
-                      );
-                      setOpen(false);
-                    }}
-                  >
-                    <Squircle
-                      fill={item.color}
-                      color={item.color}
-                      className={cn(
-                        "mr-2 h-5 w-5",
-                        item.value === selectedStatus?.value
-                          ? "opacity-100"
-                          : "opacity-40",
-                      )}
-                    />
-                    <span>{item.label}</span>
-                  </CommandItem>
-                ))}
+                        const _category = taskCategories.find(
+                          (item) => item.color === color,
+                        );
+                      }}
+                    >
+                      <Squircle
+                        fill={item.color}
+                        color={item.color}
+                        className={cn(
+                          "mr-2 h-5 w-5",
+                          item.value === selectedStatus?.value
+                            ? "opacity-100"
+                            : "opacity-40",
+                        )}
+                      />
+                      <span>{item.label}</span>
+                    </CommandItem>
+                  ))}
 
-                {selectedStatus && (
-                  <CommandItem
-                    onSelect={() => {
-                      setSelectedStatus(null);
-                      handler("all");
-
-                      setOpen(false);
-                    }}
-                  >
-                    <X className={cn("mr-2 h-5 w-5")} />
-                    <span>Delete filte</span>
-                  </CommandItem>
-                )}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                  {selectedStatus && (
+                    <CommandItem
+                      onSelect={() => {
+                        setSelectedStatus(null);
+                        handler("all");
+                      }}
+                    >
+                      <X className={cn("mr-2 h-5 w-5")} />
+                      <span>Delete filter</span>
+                    </CommandItem>
+                  )}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverDialog>
+        </Popover>
+      </PopoverTrigger>
     </div>
   );
 }

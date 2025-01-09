@@ -1,22 +1,25 @@
 import { Link } from "@remix-run/react";
 import { type MetaFunction } from "@remix-run/node";
-
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "#app/components/ui/card";
 export const meta: MetaFunction = () => [{ title: "About | Doti App" }];
 
 export default function Index() {
   return (
-    <div className="bg-background overflow-hidden rounded-md mt-4 max-w-4xl mx-auto border mb-4">
-      <div className="p-4">
-        <h3 className="text-lg leading-6 font-medium text-foreground">
-          Application Information
-        </h3>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Information details
-        </p>
-      </div>
-      <div className="border-t border-border px-4 py-5 sm:p-0">
+    <Card className="mt-4">
+      <CardHeader>
+        <CardTitle>Application Information</CardTitle>
+        <CardDescription>Information details</CardDescription>
+      </CardHeader>
+      <CardContent>
         <dl className="sm:divide-y sm:divide-border">
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">
               Developer
             </dt>
@@ -24,13 +27,13 @@ export default function Index() {
               Huda
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">Name</dt>
             <dd className="mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
               Doti App
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">
               Description
             </dt>
@@ -38,7 +41,7 @@ export default function Index() {
               Simple application for everyday
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">
               Source Api Quran
             </dt>
@@ -62,7 +65,7 @@ export default function Index() {
               </ul>
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">
               Font Quran Kemenag (LPMQ)
             </dt>
@@ -72,7 +75,7 @@ export default function Index() {
               </Link>
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">Stack</dt>
             <dd className="flex items-center flex-wrap mt-1 text-sm text-foreground sm:mt-0 sm:col-span-2">
               <ul className="list-disc list-inside">
@@ -93,7 +96,7 @@ export default function Index() {
               </ul>
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">
               Dependencies
             </dt>
@@ -134,7 +137,7 @@ export default function Index() {
               </ul>
             </dd>
           </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
             <dt className="text-sm font-medium text-muted-foreground">
               Deploy
             </dt>
@@ -142,8 +145,16 @@ export default function Index() {
               <Link to="https://vercel.com/">Vercel</Link>
             </dd>
           </div>
+          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3">
+            <dt className="text-sm font-medium text-muted-foreground">
+              Components
+            </dt>
+            <dd className="mt-1 text-sm sm:mt-0 sm:col-span-2">
+              <Link to="/components">Demo</Link>
+            </dd>
+          </div>
         </dl>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

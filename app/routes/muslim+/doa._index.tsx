@@ -198,13 +198,14 @@ export const DialogResponsive = ({ content }) => {
 // Dependencies: pnpm install lucide-react
 
 import { Badge } from "#app/components/ui/badge";
-import { ScrollArea, ScrollBar } from "#app/components/ui/scroll-area";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "#app/components/ui/tabs";
+
+import { Tab, TabList, TabPanel, Tabs } from "#app/components/ui/tabs";
+// import {
+//   Tabs,
+//   TabsContent,
+//   TabsList,
+//   TabsTrigger,
+// } from "#app/components/ui/tabs";
 
 function TabDemo({ result }) {
   const combinedData = result.flatMap((obj) => obj.data);
@@ -220,62 +221,66 @@ function TabDemo({ result }) {
   );
 
   return (
-    <Tabs defaultValue="quran">
-      <ScrollArea className="max-w-4xl mx-auto">
-        <TabsList className=" mb-3 h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
-          <TabsTrigger
-            value="search"
-            className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent"
+    <React.Fragment>
+      <Tabs defaultSelectedKey="source_quran">
+        <div className="overflow-x-auto">
+          <TabList
+            aria-label="Kumpulan Doa berbagai sumber"
+            className="mb-2 h-auto gap-2 rounded-none border-b border-border bg-transparent py-1 px-1 text-foreground"
           >
-            <Search
-              size={16}
-              strokeWidth={2}
-              className="-ms-0.5 me-1.5 opacity-60"
-            />
-            <span className="font-semibold capitalize text-sm">Cari</span>
-          </TabsTrigger>
-          {result.map((d, actionIdx) => {
-            const Icon = sumberIcons[d.source] || Circle; // Default ke Dot jika tidak match
-            return (
-              <TabsTrigger
-                value={d.source}
-                key={actionIdx}
-                className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent"
-              >
-                <Icon
-                  size={16}
-                  strokeWidth={2}
-                  className="-ms-0.5 me-1.5 opacity-60"
-                />
-                <span className="font-semibold capitalize text-sm">
-                  {d.label}
-                </span>
-                <Badge
-                  className="ms-1.5 min-w-5 bg-primary/15 px-1"
-                  variant="secondary"
+            <Tab
+              id="search_source"
+              className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[selected]:bg-transparent data-[selected]:shadow-none data-[selected]:after:bg-primary data-[selected]:hover:bg-accent shadow-none flex items-center"
+            >
+              <Search
+                size={16}
+                strokeWidth={2}
+                className="-ms-0.5 me-1.5 opacity-60"
+              />
+              <span className="font-semibold capitalize text-sm">Cari</span>
+            </Tab>
+            {result.map((d, actionIdx) => {
+              const Icon = sumberIcons[d.source] || Circle; // Default ke Dot jika tidak match
+              return (
+                <Tab
+                  id={`search_${d.source}`}
+                  key={actionIdx}
+                  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[selected]:bg-transparent data-[selected]:shadow-none data-[selected]:after:bg-primary data-[selected]:hover:bg-accent shadow-none flex items-center"
                 >
-                  {d.data?.length}
-                </Badge>
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-
-      {result?.map((d) => (
-        <TabsContent
-          key={d.label}
-          value={d.source}
-          className="max-w-4xl mx-auto p-0 m-0"
-        >
-          <DoaView source={d.source} items={d.data} />
-        </TabsContent>
-      ))}
-      <TabsContent value="search" className="p-0 m-0">
-        <SearchView result={combinedData} />
-      </TabsContent>
-    </Tabs>
+                  <Icon
+                    size={16}
+                    strokeWidth={2}
+                    className="-ms-0.5 me-1.5 opacity-60"
+                  />
+                  <span className="font-semibold capitalize text-sm">
+                    {d.label}
+                  </span>
+                  <Badge
+                    className="ms-1.5 min-w-5 bg-primary/15 px-1"
+                    variant="secondary"
+                  >
+                    {d.data?.length}
+                  </Badge>
+                </Tab>
+              );
+            })}
+          </TabList>
+        </div>
+        <TabPanel id="search_source" className="mt-0">
+          <SearchView result={combinedData} />
+        </TabPanel>
+        {result?.map((d) => (
+          <TabPanel
+            id={`search_${d.source}`}
+            key={d.label}
+            value={d.source}
+            className="p-0 m-0"
+          >
+            <DoaView source={d.source} items={d.data} />
+          </TabPanel>
+        ))}
+      </Tabs>
+    </React.Fragment>
   );
 }
 
@@ -283,43 +288,9 @@ import { get_cache, set_cache } from "#app/utils/cache-client.ts";
 import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
 
 import React from "react";
-import * as ScrollAreaRadix from "@radix-ui/react-scroll-area";
 
 const TAGS = Array.from({ length: 50 }).map(
   (_, i, a) => `v1.2.0-beta.${a.length - i}`,
-);
-
-const ScrollAreaDemo = () => (
-  <ScrollAreaRadix.Root className="h-[225px] w-[200px] overflow-hidden rounded bg-background shadow-[0_2px_10px] shadow-black">
-    <ScrollAreaRadix.Viewport className="size-full rounded">
-      <div className="px-5 py-[15px]">
-        <div className="text-[15px] font-medium leading-[18px] text-primary">
-          Tags
-        </div>
-        {TAGS.map((tag) => (
-          <div
-            className="mt-2.5 border-t border-t-mauve6 pt-2.5 text-[13px] leading-[18px] text-muted-foreground"
-            key={tag}
-          >
-            {tag}
-          </div>
-        ))}
-      </div>
-    </ScrollAreaRadix.Viewport>
-    <ScrollAreaRadix.Scrollbar
-      className="flex touch-none select-none bg-background p-0.5 transition-colors duration-[160ms] ease-out hover:bg-border data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
-      orientation="vertical"
-    >
-      <ScrollAreaRadix.Thumb className="relative flex-1 rounded-[10px] bg-gray-400/80 before:absolute before:left-1/2 before:top-1/2 before:size-full before:min-h-11 before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2" />
-    </ScrollAreaRadix.Scrollbar>
-    <ScrollAreaRadix.Scrollbar
-      className="flex touch-none select-none bg-primary p-0.5 transition-colors duration-[160ms] ease-out hover:bg-primary data-[orientation=horizontal]:h-2.5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col"
-      orientation="horizontal"
-    >
-      <ScrollAreaRadix.Thumb className="relative flex-1 rounded-[10px] bg-foreground before:absolute before:left-1/2 before:top-1/2 before:size-full before:min-h-[44px] before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2" />
-    </ScrollAreaRadix.Scrollbar>
-    <ScrollAreaRadix.Corner className="bg-border" />
-  </ScrollAreaRadix.Root>
 );
 
 const DoaView = ({ items }) => {
@@ -388,105 +359,90 @@ const DoaView = ({ items }) => {
   });
 
   return (
-    <ScrollAreaRadix.Root>
-      <ScrollAreaRadix.Viewport
-        ref={parentRef}
-        className="px-2.5 h-[calc(100vh-175px)]"
-      >
-        <div>
-          <div
-            className="space-y-0.5 py-2"
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: "relative",
-            }}
-          >
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const d = items[virtualRow.index];
-              const doa = {
-                ...d,
-                index: virtualRow.index.toString(),
-              };
+    <div
+      ref={parentRef}
+      className="px-2.5 h-[calc(100vh-175px)] overflow-y-auto"
+    >
+      <div>
+        <div
+          className="space-y-0.5 py-2"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const d = items[virtualRow.index];
+            const doa = {
+              ...d,
+              index: virtualRow.index.toString(),
+            };
 
-              const _source = `/muslim/doa?index=${doa.index}&source=${doa.source}`;
+            const _source = `/muslim/doa?index=${doa.index}&source=${doa.source}`;
 
-              const isFavorite = bookmarks_ayah.some(
-                (fav) => fav.source === _source,
-              );
-              return (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  ref={rowVirtualizer.measureElement}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                >
-                  <div key={virtualRow.index} className="w-full border-b">
-                    <div className="group relative py-4 px-2 rounded-md w-full">
-                      <div className="flex items-center sm:items-start sm:justify-between gap-x-2 mb-2">
-                        <div className="font-medium text-lg sm:order-first order-last">
-                          {doa.judul}
-                        </div>
+            const isFavorite = bookmarks_ayah.some(
+              (fav) => fav.source === _source,
+            );
+            return (
+              <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <div key={virtualRow.index} className="w-full border-b">
+                  <div className="group relative py-4 px-2 rounded-md w-full">
+                    <div className="flex items-center sm:items-start sm:justify-between gap-x-2 mb-2">
+                      <div className="font-medium text-lg sm:order-first order-last">
+                        {doa.judul}
+                      </div>
 
-                        <button
-                          onClick={() => toggleBookmark(doa)}
+                      <button
+                        onClick={() => toggleBookmark(doa)}
+                        className={cn(
+                          "order-0 sm:order-1 bg-gradient-to-br from-muted to-accent p-3 rounded-xl",
+                          isFavorite &&
+                            "from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20",
+                        )}
+                      >
+                        <Heart
                           className={cn(
-                            "order-0 sm:order-1 bg-gradient-to-br from-muted to-accent p-3 rounded-xl",
-                            isFavorite &&
-                              "from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20",
+                            "w-5 h-5 text-muted-foreground",
+                            isFavorite && "text-rose-600 dark:text-rose-400",
                           )}
-                        >
-                          <Heart
-                            className={cn(
-                              "w-5 h-5 text-muted-foreground",
-                              isFavorite && "text-rose-600 dark:text-rose-400",
-                            )}
-                          />
-                        </button>
-                      </div>
-                      <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                        <p
-                          className="relative mt-2 font-lpmq text-right text-primary"
-                          dangerouslySetInnerHTML={{
-                            __html: doa.arab,
-                          }}
                         />
-                      </div>
-                      <div className="mt-3 space-y-3">
-                        <div
-                          className="translation-text prose-sm text-muted-foreground max-w-none"
-                          dangerouslySetInnerHTML={{
-                            __html: doa.indo,
-                          }}
-                        />
-                      </div>
+                      </button>
+                    </div>
+                    <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
+                      <p
+                        className="relative mt-2 font-lpmq text-right text-primary"
+                        dangerouslySetInnerHTML={{
+                          __html: doa.arab,
+                        }}
+                      />
+                    </div>
+                    <div className="mt-3 space-y-3">
+                      <div
+                        className="translation-text prose-sm text-muted-foreground max-w-none"
+                        dangerouslySetInnerHTML={{
+                          __html: doa.indo,
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
-      </ScrollAreaRadix.Viewport>
-      <ScrollAreaRadix.Scrollbar
-        className="flex touch-none select-none transition-colors h-full w-2.5 border-l border-l-transparent p-[1px]"
-        orientation="vertical"
-      >
-        <ScrollAreaRadix.Thumb className="relative flex-1 rounded-full bg-border" />
-      </ScrollAreaRadix.Scrollbar>
-      <ScrollAreaRadix.Scrollbar
-        className="flex touch-none select-none transition-colors h-2.5 flex-col border-t border-t-transparent p-[1px]"
-        orientation="horizontal"
-      >
-        <ScrollAreaRadix.Thumb className="relative flex-1 rounded-full bg-border" />
-      </ScrollAreaRadix.Scrollbar>
-      <ScrollAreaRadix.Corner className="bg-border" />
-    </ScrollAreaRadix.Root>
+      </div>
+    </div>
   );
 };
 

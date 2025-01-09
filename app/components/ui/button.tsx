@@ -1,33 +1,38 @@
-import { Button as ButtonRAC } from "react-aria-components";
+import React from "react";
+import * as ReactAria from "react-aria-components";
 import { cva, type VariantProps } from "class-variance-authority";
-import * as React from "react";
-
 import { cn } from "#app/utils/misc.tsx";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-sm",
+  [
+    "inline-flex gap-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors",
+    /* Disabled */
+    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ",
+    /* Focus Visible */
+    "data-[focus-visible]:outline-none data-[focus-visible]:ring-1 data-[focus-visible]:ring-ring ",
+    /* Resets */
+    "focus-visible:outline-none",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  ],
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        default:
+          "bg-primary text-primary-foreground shadow data-[hovered]:bg-primary/90",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/80",
+          "bg-destructive text-destructive-foreground shadow-sm data-[hovered]:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        outline_active:
-          "border border-input bg-accent hover:text-accent-foreground",
+          "border border-input bg-background shadow-sm  data-[hovered]:bg-accent data-[hovered]:text-accent-foreground",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-secondary text-secondary-foreground shadow-sm data-[hovered]:bg-secondary/80",
+        ghost: "data-[hovered]:bg-accent data-[hovered]:text-accent-foreground",
+        link: "text-primary underline-offset-4 data-[hovered]:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        wide: "px-24 py-5",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        pill: "px-12 py-3 leading-3",
-        icon: "h-10 w-10",
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "size-9",
       },
     },
     defaultVariants: {
@@ -43,17 +48,26 @@ export interface ButtonProps
   asChild?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    return (
-      <ButtonRAC
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
+export interface ButtonProps
+  extends ReactAria.ButtonProps,
+    VariantProps<typeof buttonVariants> {
+  className?: string;
+}
+
+const Button = ({ className, variant, size, ...props }: ButtonProps) => {
+  return (
+    <ReactAria.Button
+      className={cn(
+        buttonVariants({
+          variant,
+          size,
+          className,
+        }),
+      )}
+      {...props}
+    />
+  );
+};
 Button.displayName = "Button";
 
 export { Button, buttonVariants };

@@ -1,10 +1,11 @@
 import { Equal, Plus, Minus, History, Delete, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "#app/components/ui/button";
+import { Input } from "#app/components/ui/input";
 import React, { useState } from "react";
 import {
   Popover,
-  PopoverContent,
+  PopoverDialog,
   PopoverTrigger,
 } from "#app/components/ui/popover";
 import { cn } from "#app/utils/misc";
@@ -271,132 +272,137 @@ const Calculator: React.FC = () => {
         "h-[calc(100vh-57px)]",
       )}
     >
-      <Popover>
-        <div>
-          <div className="w-full flex items-center justify-between border-b px-2.5 sm:px-3 py-1">
-            <div>
-              <p className="mr-2 inline-block uppercase my-1 font-sans font-bold">
-                Calculator
-              </p>
-            </div>
-            <PopoverTrigger className="flex items-center gap-x-1.5">
-              <History className="w-4 h-4" /> Riwayat
-            </PopoverTrigger>
+      <div>
+        <div className="w-full flex items-center justify-between border-b px-2.5 sm:px-3 py-1">
+          <div>
+            <p className="mr-2 inline-block uppercase my-1 font-sans font-bold">
+              Calculator
+            </p>
           </div>
 
-          <div className="flex items-center justify-between bg-muted/50 px-2 border-b">
-            <span className="text-xl font-bold text-right text-foreground/80">
-              {currentInput?.slice(-28)}
-            </span>
-          </div>
-        </div>
-        <PopoverContent className="w-full mb-4 overflow-y-auto divide-y divide-gray-300 max-h-[80vh]">
-          {history.map((d, index) => (
-            <div key={index} className="grid break-words py-2">
-              <Collapsible>
-                <CollapsibleTrigger className="w-full [&[data-state=open]>div.chev]:hidden">
-                  <div className="text-pretty text-xl font-medium text-start w-[300px]">
-                    {splitExpression(processInput(d.expression)).map(
-                      (dt, index) => (
-                        <React.Fragment key={index}>{dt}</React.Fragment>
-                      ),
-                    )}
-                  </div>
-                  <div className="chev text-2xl text-right font-semibold">
-                    {d.result && `${formatRupiah(parseFloat(d.result))}`}
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="text-xl font-semibold max-h-[calc(100vh-360px)] overflow-y-auto pr-3 my-3">
-                    {splitExpression(processInput(d.expression)).map(
-                      (item, index, arr) => {
-                        const lastIndex = findLastEvenIndex(arr);
-                        // Menampilkan angka
-                        if (index % 2 === 0) {
-                          return (
-                            <div key={index} className="text-right">
-                              {index === 0 ? (
-                                // Menampilkan angka pertama dengan warna biru
-                                <div className="flex items-center justify-between border-b border-dashed border-gray-400 px-2 bg-green-50 dark:bg-green-950">
-                                  <div className="gap-x-6 flex items-center text-[16px] w-4 text-start">
-                                    <span>{index === 0 && "1."}</span>
-                                  </div>
-                                  <span className="text-xl font-semibold">
-                                    {formatRupiah(parseFloat(item))}
-                                  </span>
-                                </div>
-                              ) : (
-                                <>
-                                  {/* Menampilkan operator setelah angka */}
-                                  <div
-                                    className={cn(
-                                      "flex items-center justify-between gap-2 items-center justify-between px-2 py-0.5 border-b border-dashed border-muted-foreground",
-                                      splitExpression(
-                                        processInput(d.expression),
-                                      )[index - 1] === "+" &&
-                                        "bg-green-50 dark:bg-green-950",
-                                      splitExpression(
-                                        processInput(d.expression),
-                                      )[index - 1] === "-" &&
-                                        "bg-red-50 dark:bg-red-950",
-                                      splitExpression(
-                                        processInput(d.expression),
-                                      )[index - 1] === "÷" &&
-                                        "bg-orange-50 dark:bg-orange-950",
-                                      splitExpression(
-                                        processInput(d.expression),
-                                      )[index - 1] === "×" &&
-                                        "bg-blue-50 dark:bg-blue-950",
-                                    )}
-                                  >
-                                    <div className="gap-x-3 flex items-center">
-                                      <span className="text-[16px] w-2.5 text-start flex items-center">
-                                        <span>
-                                          {index === 0 ? "" : index / 2 + 1}
+          <PopoverTrigger>
+            <Button variant="ghost">
+              <History className="w-4 h-4" /> Riwayat
+            </Button>
+            <Popover placement="bottom">
+              <PopoverDialog className="w-full mb-4 overflow-y-auto divide-y divide-gray-300 max-h-[80vh]">
+                {history.map((d, index) => (
+                  <div key={index} className="grid break-words py-2">
+                    <Collapsible>
+                      <CollapsibleTrigger className="w-full [&[data-state=open]>div.chev]:hidden">
+                        <div className="text-pretty text-xl font-medium text-start w-[300px]">
+                          {splitExpression(processInput(d.expression)).map(
+                            (dt, index) => (
+                              <React.Fragment key={index}>{dt}</React.Fragment>
+                            ),
+                          )}
+                        </div>
+                        <div className="chev text-2xl text-right font-semibold">
+                          {d.result && `${formatRupiah(parseFloat(d.result))}`}
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="text-xl font-semibold max-h-[calc(100vh-360px)] overflow-y-auto pr-3 my-3">
+                          {splitExpression(processInput(d.expression)).map(
+                            (item, index, arr) => {
+                              const lastIndex = findLastEvenIndex(arr);
+                              // Menampilkan angka
+                              if (index % 2 === 0) {
+                                return (
+                                  <div key={index} className="text-right">
+                                    {index === 0 ? (
+                                      // Menampilkan angka pertama dengan warna biru
+                                      <div className="flex items-center justify-between border-b border-dashed border-gray-400 px-2 bg-green-50 dark:bg-green-950">
+                                        <div className="gap-x-6 flex items-center text-[16px] w-4 text-start">
+                                          <span>{index === 0 && "1."}</span>
+                                        </div>
+                                        <span className="text-xl font-semibold">
+                                          {formatRupiah(parseFloat(item))}
                                         </span>
-                                        <span>.</span>
-                                      </span>
-                                      <span className="text-2xl px-2">
-                                        {
-                                          splitExpression(
-                                            processInput(d.expression),
-                                          )[index - 1]
-                                        }
-                                      </span>
-                                    </div>
-                                    <span className="text-xl font-semibold">
-                                      {formatRupiah(parseFloat(item))}
-                                    </span>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        {/* Menampilkan operator setelah angka */}
+                                        <div
+                                          className={cn(
+                                            "flex items-center justify-between gap-2 items-center justify-between px-2 py-0.5 border-b border-dashed border-muted-foreground",
+                                            splitExpression(
+                                              processInput(d.expression),
+                                            )[index - 1] === "+" &&
+                                              "bg-green-50 dark:bg-green-950",
+                                            splitExpression(
+                                              processInput(d.expression),
+                                            )[index - 1] === "-" &&
+                                              "bg-red-50 dark:bg-red-950",
+                                            splitExpression(
+                                              processInput(d.expression),
+                                            )[index - 1] === "÷" &&
+                                              "bg-orange-50 dark:bg-orange-950",
+                                            splitExpression(
+                                              processInput(d.expression),
+                                            )[index - 1] === "×" &&
+                                              "bg-blue-50 dark:bg-blue-950",
+                                          )}
+                                        >
+                                          <div className="gap-x-3 flex items-center">
+                                            <span className="text-[16px] w-2.5 text-start flex items-center">
+                                              <span>
+                                                {index === 0
+                                                  ? ""
+                                                  : index / 2 + 1}
+                                              </span>
+                                              <span>.</span>
+                                            </span>
+                                            <span className="text-2xl px-2">
+                                              {
+                                                splitExpression(
+                                                  processInput(d.expression),
+                                                )[index - 1]
+                                              }
+                                            </span>
+                                          </div>
+                                          <span className="text-xl font-semibold">
+                                            {formatRupiah(parseFloat(item))}
+                                          </span>
+                                        </div>
+                                      </>
+                                    )}
                                   </div>
-                                </>
+                                );
+                              } else {
+                                return null;
+                              }
+                            },
+                          )}
+
+                          <div className="bg-background flex items-center justify-between sticky bottom-0 z-10 border-t-2 border-primary px-2">
+                            <div className="py-1 text-xl font-semibold text-right">
+                              TOTAL{" "}
+                            </div>
+                            <div className="flex items-center gap-2 py-1">
+                              {d.result && (
+                                <span className="text-2xl font-semibold text-right">
+                                  {formatRupiah(parseFloat(d.result))}
+                                </span>
                               )}
                             </div>
-                          );
-                        } else {
-                          return null;
-                        }
-                      },
-                    )}
-
-                    <div className="bg-background flex items-center justify-between sticky bottom-0 z-10 border-t-2 border-primary px-2">
-                      <div className="py-1 text-xl font-semibold text-right">
-                        TOTAL{" "}
-                      </div>
-                      <div className="flex items-center gap-2 py-1">
-                        {d.result && (
-                          <span className="text-2xl font-semibold text-right">
-                            {formatRupiah(parseFloat(d.result))}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          ))}
-        </PopoverContent>
-      </Popover>
+                ))}
+              </PopoverDialog>
+            </Popover>
+          </PopoverTrigger>
+        </div>
+
+        <Input
+          className="text-xl font-bold w-full rounded-none border-x-0 border-t-0 border-b disabled:opacity-70"
+          value={currentInput}
+          disabled
+        />
+      </div>
 
       <div>
         <Collapsible defaultOpen={true} className="m-0 p-0">

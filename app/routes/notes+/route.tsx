@@ -1,6 +1,6 @@
 import { Outlet } from "@remix-run/react";
 import React from "react";
-import { Button } from "#app/components/ui/button-shadcn";
+import { Button } from "#app/components/ui/button";
 import { ChevronLeft, House } from "lucide-react";
 import { useNavigate } from "@remix-run/react";
 

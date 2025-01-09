@@ -1,7 +1,7 @@
 import { data } from "#/app/constants/dzikr.ts";
 import React from "react";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { Button } from "#app/components/ui/button-shadcn";
+import { Button } from "#app/components/ui/button";
 import { useRouteLoaderData, useLoaderData } from "@remix-run/react";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { cn } from "#app/utils/misc.tsx";

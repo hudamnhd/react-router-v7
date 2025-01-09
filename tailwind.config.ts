@@ -18,5 +18,10 @@ export default {
     extend: extendedTheme,
   },
   presets: [marketingPreset],
-  plugins: [animatePlugin, radixPlugin, require("@tailwindcss/typography")],
+  plugins: [
+    animatePlugin,
+    radixPlugin,
+    require("@tailwindcss/typography"),
+    require("tailwindcss-react-aria-components"),
+  ],
 } satisfies Config;

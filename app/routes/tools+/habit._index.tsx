@@ -14,10 +14,10 @@ import {
   addDays,
   subMonths,
 } from "date-fns";
-import { Button } from "#app/components/ui/button-shadcn";
+import { Button } from "#app/components/ui/button";
 import { Input } from "#app/components/ui/input";
 import { Plus, PencilLine, Trash2, Check, X } from "lucide-react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { type MetaFunction } from "@remix-run/node";
 
@@ -346,7 +346,7 @@ const CalendarMonth = ({ total_sessions, statistics }) => {
           className="h-8 w-8 p-0"
         >
           <span className="sr-only">Go to previous page</span>
-          <ChevronLeftIcon className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
         <h2 className="text-xl font-semibold">
           {format(currentMonth, "MMMM yyyy")}
@@ -357,7 +357,7 @@ const CalendarMonth = ({ total_sessions, statistics }) => {
           className="h-8 w-8 p-0"
         >
           <span className="sr-only">Go to next page</span>
-          <ChevronRightIcon className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
       <div className="flex gap-10 items-start">

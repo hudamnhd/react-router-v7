@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "#app/utils/misc";
 
@@ -25,7 +24,7 @@ export interface SpinnerProps
 
 const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
   ({ className, size, loading = true, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "span";
+    const Comp = "span";
 
     const [bgColorClass, filteredClassName] = React.useMemo(() => {
       const bgClass = className?.match(/(?:dark:bg-|bg-)[a-zA-Z0-9-]+/g) || [];

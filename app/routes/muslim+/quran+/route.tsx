@@ -14,12 +14,7 @@ import { Scroll, Minus, Dot } from "lucide-react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
 import { Spinner } from "#app/components/ui/spinner-circle";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "#app/components/ui/tabs";
+import { Tab, TabList, TabPanel, Tabs } from "#app/components/ui/tabs";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 
 import { type MetaFunction } from "@remix-run/node";
@@ -66,28 +61,20 @@ function App() {
     <div className="flex items-start gap-x-3">
       {id && is_desktop && (
         <div className="xl:block hidden max-w-sm mx-auto py-1 w-full sticky top-[60px]">
-          <Tabs
-            defaultValue="surat"
-            className="flex flex-col items-center mt-2 mx-auto"
-          >
-            <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="juz">Juz</TabsTrigger>
-              <TabsTrigger value="surat">Surat</TabsTrigger>
-            </TabsList>
-            <TabsContent
-              value="surat"
-              className="w-full tab-content"
-              forceMount
+          <Tabs>
+            <TabList
+              aria-label="options surah or juz"
+              className="grid grid-cols-2 w-fit mx-auto mt-1"
             >
+              <Tab id="juz">Juz</Tab>
+              <Tab id="surat">Surat</Tab>
+            </TabList>
+            <TabPanel id="surat" className="mt-0">
               <SurahView version={version} />
-            </TabsContent>
-            <TabsContent
-              value="juz"
-              className="w-full h-full tab-content"
-              forceMount
-            >
+            </TabPanel>
+            <TabPanel id="juz" className="mt-0">
               <JuzView version={version} />
-            </TabsContent>
+            </TabPanel>
           </Tabs>
         </div>
       )}
@@ -205,7 +192,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
   return (
     <div
       ref={parentRef}
-      className="py-2 h-[calc(100vh-170px)]"
+      className="p-2 h-[calc(100vh-165px)]"
       style={{
         overflow: "auto",
       }}
@@ -277,13 +264,13 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({
   const rowVirtualizer = useVirtualizer({
     count: items.length, // Jumlah total item
     getScrollElement: () => parentRef.current, // Elemen tempat scrolling
-    estimateSize: () => 56, // Perkiraan tinggi item (70px)
+    estimateSize: () => 58, // Perkiraan tinggi item (70px)
   });
 
   return (
     <div
       ref={parentRef}
-      className="py-2 h-[calc(100vh-170px)]"
+      className="p-2 h-[calc(100vh-165px)]"
       style={{
         overflow: "auto",
       }}
@@ -319,7 +306,7 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({
               <Link
                 to={to}
                 className={cn(
-                  "relative flex cursor-default select-none items-start gap-x-2 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm",
+                  "relative flex cursor-default select-none items-start gap-x-2 rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground text-sm",
                   is_juz === item.number && "bg-accent",
                 )}
               >

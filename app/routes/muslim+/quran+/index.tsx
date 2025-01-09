@@ -1,4 +1,5 @@
 import ky from "ky";
+import { cn } from "#app/utils/misc.tsx";
 import Fuse from "fuse.js";
 import { Search as SearchIcon } from "lucide-react";
 import { useLoaderData, Link } from "@remix-run/react";
@@ -6,17 +7,12 @@ import { json, type ClientLoaderFunctionArgs } from "@remix-run/node";
 import { Scroll, Minus, Dot } from "lucide-react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
+import { buttonVariants } from "#app/components/ui/button";
 import { Spinner } from "#app/components/ui/spinner-circle";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "#app/components/ui/tabs";
+import { Tab, TabList, TabPanel, Tabs } from "#app/components/ui/tabs";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 import * as React from "react";
-
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, BookOpen, ArrowRight } from "lucide-react";
 import {
   Select,
   SelectButton,
@@ -85,33 +81,45 @@ export function App() {
         Al-Qur'an
       </h1>
 
-      <Tabs
-        defaultValue="juz"
-        className="flex flex-col items-center mt-2 mx-auto"
-      >
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="juz">Juz</TabsTrigger>
-          <TabsTrigger value="surat">Surat</TabsTrigger>
-        </TabsList>
-        <TabsContent value="surat" className="w-full tab-content" forceMount>
-          <SurahView version={version} />
-        </TabsContent>
-        <TabsContent
-          value="juz"
-          className="w-full h-full tab-content"
-          forceMount
+      <Tabs>
+        <TabList
+          aria-label="options surah or juz"
+          className="grid grid-cols-2 w-fit mx-auto mt-2"
         >
+          <Tab id="juz">Juz</Tab>
+          <Tab id="surat">Surat</Tab>
+        </TabList>
+        <TabPanel id="surat" className="mt-1">
+          <SurahView version={version} />
+        </TabPanel>
+        <TabPanel id="juz" className="mt-1">
           <JuzView version={version} />
-        </TabsContent>
+        </TabPanel>
       </Tabs>
 
-      <div>
+      <div className="flex items-center justify-between w-full my-2">
+        <Link
+          className={cn(
+            buttonVariants({ variant: "secondary" }),
+            "group flex items-center",
+          )}
+          to="/muslim/quran-kemenag/"
+        >
+          <BookOpen className="opacity-60" strokeWidth={2} aria-hidden="true" />
+          <span>Tafsir Kemenag</span>
+          <ArrowRight
+            className="-me-1 ms-2 opacity-60 transition-transform group-hover:translate-x-0.5"
+            strokeWidth={2}
+            aria-hidden="true"
+          />
+        </Link>
+
         <Select
           aria-label="Select Version"
           selectedKey={version}
           onSelectionChange={(selected) => setVersion(selected)}
           id="select-version"
-          className="my-2 max-w-[100px] mx-auto"
+          className="max-w-[100px]"
         >
           <SelectButton variant="outline">
             <SelectValue>
@@ -233,7 +241,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
   return (
     <div
       ref={parentRef}
-      className="py-2"
+      className="p-2"
       style={{
         height: "300px",
         overflow: "auto",
@@ -266,7 +274,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
             >
               <Link
                 to={to}
-                className="relative flex cursor-default select-none items-start rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground  text-sm"
+                className="relative flex cursor-default select-none items-start rounded-sm px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground text-sm"
               >
                 {item.number}.
                 <div>
@@ -305,7 +313,7 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
   return (
     <div
       ref={parentRef}
-      className="py-2"
+      className="p-2"
       style={{
         height: "300px",
         overflow: "auto",
