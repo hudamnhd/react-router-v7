@@ -1,30 +1,5 @@
-import cache from "#app/utils/cache-server.ts";
-import { cn } from "#app/utils/misc.tsx";
-import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
-import {
-  Dialog,
-  Heading,
-  DialogTrigger,
-  Button as ButtonTrigger,
-  Modal,
-  ModalOverlay,
-} from "react-aria-components";
-import React, { useState, useEffect } from "react";
-import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { Button, buttonVariants } from "#app/components/ui/button";
-import {
-  ListCollapse,
-  ChevronLeft,
-  ChevronRight,
-  Bookmark,
-  Heart,
-  Ellipsis,
-  Dot,
-  Minus,
-  X,
-  BookOpen,
-} from "lucide-react";
-
+import { Link } from "@remix-run/react";
+import React from "react";
 import { type MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => {

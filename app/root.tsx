@@ -398,7 +398,7 @@ function NavbarMobile() {
                         className={({ isActive }) =>
                           [
                             isActive ? "font-semibold bg-muted" : "",
-                            "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-2",
+                            "font-medium transition-colors hover:text-primary w-full px-4 py-2 rounded-md flex items-center gap-x-2 text-sm",
                           ].join(" ")
                         }
                       >

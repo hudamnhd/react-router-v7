@@ -288,7 +288,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({
                     <span>{item.number_of_verses} ayat</span>
                   </div>
                 </div>
-                <div className="ml-auto font-lpmq-2 text-lg text-primary text-right">
+                <div className="sm:block hidden ml-auto font-lpmq-2 text-lg text-primary text-right">
                   {item.name_short}
                 </div>
               </Link>
@@ -359,8 +359,11 @@ const VirtualizedListJuz: React.FC<{ items: any[] }> = ({ items, version }) => {
                       {item.name_start_id} {item.verse_start}
                     </span>
                     <Minus />
-                    <span>
-                      {item.name_end_id} {item.verse_end}
+                    <span className="sm:text-sm text-xs">
+                      {item.name_end_id === item.name_start_id
+                        ? ""
+                        : item.name_end_id}{" "}
+                      {item.verse_end}
                     </span>
                   </div>
                 </div>

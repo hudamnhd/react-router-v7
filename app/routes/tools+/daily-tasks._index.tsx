@@ -1157,8 +1157,8 @@ const TodoTimer = ({
             </div>
 
             <div className="h-2.5">
-              <div className="absolute flex gap-1">
-                {new Array(16).fill(null).map((_, index) => {
+              <div className="absolute flex gap-1 flex-wrap">
+                {new Array(8).fill(null).map((_, index) => {
                   const active = active_task?.sessions?.length - 1;
 
                   return (
@@ -1187,7 +1187,7 @@ const TodoTimer = ({
                 })}
               </div>
             </div>
-            <div className="mt-1">
+            <div className="mt-1 text-sm">
               {active_task?.sessions?.length} dari{" "}
               {active_task?.target_sessions} target sesi
             </div>
@@ -2216,7 +2216,16 @@ const MainTaskCard = React.memo(
                   <div className="flex items-end">
                     <div className="flex items-center justify-start gap-1 h-4">
                       {new Array(16).fill(null).map((_, index) => {
-                        const active = task?.sessions?.length - 1;
+                        const active = task?.sessions?.length;
+                        const active_task_index = task?.sessions?.length - 1;
+                        if (active_task_index === index) {
+                          console.warn(
+                            "DEBUGPRINT[9]: daily-tasks._index.tsx:2255: active === index=",
+                            active_task_index === index,
+                            active_task_index,
+                            index,
+                          );
+                        }
 
                         return (
                           <div
@@ -2225,7 +2234,11 @@ const MainTaskCard = React.memo(
                           >
                             <button
                               onClick={() => {
-                                const total = index + 1 + totalTargetSessions;
+                                const total =
+                                  index +
+                                  1 +
+                                  (totalTargetSessions - todo?.target_sessions);
+                                const target = index + 1;
                                 if (total > 16)
                                   return toast.error("Maximal 16 Session");
                                 dispatch(
@@ -2234,7 +2247,7 @@ const MainTaskCard = React.memo(
                                     key: date.timestamp,
                                     updated_task: {
                                       title: todo.title,
-                                      target_sessions: index + 1,
+                                      target_sessions: target,
                                     },
                                   }),
                                 );
@@ -2243,23 +2256,24 @@ const MainTaskCard = React.memo(
                               style={{ animationDelay: `${index * 0.03}s` }}
                               className={cn(
                                 "h-[12px] w-[12px] shrink-0 cursor-pointer rounded-full ",
-                                active >= index
+                                active > index
                                   ? "bg-chart-2"
-                                  : todo?.target_sessions >= index
+                                  : todo?.target_sessions > index
                                     ? "bg-primary/30"
                                     : todo.status === "progress" &&
-                                        active === index
+                                        active_task_index === index
                                       ? "bg-chart-1"
                                       : "bg-muted hover:bg-primary/50 duration-300 hidden group-hover:block transition-all duration-300 animate-roll-reveal [animation-fill-mode:backwards] ",
                               )}
                             />
 
-                            {todo.status === "progress" && active === index && (
-                              <React.Fragment>
-                                <div className="w-3 h-3 bg-chart-1 rounded-full absolute top-0 left-0 animate-ping" />
-                                <div className="h-[12px] w-[12px]  bg-chart-1 rounded-full absolute top-0 left-0 animate-pulse" />
-                              </React.Fragment>
-                            )}
+                            {todo.status === "progress" &&
+                              active_task_index === index && (
+                                <React.Fragment>
+                                  <div className="w-3 h-3 bg-chart-1 rounded-full absolute top-0 left-0 animate-ping" />
+                                  <div className="h-[12px] w-[12px]  bg-chart-1 rounded-full absolute top-0 left-0 animate-pulse" />
+                                </React.Fragment>
+                              )}
                           </div>
                         );
                       })}

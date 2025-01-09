@@ -205,7 +205,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items, id }) => {
                     <span>{item.number_of_verses} ayat</span>
                   </div>
                 </div>
-                <div className="ml-auto font-lpmq-2 text-lg text-primary text-right">
+                <div className="sm:block hidden ml-auto font-lpmq-2 text-lg text-primary text-right">
                   {item.name_short}
                 </div>
               </Link>
