@@ -11,6 +11,8 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import {
+  useLocation,
+  useMatches,
   NavLink,
   Links,
   Meta,
@@ -429,7 +431,7 @@ function AppWithProviders() {
 
 // export default withSentry(AppWithProviders);
 export default AppWithProviders;
-
+let isMount = true;
 function Document({
   children,
   nonce,
@@ -444,6 +446,44 @@ function Document({
 }) {
   // const allowIndexing = ENV.ALLOW_INDEXING !== "false";
   const allowIndexing = env.ALLOW_INDEXING !== "false";
+
+  let location = useLocation();
+  let matches = useMatches();
+
+  React.useEffect(() => {
+    let mounted = isMount;
+    isMount = false;
+    if ("serviceWorker" in navigator) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller?.postMessage({
+          type: "REMIX_NAVIGATION",
+          isMount: mounted,
+          location,
+          matches,
+          manifest: window.__remixManifest,
+        });
+      } else {
+        let listener = async () => {
+          await navigator.serviceWorker.ready;
+          navigator.serviceWorker.controller?.postMessage({
+            type: "REMIX_NAVIGATION",
+            isMount: mounted,
+            location,
+            matches,
+            manifest: window.__remixManifest,
+          });
+        };
+        navigator.serviceWorker.addEventListener("controllerchange", listener);
+        return () => {
+          navigator.serviceWorker.removeEventListener(
+            "controllerchange",
+            listener,
+          );
+        };
+      }
+    }
+  }, [location]);
+
   return (
     <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
       <head>
