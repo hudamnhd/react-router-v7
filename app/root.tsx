@@ -18,6 +18,7 @@ import {
   Meta,
   Outlet,
   Scripts,
+  LiveReload,
   ScrollRestoration,
   useFetcher,
   useFetchers,
@@ -506,6 +507,8 @@ function Document({
         />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+
+        {process.env.NODE_ENV === "development" && <LiveReload />}
       </body>
     </html>
   );
