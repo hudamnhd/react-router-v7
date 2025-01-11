@@ -95,9 +95,59 @@
     format("truetype");
 }
 
+/*
+  @font-face {
+  font-family: "AlQuran IndoPak";
+  src: local("AlQuran IndoPak"), url("/fonts/AlQuran-IndoPak.ttf")
+    format("truetype");
+}
+*/
+
+@font-face {
+  font-family: Uthmani-Hafs;
+  src: url("/fonts/Uthmani.woff2") format("woff2"), url("/fonts/Uthmani.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: IndoPak;
+  src: url("/fonts/IndoPak.woff2") format("woff2"), url("/fonts/IndoPak.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Cabin;
+  src: local("Cabin-Bold");
+  src: url("/fonts/Cabin-Bold.eot");
+  src: url("/fonts/Cabin-Bold.eot?#iefix") format("embedded-opentype"),
+    url("/fonts/Cabin-Bold.woff2") format("woff2"),
+    url("/fonts/Cabin-Bold.woff") format("woff"), url("/fonts/Cabin-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-lpmq {
   font-family: "LPMQ IsepMisbah";
   font-size: 1.875rem; /* 30px */
+  line-height: 4rem; /* 36px */
+}
+
+.font-indopak {
+  font-family: "IndoPak";
+  font-size: 1.875rem; /* 30px */
+  line-height: 4rem; /* 36px */
+}
+
+.font-uthmani {
+  font-family: "Uthmani-Hafs";
+  font-size: 40px; /* 30px */
   line-height: 4rem; /* 36px */
 }
 

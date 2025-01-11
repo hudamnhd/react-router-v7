@@ -12,7 +12,7 @@ import { Spinner } from "#app/components/ui/spinner-circle";
 import { Tab, TabList, TabPanel, Tabs } from "#app/components/ui/tabs";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 import * as React from "react";
-import { ChevronDown, BookOpen, ArrowRight } from "lucide-react";
+import { ChevronDown, BookOpen, Puzzle, ArrowRight } from "lucide-react";
 import {
   Select,
   SelectButton,
@@ -97,23 +97,7 @@ export function App() {
         </TabPanel>
       </Tabs>
 
-      <div className="flex items-center justify-between w-full my-2">
-        <Link
-          className={cn(
-            buttonVariants({ variant: "secondary" }),
-            "group flex items-center",
-          )}
-          to="/muslim/quran-kemenag/"
-        >
-          <BookOpen className="opacity-60" strokeWidth={2} aria-hidden="true" />
-          <span>Tafsir Kemenag</span>
-          <ArrowRight
-            className="-me-1 ms-2 opacity-60 transition-transform group-hover:translate-x-0.5"
-            strokeWidth={2}
-            aria-hidden="true"
-          />
-        </Link>
-
+      <div className="flex items-center justify-between w-full my-2 gap-x-2">
         <Select
           aria-label="Select Version"
           selectedKey={version}
@@ -138,6 +122,36 @@ export function App() {
             </SelectItem>
           </SelectContent>
         </Select>
+        <Link
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "group flex items-center",
+          )}
+          to="/muslim/quran-kemenag/"
+        >
+          <BookOpen className="opacity-60" strokeWidth={2} aria-hidden="true" />
+          <span>Tafsir Kemenag</span>
+          <ArrowRight
+            className="-me-1 ms-2 opacity-60 transition-transform group-hover:translate-x-0.5"
+            strokeWidth={2}
+            aria-hidden="true"
+          />
+        </Link>
+        <Link
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "group flex items-center",
+          )}
+          to="/muslim/quran-word-by-word/1"
+        >
+          <Puzzle className="opacity-60" strokeWidth={2} aria-hidden="true" />
+          <span>Challenge</span>
+          <ArrowRight
+            className="-me-1 ms-2 opacity-60 transition-transform group-hover:translate-x-0.5"
+            strokeWidth={2}
+            aria-hidden="true"
+          />
+        </Link>
       </div>
     </div>
   );
