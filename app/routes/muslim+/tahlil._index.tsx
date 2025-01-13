@@ -1,6 +1,8 @@
 import { data } from "#/app/constants/tahlil";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { useRouteLoaderData } from "@remix-run/react";
+import { Link, useRouteLoaderData } from "@remix-run/react";
+import { buttonVariants } from "#app/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { cn } from "#app/utils/misc.tsx";
 
@@ -15,11 +17,24 @@ export default function Route() {
   const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
 
   return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
-      <div className="p-1.5 flex justify-end">
-        <DisplaySetting opts={opts} />
+    <div className="prose-base dark:prose-invert w-full max-w-xl mx-auto border-x">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6 bg-transparent",
+            )}
+            to="/muslim"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold capitalize">Tahlil</span>
+        </div>
+
+        <DisplaySetting />
       </div>
-      <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
+      <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-3">
         Tahlil
       </div>
 
@@ -52,7 +67,7 @@ export default function Route() {
             </div>
             {opts?.font_translation === "on" && (
               <div
-                className="translation-text prose text-muted-foreground max-w-none"
+                className="translation-text prose leading-7 max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: translateContent,
                 }}

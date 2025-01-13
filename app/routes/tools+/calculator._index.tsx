@@ -1,6 +1,16 @@
-import { Equal, Plus, Minus, History, Delete, X } from "lucide-react";
+import { Button, buttonVariants } from "#app/components/ui/button";
+import {
+  ChevronLeft,
+  Equal,
+  Plus,
+  Minus,
+  History,
+  Delete,
+  X,
+} from "lucide-react";
+import { Link } from "@remix-run/react";
+import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { toast } from "sonner";
-import { Button } from "#app/components/ui/button";
 import { Input } from "#app/components/ui/input";
 import React, { useState } from "react";
 import {
@@ -43,7 +53,6 @@ interface HistoryItem {
 }
 
 const Calculator: React.FC = () => {
-  const [total, setTotal] = useState<number>(0); // Total kumulatif
   const [currentInput, setCurrentInput] = useState<string>(() => {
     // Ambil currentInput dari localStorage jika ada
     const savedCurrentInput = localStorage.getItem("calcCurrentInput");
@@ -110,7 +119,6 @@ const Calculator: React.FC = () => {
   // Fungsi untuk menghapus input
   const handleClear = () => {
     setCurrentInput("");
-    setTotal(0); // Reset total ketika Clear
   };
 
   // Fungsi untuk menghapus karakter terakhir
@@ -137,7 +145,6 @@ const Calculator: React.FC = () => {
       setHistory(updatedHistory);
       toast.success("Sukses tersimpan dalam riwayat");
       // setCurrentInput(result.toString());
-      // setTotal(result); // Update total dengan hasil terakhir
     } catch (error) {
       setCurrentInput("Error");
     }
@@ -201,32 +208,6 @@ const Calculator: React.FC = () => {
     return result;
   }
 
-  function evaluateInput(input) {
-    const processedInput = processInput(input);
-    const currentResult = eval(processedInput); // Menilai ekspresi
-    return currentResult;
-  }
-  // Menangani tombol "=" untuk menghitung total secara kumulatif
-  const handleEquals = () => {
-    try {
-      const currentResult = eval(currentInput); // Menilai ekspresi
-      setTotal((prev) => prev + currentResult); // Menambahkan ke total sebelumnya
-      setCurrentInput(""); // Reset input setelah "="
-
-      // Menyimpan ke history dengan total kumulatif
-      const newHistory: HistoryItem = {
-        expression: `${currentInput} =`,
-        result: total.toString(),
-      };
-      const updatedHistory = [newHistory, ...history].slice(0, 5);
-      localStorage.setItem("calcHistory", JSON.stringify(updatedHistory));
-      setHistory(updatedHistory);
-    } catch (error) {
-      setCurrentInput("Error");
-    }
-  };
-  // Fungsi untuk memecah input menjadi bagian-bagian ekspresi
-
   const splitExpression = (input: string) => {
     // Pecah ekspresi berdasarkan angka dan operator (+, -, *, /)
     const regex = /(\d*\.?\d+|[+\-*/])/g; // Menggunakan regex untuk angka desimal dan operator
@@ -268,133 +249,154 @@ const Calculator: React.FC = () => {
   return (
     <div
       className={cn(
-        "relative flex flex-col gap-2 justify-between bg-background w-full sm:max-w-sm mx-auto border-x",
-        "h-[calc(100vh-57px)]",
+        "relative flex flex-col gap-2 justify-between bg-background w-full sm:max-w-md mx-auto border-x",
+        "h-screen",
       )}
     >
       <div>
-        <div className="w-full flex items-center justify-between border-b px-2.5 sm:px-3 py-1">
-          <div>
-            <p className="mr-2 inline-block uppercase my-1 font-sans font-bold">
-              Calculator
-            </p>
+        <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
+          <div className="flex items-center gap-x-2">
+            <Link
+              className={cn(
+                buttonVariants({ size: "icon", variant: "outline" }),
+                "prose-none [&_svg]:size-6",
+              )}
+              to="/tools"
+            >
+              <ChevronLeft />
+            </Link>
+            <span className="text-lg font-semibold">Calculator</span>
           </div>
 
-          <PopoverTrigger>
-            <Button variant="ghost">
-              <History className="w-4 h-4" /> Riwayat
-            </Button>
-            <Popover placement="bottom">
-              <PopoverDialog className="w-full mb-4 overflow-y-auto divide-y divide-gray-300 max-h-[80vh]">
-                {history.map((d, index) => (
-                  <div key={index} className="grid break-words py-2">
-                    <Collapsible>
-                      <CollapsibleTrigger className="w-full [&[data-state=open]>div.chev]:hidden">
-                        <div className="text-pretty text-xl font-medium text-start w-[300px]">
-                          {splitExpression(processInput(d.expression)).map(
-                            (dt, index) => (
-                              <React.Fragment key={index}>{dt}</React.Fragment>
-                            ),
-                          )}
-                        </div>
-                        <div className="chev text-2xl text-right font-semibold">
-                          {d.result && `${formatRupiah(parseFloat(d.result))}`}
-                        </div>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="text-xl font-semibold max-h-[calc(100vh-360px)] overflow-y-auto pr-3 my-3">
-                          {splitExpression(processInput(d.expression)).map(
-                            (item, index, arr) => {
-                              const lastIndex = findLastEvenIndex(arr);
-                              // Menampilkan angka
-                              if (index % 2 === 0) {
-                                return (
-                                  <div key={index} className="text-right">
-                                    {index === 0 ? (
-                                      // Menampilkan angka pertama dengan warna biru
-                                      <div className="flex items-center justify-between border-b border-dashed border-gray-400 px-2 bg-green-50 dark:bg-green-950">
-                                        <div className="gap-x-6 flex items-center text-[16px] w-4 text-start">
-                                          <span>{index === 0 && "1."}</span>
-                                        </div>
-                                        <span className="text-xl font-semibold">
-                                          {formatRupiah(parseFloat(item))}
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <>
-                                        {/* Menampilkan operator setelah angka */}
-                                        <div
-                                          className={cn(
-                                            "flex items-center justify-between gap-2 items-center justify-between px-2 py-0.5 border-b border-dashed border-muted-foreground",
-                                            splitExpression(
-                                              processInput(d.expression),
-                                            )[index - 1] === "+" &&
-                                              "bg-green-50 dark:bg-green-950",
-                                            splitExpression(
-                                              processInput(d.expression),
-                                            )[index - 1] === "-" &&
-                                              "bg-red-50 dark:bg-red-950",
-                                            splitExpression(
-                                              processInput(d.expression),
-                                            )[index - 1] === "÷" &&
-                                              "bg-orange-50 dark:bg-orange-950",
-                                            splitExpression(
-                                              processInput(d.expression),
-                                            )[index - 1] === "×" &&
-                                              "bg-blue-50 dark:bg-blue-950",
-                                          )}
-                                        >
-                                          <div className="gap-x-3 flex items-center">
-                                            <span className="text-[16px] w-2.5 text-start flex items-center">
-                                              <span>
-                                                {index === 0
-                                                  ? ""
-                                                  : index / 2 + 1}
-                                              </span>
-                                              <span>.</span>
-                                            </span>
-                                            <span className="text-2xl px-2">
-                                              {
-                                                splitExpression(
-                                                  processInput(d.expression),
-                                                )[index - 1]
-                                              }
-                                            </span>
-                                          </div>
-                                          <span className="text-xl font-semibold">
-                                            {formatRupiah(parseFloat(item))}
-                                          </span>
-                                        </div>
-                                      </>
-                                    )}
-                                  </div>
-                                );
-                              } else {
-                                return null;
-                              }
-                            },
-                          )}
-
-                          <div className="bg-background flex items-center justify-between sticky bottom-0 z-10 border-t-2 border-primary px-2">
-                            <div className="py-1 text-xl font-semibold text-right">
-                              TOTAL{" "}
-                            </div>
-                            <div className="flex items-center gap-2 py-1">
-                              {d.result && (
-                                <span className="text-2xl font-semibold text-right">
-                                  {formatRupiah(parseFloat(d.result))}
-                                </span>
+          <div className="flex items-center gap-1">
+            <PopoverTrigger>
+              <Button variant="ghost">
+                <History className="w-4 h-4" /> Riwayat
+              </Button>
+              <Popover placement="bottom">
+                <PopoverDialog className="w-full mb-4 overflow-y-auto divide-y divide-gray-300 max-h-[80vh]">
+                  {history.length > 0 ? (
+                    history.map((d, index) => (
+                      <div key={index} className="grid break-words py-2">
+                        <Collapsible>
+                          <CollapsibleTrigger className="w-full [&[data-state=open]>div.chev]:hidden">
+                            <div className="text-pretty text-xl font-medium text-start w-[300px]">
+                              {splitExpression(processInput(d.expression)).map(
+                                (dt, index) => (
+                                  <React.Fragment key={index}>
+                                    {dt}
+                                  </React.Fragment>
+                                ),
                               )}
                             </div>
-                          </div>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-                ))}
-              </PopoverDialog>
-            </Popover>
-          </PopoverTrigger>
+                            <div className="chev text-2xl text-right font-semibold">
+                              {d.result &&
+                                `${formatRupiah(parseFloat(d.result))}`}
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="text-xl font-semibold max-h-[calc(100vh-360px)] overflow-y-auto pr-3 my-3">
+                              {splitExpression(processInput(d.expression)).map(
+                                (item, index, arr) => {
+                                  const lastIndex = findLastEvenIndex(arr);
+                                  // Menampilkan angka
+                                  if (index % 2 === 0) {
+                                    return (
+                                      <div key={index} className="text-right">
+                                        {index === 0 ? (
+                                          // Menampilkan angka pertama dengan warna biru
+                                          <div className="flex items-center justify-between border-b border-dashed border-gray-400 px-2 bg-green-50 dark:bg-green-950">
+                                            <div className="gap-x-6 flex items-center text-[16px] w-4 text-start">
+                                              <span>{index === 0 && "1."}</span>
+                                            </div>
+                                            <span className="text-xl font-semibold">
+                                              {formatRupiah(parseFloat(item))}
+                                            </span>
+                                          </div>
+                                        ) : (
+                                          <>
+                                            {/* Menampilkan operator setelah angka */}
+                                            <div
+                                              className={cn(
+                                                "flex items-center justify-between gap-2 items-center justify-between px-2 py-0.5 border-b border-dashed border-muted-foreground",
+                                                splitExpression(
+                                                  processInput(d.expression),
+                                                )[index - 1] === "+" &&
+                                                  "bg-green-50 dark:bg-green-950",
+                                                splitExpression(
+                                                  processInput(d.expression),
+                                                )[index - 1] === "-" &&
+                                                  "bg-red-50 dark:bg-red-950",
+                                                splitExpression(
+                                                  processInput(d.expression),
+                                                )[index - 1] === "÷" &&
+                                                  "bg-orange-50 dark:bg-orange-950",
+                                                splitExpression(
+                                                  processInput(d.expression),
+                                                )[index - 1] === "×" &&
+                                                  "bg-blue-50 dark:bg-blue-950",
+                                              )}
+                                            >
+                                              <div className="gap-x-3 flex items-center">
+                                                <span className="text-[16px] w-2.5 text-start flex items-center">
+                                                  <span>
+                                                    {index === 0
+                                                      ? ""
+                                                      : index / 2 + 1}
+                                                  </span>
+                                                  <span>.</span>
+                                                </span>
+                                                <span className="text-2xl px-2">
+                                                  {
+                                                    splitExpression(
+                                                      processInput(
+                                                        d.expression,
+                                                      ),
+                                                    )[index - 1]
+                                                  }
+                                                </span>
+                                              </div>
+                                              <span className="text-xl font-semibold">
+                                                {formatRupiah(parseFloat(item))}
+                                              </span>
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
+                                    );
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              )}
+
+                              <div className="bg-background flex items-center justify-between sticky bottom-0 z-10 border-t-2 border-primary px-2">
+                                <div className="py-1 text-xl font-semibold text-right">
+                                  TOTAL{" "}
+                                </div>
+                                <div className="flex items-center gap-2 py-1">
+                                  {d.result && (
+                                    <span className="text-2xl font-semibold text-right">
+                                      {formatRupiah(parseFloat(d.result))}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-sm pt-3">
+                      Belum ada riwayat
+                    </div>
+                  )}
+                </PopoverDialog>
+              </Popover>
+            </PopoverTrigger>
+            <DisplaySetting themeSwitchOnly={true} />
+          </div>
         </div>
 
         <Input

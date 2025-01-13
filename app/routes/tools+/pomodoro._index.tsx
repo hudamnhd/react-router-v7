@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Button, buttonVariants } from "#app/components/ui/button";
+import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { cn } from "#app/utils/misc";
 import { TimerReset } from "lucide-react";
-import { Coffee, Play, Activity, Pause } from "lucide-react";
-import { Button } from "#app/components/ui/button";
-import { useBeforeUnload } from "@remix-run/react";
+import { ChevronLeft, Coffee, Play, Activity, Pause } from "lucide-react";
+import { useBeforeUnload, Link } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
 import { type MetaFunction } from "@remix-run/node";
@@ -103,8 +104,27 @@ const App: React.FC = () => {
   const strokeDashoffset = isRunning ? (1 - progress) * 2 * Math.PI * 45 : 0;
 
   return (
-    <div className="grid place-items-center sm:py-4 px-4 text-center space-y-4 sm:max-w-md mx-auto">
-      <div className="my-4 grid grid-cols-3 gap-2">
+    <div className="max-w-xl mx-auto border-x min-h-screen">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6",
+            )}
+            to="/tools"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">Pomodoro</span>
+        </div>
+
+        <DisplaySetting themeSwitchOnly={true} />
+      </div>
+      <div className="block text-2xl text-center leading-8 font-extrabold tracking-tight sm:text-3xl pt-3">
+        Pomodoro
+      </div>
+      <div className="my-4 flex items-center justify-center gap-2 px-3">
         <Button
           variant={mode === MODE.POMO ? "default" : "outline"}
           onPress={() => handleModeChange(MODE.POMO)}
@@ -134,7 +154,7 @@ const App: React.FC = () => {
 
       {/* Timer */}
 
-      <div className="relative w-48 h-48 mb-6">
+      <div className="relative w-48 h-48 mb-6 mx-auto">
         <div className="absolute flex h-full w-full justify-center">
           <div className="flex flex-col justify-center items-center">
             {mode !== "Pomo" ? (
@@ -216,7 +236,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Controls */}
-      <div className="grid grid-cols-2 gap-2 sm:w-[70%] mx-auto">
+      <div className="my-4 flex items-center justify-center gap-2 px-3">
         <Button onPress={() => setIsRunning(!isRunning)}>
           {isRunning ? <Pause /> : <Play />}
           {isRunning ? "Pause" : "Start"}
@@ -232,73 +252,45 @@ const App: React.FC = () => {
           Reset
         </Button>
       </div>
+
+      <div className="space-y-4 mt-3 px-3">
+        <details className="group [&_summary::-webkit-details-marker]:hidden">
+          <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-2.5">
+            <p className="font-medium text-sm">Apa itu Pomodoro ?</p>
+
+            <svg
+              className="size-4 shrink-0 transition duration-300 group-open:-rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </summary>
+
+          <p className="text-muted-foreground px-4 py-2.5 text-sm">
+            Kata <strong>pomodoro</strong> berasal dari bahasa Italia yang
+            berarti <strong>tomat</strong>. Metode Pomodoro Technique dinamai
+            demikian karena Francesco Cirillo, pencipta metode ini, awalnya
+            menggunakan timer dapur berbentuk tomat untuk mengatur waktu
+            kerjanya. Pomodoro Technique Ini adalah teknik manajemen waktu yang
+            membagi waktu kerja menjadi interval fokus (biasanya{" "}
+            <strong>25 menit</strong>), yang disebut <strong>pomodoros</strong>,
+            diikuti dengan istirahat singkat (biasanya <strong>5 menit</strong>
+            ).
+          </p>
+        </details>
+      </div>
     </div>
   );
 };
 
 export default function Route() {
-  return (
-    <ClientOnly fallback={<Loader />}>
-      {() => (
-        <React.Fragment>
-          <Example>
-            <App />
-          </Example>
-        </React.Fragment>
-      )}
-    </ClientOnly>
-  );
-}
-
-function Example({ children }) {
-  return (
-    <div className="relative sm:py-4 bg-background overflow-hidden">
-      <div className="relative px-4 sm:px-6 lg:px-8">
-        <div className="text-lg max-w-prose mx-auto">
-          <h1>
-            <span className="block text-2xl text-center leading-8 font-extrabold tracking-tight sm:text-3xl">
-              Pomodoro
-            </span>
-          </h1>
-
-          {children}
-          <div className="space-y-4 mt-3">
-            <details className="group [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-2.5">
-                <p className="font-medium text-sm">Apa itu Pomodoro ?</p>
-
-                <svg
-                  className="size-4 shrink-0 transition duration-300 group-open:-rotate-180"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </summary>
-
-              <p className="text-muted-foreground px-4 py-2.5 text-sm">
-                Kata <strong>pomodoro</strong> berasal dari bahasa Italia yang
-                berarti <strong>tomat</strong>. Metode Pomodoro Technique
-                dinamai demikian karena Francesco Cirillo, pencipta metode ini,
-                awalnya menggunakan timer dapur berbentuk tomat untuk mengatur
-                waktu kerjanya. Pomodoro Technique Ini adalah teknik manajemen
-                waktu yang membagi waktu kerja menjadi interval fokus (biasanya{" "}
-                <strong>25 menit</strong>), yang disebut{" "}
-                <strong>pomodoros</strong>, diikuti dengan istirahat singkat
-                (biasanya <strong>5 menit</strong>
-                ).
-              </p>
-            </details>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <ClientOnly fallback={<Loader />}>{() => <App />}</ClientOnly>;
 }

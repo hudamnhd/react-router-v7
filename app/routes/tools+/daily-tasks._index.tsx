@@ -1,6 +1,8 @@
 import lodash from "lodash";
 import React, { useState, useRef, useCallback } from "react";
+import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { ClientOnly } from "remix-utils/client-only";
+import { Link } from "@remix-run/react";
 import Loader from "#app/components/ui/loader";
 import { toast } from "sonner";
 import { Badge } from "#app/components/ui/badge";
@@ -222,7 +224,7 @@ const TodoNavigator = ({ data }) => {
   const streak_data = calculateStreak(data);
 
   return (
-    <div className="pb-6">
+    <div className="pb-4 pt-2">
       <TaskApp
         data={data}
         todos={todos}
@@ -236,7 +238,7 @@ const TodoNavigator = ({ data }) => {
 
       <BreakState data={todos} />
 
-      <div id="container-task">
+      <div id="container-task" className="px-2.5">
         <DragDropList
           data={data}
           tasks={todos}
@@ -256,7 +258,7 @@ const BreakState = () => {
     <div
       id="container-break-time"
       style={{ display: "none" }}
-      className="flex mx-auto w-full flex-col items-center justify-center rounded py-20 text-center text-xl "
+      className="flex mx-auto w-full flex-col items-center justify-center rounded py-20 text-center text-xl px-2.5"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -435,7 +437,7 @@ const Layout = () => {
 
   if (!initial_data) {
     return (
-      <div className="mx-auto max-w-3xl w-full h-[calc(100vh-57px)] overflow-y-auto border-x p-2.5 sm:p-4">
+      <div className="max-w-xl mx-auto border-x min-h-screen">
         {/*<Debug data={todos} />*/}
         <TodoNavigator data={todos} />
       </div>
@@ -604,18 +606,19 @@ const TaskApp = ({
   return (
     <div className="">
       {/*<RenderTracker name="TASK APP" stateName={totalTargetSessions} />*/}
-      <section className="relative mx-auto flex items-center justify-between w-full items-center mb-4">
-        <PopoverTrigger>
-          <Button variant="ghost" size="icon">
-            <FocusDisplay total_sessions={total_sessions} isBtn={true} />
-          </Button>
-
-          <Popover placement="bottom">
-            <PopoverDialog>
-              <CalendarMonth total_sessions={all_session} />
-            </PopoverDialog>
-          </Popover>
-        </PopoverTrigger>
+      <section className="px-1.5 pb-2 flex justify-between gap-x-3 border-b mb-4">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6",
+            )}
+            to="/tools"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">Daily Task</span>
+        </div>
         <div className="flex-none flex items-center gap-2">
           {/*<Link
             to="./garden"
@@ -627,7 +630,18 @@ const TaskApp = ({
           </Link>*/}
 
           <PopoverTrigger>
-            <Button variant="secondary" size="icon">
+            <Button variant="ghost" size="icon">
+              <FocusDisplay total_sessions={total_sessions} isBtn={true} />
+            </Button>
+
+            <Popover placement="bottom">
+              <PopoverDialog>
+                <CalendarMonth total_sessions={all_session} />
+              </PopoverDialog>
+            </Popover>
+          </PopoverTrigger>
+          <PopoverTrigger>
+            <Button variant="outline" size="icon">
               <Flame />
             </Button>
 
@@ -641,7 +655,7 @@ const TaskApp = ({
             </Popover>
           </PopoverTrigger>
           <PopoverTrigger>
-            <Button variant="secondary" size="icon">
+            <Button variant="outline" size="icon">
               <Activity />
             </Button>
 
@@ -652,7 +666,7 @@ const TaskApp = ({
             </Popover>
           </PopoverTrigger>
           <PopoverTrigger>
-            <Button variant="secondary" size="icon">
+            <Button variant="outline" size="icon">
               <Info />
             </Button>
 
@@ -682,12 +696,14 @@ const TaskApp = ({
               </PopoverDialog>
             </Popover>
           </PopoverTrigger>
+
+          <DisplaySetting themeSwitchOnly={true} />
         </div>
       </section>
 
       <TodoTimer todos={todos} date={date} active_task={active_task} />
 
-      <div>
+      <div className="px-2.5">
         <div
           style={{ animationDelay: `0.1s` }}
           className="animate-slide-top [animation-fill-mode:backwards] flex flex-col items-end"

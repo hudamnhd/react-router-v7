@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Button, buttonVariants } from "#app/components/ui/button";
+import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { cn } from "#app/utils/misc.tsx";
 import {
   addMonths,
@@ -14,12 +16,19 @@ import {
   addDays,
   subMonths,
 } from "date-fns";
-import { Button } from "#app/components/ui/button";
 import { Input } from "#app/components/ui/input";
-import { Plus, PencilLine, Trash2, Check, X } from "lucide-react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  PencilLine,
+  Trash2,
+  Check,
+  X,
+} from "lucide-react";
 
 import { type MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => [{ title: "Habit | Doti App" }];
 
@@ -151,144 +160,168 @@ const HabitTracker: React.FC = () => {
   // Hitung statistik
   const statistics = getStatistics(habits);
   return (
-    <div className="grid xl:grid-cols-2 gap-5 sm:p-4 place-items-start max-w-4xl sm:max-w-full  w-full">
-      <div className="max-w-md w-full">
-        <h1 className="text-2xl font-bold mt-2 mb-4 sm:text-start text-center">
-          {monthName}
-        </h1>
+    <div className="max-w-xl mx-auto border-x min-h-screen">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6",
+            )}
+            to="/tools"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">Habit Tracker</span>
+        </div>
 
-        <div className="grid grid-cols-7 justify-center place-items-strecth rounded-lg max-w-md border  p-0.5">
-          <React.Fragment>
-            <div className="text-sm  font-bold col-span-3 py-1 flex items-center justify-center border-r-2 border-b">
-              Habit
-            </div>
-            {currentWeek.map((date, index) => {
-              const today = isToday(date);
-              return (
-                <div
-                  key={date}
-                  className={cn(
-                    "flex flex-col items-center uppercase font-semibold text-sm py-2 border-b",
-                    today && "bg-accent",
-                  )}
-                >
-                  <span>{format(date, "EEE")}</span>
-                  <span className="text-muted-foreground">
-                    {format(date, "d")}
-                  </span>
-                </div>
-              );
-            })}
-          </React.Fragment>
+        <DisplaySetting themeSwitchOnly={true} />
+      </div>
+      <div className="grid gap-5 sm:p-4 place-items-start max-w-4xl sm:max-w-full  w-full">
+        <div className="w-full">
+          <h1 className="text-2xl font-bold  mb-4 sm:text-start text-center">
+            {monthName}
+          </h1>
 
-          {habits.length > 0 ? (
-            habits.map((habit, index) => {
-              const last_index = habits.length - 1 === index;
-              return (
-                <React.Fragment key={habit.id}>
+          <div className="grid grid-cols-7 justify-center place-items-strecth rounded-lg border  p-0.5">
+            <React.Fragment>
+              <div className="text-sm  font-bold col-span-3 py-1 flex items-center justify-center border-r-2 border-b">
+                Habit
+              </div>
+              {currentWeek.map((date, index) => {
+                const today = isToday(date);
+                return (
                   <div
+                    key={date}
                     className={cn(
-                      "group col-span-3 p-2 border-r-2 border-b",
-                      last_index && "border-b-0",
+                      "flex flex-col items-center uppercase font-semibold text-sm py-2 border-b",
+                      today && "bg-accent",
                     )}
                   >
-                    <div className="group-hover:hidden block">{habit.name}</div>
-                    <div className="group-hover:flex hidden gap-x-2 text-center justify-center">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleEditHabit(habit.id)}
-                      >
-                        <PencilLine />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className="h-6 w-6"
-                        onClick={() => deleteHabit(habit.id)}
-                      >
-                        <Trash2 />
-                      </Button>
-                    </div>
+                    <span>{format(date, "EEE")}</span>
+                    <span className="text-muted-foreground">
+                      {format(date, "d")}
+                    </span>
                   </div>
-                  {currentWeek.map((date) => {
-                    const formattedDate = format(date, "yyyy-MM-dd");
-                    const isCompleted = habit.dates[formattedDate] || false;
+                );
+              })}
+            </React.Fragment>
 
-                    const td = new Date();
-                    const todayStart = new Date(
-                      td.getFullYear(),
-                      td.getMonth(),
-                      td.getDate(),
-                    );
-                    const yesterday = isBefore(date, todayStart);
-                    const today = isToday(date);
-
-                    return (
-                      <div
-                        key={formattedDate}
-                        className={cn(
-                          "p-2 border-b ",
-                          today && "bg-accent",
-                          last_index && "border-b-0",
-                        )}
-                      >
-                        <div className="group flex flex-col items-center gap-y-2 relative transition-all duration-500 ease-in-out">
-                          <button
-                            // disabled={!today}
-                            onClick={() =>
-                              toggleHabitCompletion(habit.id, formattedDate)
-                            }
-                            className={cn(
-                              "flex h-6 w-6 items-center justify-center rounded-full",
-                              !isCompleted &&
-                                "bg-gray-300 dark:bg-gray-700 text-white",
-                              today && "bg-foreground/50 dark:bg-foreground",
-                              isCompleted &&
-                                "bg-green-500 dark:bg-green-500 text-white",
-                              yesterday &&
-                                !isCompleted &&
-                                "bg-red-500 dark:bg-red-500 text-white",
-                            )}
-                          >
-                            <span>
-                              {isCompleted ? (
-                                <Check />
-                              ) : yesterday && !isCompleted ? (
-                                <X />
-                              ) : (
-                                ""
-                              )}
-                            </span>
-                          </button>
-                        </div>
+            {habits.length > 0 ? (
+              habits.map((habit, index) => {
+                const last_index = habits.length - 1 === index;
+                return (
+                  <React.Fragment key={habit.id}>
+                    <div
+                      className={cn(
+                        "group col-span-3 p-2 border-r-2 border-b",
+                        last_index && "border-b-0",
+                      )}
+                    >
+                      <div className="group-hover:hidden block">
+                        {habit.name}
                       </div>
-                    );
-                  })}
-                </React.Fragment>
-              );
-            })
-          ) : (
-            <div className="col-span-7 text-center p-2 text-sm text-muted-foreground">
-              No data
-            </div>
-          )}
+                      <div className="group-hover:flex hidden gap-x-2 text-center justify-center">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleEditHabit(habit.id)}
+                        >
+                          <PencilLine />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className="h-6 w-6"
+                          onClick={() => deleteHabit(habit.id)}
+                        >
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </div>
+                    {currentWeek.map((date) => {
+                      const formattedDate = format(date, "yyyy-MM-dd");
+                      const isCompleted = habit.dates[formattedDate] || false;
+
+                      const td = new Date();
+                      const todayStart = new Date(
+                        td.getFullYear(),
+                        td.getMonth(),
+                        td.getDate(),
+                      );
+                      const yesterday = isBefore(date, todayStart);
+                      const today = isToday(date);
+
+                      return (
+                        <div
+                          key={formattedDate}
+                          className={cn(
+                            "p-2 border-b ",
+                            today && "bg-accent",
+                            last_index && "border-b-0",
+                          )}
+                        >
+                          <div className="group flex flex-col items-center gap-y-2 relative transition-all duration-500 ease-in-out">
+                            <button
+                              // disabled={!today}
+                              onClick={() =>
+                                toggleHabitCompletion(habit.id, formattedDate)
+                              }
+                              className={cn(
+                                "flex h-6 w-6 items-center justify-center rounded-full",
+                                !isCompleted &&
+                                  "bg-gray-300 dark:bg-gray-700 text-white",
+                                today && "bg-foreground/50 dark:bg-foreground",
+                                isCompleted &&
+                                  "bg-green-500 dark:bg-green-500 text-white",
+                                yesterday &&
+                                  !isCompleted &&
+                                  "bg-red-500 dark:bg-red-500 text-white",
+                              )}
+                            >
+                              <span>
+                                {isCompleted ? (
+                                  <Check />
+                                ) : yesterday && !isCompleted ? (
+                                  <X />
+                                ) : (
+                                  ""
+                                )}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              <div className="col-span-7 text-center p-2 text-sm text-muted-foreground">
+                No data
+              </div>
+            )}
+          </div>
+          {/* Add Habit Input */}
+          <div className="flex gap-2 mt-4 w-full">
+            <Input
+              type="text"
+              value={newHabit}
+              onChange={(e) => setNewHabit(e.target.value)}
+              placeholder="Enter a new habit"
+            />
+            <Button
+              size="icon"
+              disabled={newHabit.lengh == 0}
+              onClick={addHabit}
+            >
+              <Plus />
+            </Button>
+          </div>
         </div>
-        {/* Add Habit Input */}
-        <div className="flex gap-2 mt-4 w-full">
-          <Input
-            type="text"
-            value={newHabit}
-            onChange={(e) => setNewHabit(e.target.value)}
-            placeholder="Enter a new habit"
-          />
-          <Button size="icon" disabled={newHabit.lengh == 0} onClick={addHabit}>
-            <Plus />
-          </Button>
-        </div>
+        <CalendarMonth total_sessions={6} statistics={statistics} />
       </div>
-      <CalendarMonth total_sessions={6} statistics={statistics} />
     </div>
   );
 };
@@ -396,11 +429,11 @@ const CalendarMonth = ({ total_sessions, statistics }) => {
             );
           })}
         </div>
-        <div className="sm:block hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
+        {/*<div className="sm:block hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
           <div className="">Perisai Target</div>
           <hr className="my-3" />
           <FocusList />
-        </div>
+        </div>*/}
       </div>
     </div>
   );

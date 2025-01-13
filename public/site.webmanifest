@@ -2,6 +2,8 @@
   "name": "Doti",
   "short_name": "Doti",
   "description": "Simplify your day with Doti - Track habits, manage tasks, and stay motivated!",
+  "id": "/",
+  "start_url": "/",
   "icons": [
     {
       "src": "/favicons/web-app-manifest-192x192.png",
@@ -20,4 +22,3 @@
   "background_color": "#ffffff",
   "display": "standalone"
 }
-

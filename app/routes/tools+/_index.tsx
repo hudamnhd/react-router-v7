@@ -1,8 +1,9 @@
-import { Button } from "#app/components/ui/button";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { Wrench, Info, BookOpenText, Frame } from "lucide-react";
-import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
-import { useNavigate, NavLink, Link } from "@remix-run/react";
+import { cn } from "#app/utils/misc.tsx";
+import { buttonVariants } from "#app/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import { toolsLinks } from "#app/constants/nav-link";
+import { useNavigate, Link } from "@remix-run/react";
 
 export function headers() {
   return {
@@ -11,20 +12,29 @@ export function headers() {
 }
 
 export default function Example() {
+  const data = toolsLinks;
   const navigate = useNavigate();
   return (
-    <div className="border-x h-[calc(100vh)] max-w-xl mx-auto pb-2 relative">
+    <div className="border-x min-h-[calc(100vh)] max-w-xl mx-auto pb-2">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
-        <NavLink className="pl-1 flex items-center gap-2 " to="/">
-          <Frame className="w-5 h-5 text-foreground -translate-y-[1px]" />
-          <span className="font-bold  sm:text-sm text-base">Doti</span>
-        </NavLink>
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6",
+            )}
+            to="/"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">Tools</span>
+        </div>
 
         <DisplaySetting themeSwitchOnly={true} />
       </div>
       <div className="text-center pt-3">
         <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
-          Apps
+          Tools
         </div>
         <p className="text-muted-foreground mt-1">
           Here's a list of apps ready to use!
@@ -32,73 +42,31 @@ export default function Example() {
       </div>
 
       <ul role="list" className="grid grid-cols-1 gap-2 p-2.5 sm:p-3">
-        <li
-          onClick={() => navigate("/muslim")}
-          className="col-span-1 flex shadow-sm rounded-md"
-        >
-          <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
-            <BookOpenText className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
-            <div className="flex-1 px-4 py-2 text-sm truncate">
-              <Link
-                to="/muslim"
-                className="font-semibold hover:text-muted-foreground cursor-pointer"
-              >
-                Muslim
-              </Link>
-              <p className="text-muted-foreground line-clamp-1">
-                Berisi Al-Quran, Sholawat dan doa sehari-hari
-              </p>
+        {data.map((action, actionIdx) => (
+          <li
+            onClick={() => navigate(action.href)}
+            key={actionIdx}
+            className="col-span-1 flex shadow-sm rounded-md"
+          >
+            <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
+              <action.icon className="h-5 w-5" aria-hidden="true" />
             </div>
-          </div>
-        </li>
-        <li
-          onClick={() => navigate("/tools")}
-          className="col-span-1 flex shadow-sm rounded-md"
-        >
-          <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
-            <Wrench className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
-            <div className="flex-1 px-4 py-2 text-sm truncate">
-              <Link
-                to="/tools"
-                className="font-semibold hover:text-muted-foreground cursor-pointer"
-              >
-                Tools
-              </Link>
-              <p className="text-muted-foreground line-clamp-1">
-                Berisi calculator, todolist dan lain-lain
-              </p>
+            <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
+              <div className="flex-1 px-4 py-2 text-sm truncate">
+                <Link
+                  to={action.href}
+                  className="font-semibold hover:text-muted-foreground cursor-pointer"
+                >
+                  {action.title}
+                </Link>
+                <p className="text-muted-foreground line-clamp-1">
+                  {action.description}
+                </p>
+              </div>
             </div>
-          </div>
-        </li>
-        <li
-          onClick={() => navigate("/about")}
-          className="col-span-1 flex shadow-sm rounded-md"
-        >
-          <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
-            <Info className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
-            <div className="flex-1 px-4 py-2 text-sm truncate">
-              <Link
-                to="/about"
-                className="font-semibold hover:text-muted-foreground cursor-pointer"
-              >
-                About
-              </Link>
-              <p className="text-muted-foreground line-clamp-1">
-                Informasi Aplikasi
-              </p>
-            </div>
-          </div>
-        </li>
+          </li>
+        ))}
       </ul>
-      <div className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 text-sm">
-        <span className="text-muted-foreground">© 2025 Huda</span>
-      </div>
     </div>
   );
 }

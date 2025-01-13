@@ -1,11 +1,11 @@
 import { data } from "#/app/constants/dzikr.ts";
 import React from "react";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { Button } from "#app/components/ui/button";
-import { useRouteLoaderData, useLoaderData } from "@remix-run/react";
+import { Button, buttonVariants } from "#app/components/ui/button";
+import { useRouteLoaderData, Link, useLoaderData } from "@remix-run/react";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { cn } from "#app/utils/misc.tsx";
-import { Sun, Moon, Plus } from "lucide-react";
+import { Sun, Moon, Plus, ChevronLeft } from "lucide-react";
 import { json } from "@remix-run/node";
 
 import { type MetaFunction } from "@remix-run/node";
@@ -67,11 +67,26 @@ export default function DzikrView() {
   }, []);
 
   return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
-      <div className="p-1.5 flex justify-end">
-        <DisplaySetting opts={opts} />
+    <div className="prose-base dark:prose-invert w-full max-w-xl mx-auto border-x">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6 bg-transparent",
+            )}
+            to="/muslim"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold capitalize">
+            Dzikir {time}
+          </span>
+        </div>
+
+        <DisplaySetting />
       </div>
-      <div className="flex items-center gap-x-3 justify-center text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
+      <div className="flex items-center gap-x-3 justify-center text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-3">
         <span>Dzikir {time}</span>
         {time === "pagi" ? <Sun /> : <Moon />}
       </div>

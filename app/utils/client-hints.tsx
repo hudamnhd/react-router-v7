@@ -36,26 +36,10 @@ export function useHints() {
 export function ClientHintCheck({ nonce }: { nonce: string }) {
   const { revalidate } = useRevalidator();
 
-  React.useEffect(() => {
-    const online = navigator.onLine;
-    const handler = () => {
-      if (online) {
-        // Hanya panggil revalidate jika online
-        revalidate();
-      } else {
-        console.warn("Offline: revalidate skipped");
-      }
-    };
-
-    const unsubscribe = online ? subscribeToSchemeChange(handler) : null;
-
-    return () => unsubscribe(); // Cleanup subscription
-  }, [revalidate]);
-
-  // React.useEffect(
-  //   () => subscribeToSchemeChange(() => revalidate()),
-  //   [revalidate],
-  // );
+  React.useEffect(
+    () => subscribeToSchemeChange(() => revalidate()),
+    [revalidate],
+  );
 
   return (
     <script

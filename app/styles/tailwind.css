@@ -60,12 +60,11 @@
 
   * {
     scrollbar-width: auto;
-    /*scrollbar-color: hsl(var(--primary)) transparent;*/
   }
 
   *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 4px;
+    height: 5px;
   }
 
   *::-webkit-scrollbar-track {
@@ -78,7 +77,7 @@
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--accent), 0.5);
+    background: hsl(var(--primary));
   }
 }
 

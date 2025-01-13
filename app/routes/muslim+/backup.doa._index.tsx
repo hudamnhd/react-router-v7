@@ -42,19 +42,26 @@ export function headers() {
   };
 }
 
-const sumber = [
-  "quran",
-  "hadits",
-  "pilihan",
-  "harian",
-  "ibadah",
-  "haji",
-  "lainnya",
-];
 export async function loader() {
+  const cacheKey = `doa-lengkap`;
+  const cacheData = cache.get(cacheKey);
+
+  if (cacheData) {
+    return cacheData;
+  }
   const api = ky.create({ prefixUrl: "https://api.myquran.com/v2/doa/sumber" });
+  const sumber = [
+    "quran",
+    "hadits",
+    "pilihan",
+    "harian",
+    "ibadah",
+    "haji",
+    "lainnya",
+  ];
   const data = await Promise.all(sumber.map((item) => api.get(item).json()));
 
+  cache.set(cacheKey, data);
   return json(data, {
     headers: {
       "Cache-Control": "public, max-age=31560000",
@@ -95,7 +102,7 @@ function Doa() {
 
   return (
     <React.Fragment>
-      <div className="h-screen w-full max-w-xl mx-auto border-x">
+      <div className="prose-base dark:prose-invert w-full max-w-xl mx-auto border-x">
         <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
           <div className="flex items-center gap-x-2">
             <Link
@@ -112,44 +119,11 @@ function Doa() {
 
           <DisplaySetting />
         </div>
-
-        <div className="text-center pt-2">
-          <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
-            Do'a
-          </div>
-          <p className="text-muted-foreground mt-1">Kumpulan do'a</p>
+        <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-2">
+          Do'a
         </div>
 
-        <ul role="list" className="grid gap-2 p-2.5 sm:p-3">
-          {sumber.map((d, index) => {
-            const Icon = sumberIcons[d] || Circle;
-            const to = `/muslim/doa/${d}`;
-            return (
-              <li key={index} className="flex shadow-sm rounded-md">
-                <Link to={to} className="flex w-full">
-                  <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
-                    <div className="flex-1 px-4 py-2 text-sm truncate">
-                      <Link
-                        to={to}
-                        className="capitalize font-semibold hover:text-muted-foreground cursor-pointer"
-                      >
-                        Do'a {d}
-                      </Link>
-                      <p className="text-muted-foreground line-clamp-1">
-                        Kumpulan Do'a {d}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/*<TabDemo result={result} />*/}
+        <TabDemo result={result} />
       </div>
     </React.Fragment>
   );

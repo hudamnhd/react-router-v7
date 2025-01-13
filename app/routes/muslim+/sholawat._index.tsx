@@ -1,18 +1,19 @@
 import data from "#/app/constants/sholawat";
+import { buttonVariants } from "#app/components/ui/button";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { useRouteLoaderData } from "@remix-run/react";
+import { useRouteLoaderData, Link } from "@remix-run/react";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { cn } from "#app/utils/misc.tsx";
 import { get_cache, set_cache } from "#app/utils/cache-client.ts";
 import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
 import React from "react";
-import { Heart } from "lucide-react";
-
+import { Heart, ChevronLeft } from "lucide-react";
 import { type MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => [{ title: "Sholawat | Doti App" }];
 
 const BOOKMARK_KEY = "BOOKMARK";
+
 export default function Sholawat() {
   const loaderRoot = useRouteLoaderData("root");
   const opts = loaderRoot?.opts || {};
@@ -76,9 +77,22 @@ export default function Sholawat() {
     save_bookmark_to_lf(bookmarks);
   }, [bookmarks]);
   return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x">
-      <div className="p-1.5 flex justify-end">
-        <DisplaySetting opts={opts} />
+    <div className="prose-base dark:prose-invert w-full max-w-xl mx-auto border-x">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6 bg-transparent",
+            )}
+            to="/muslim"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">Sholawat</span>
+        </div>
+
+        <DisplaySetting />
       </div>
       <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
         Sholawat
@@ -93,32 +107,35 @@ export default function Sholawat() {
         const _source = `/muslim/sholawat?index=${ayat.index}`;
         const isFavorite = bookmarks_ayah.some((fav) => fav.source === _source);
         return (
-          <div
-            key={index}
-            className="group relative px-4 py-4 sm:px-5 rounded-md border-t"
-          >
-            <div className="flex items-center sm:items-start sm:justify-between gap-x-2 mb-2">
-              <div className="text-primary font-medium text-lg sm:order-first order-last">
+          <div key={index} className="group relative  border-t pb-4">
+            <div
+              className={cn(
+                "flex items-center justify-between gap-x-2 mb-2 border-b p-2.5 bg-gradient-to-br from-muted/20 to-accent/20",
+                isFavorite &&
+                  "from-primary/10 to-secondary/10 dark:from-primary/20 dark:to-secondary/20",
+              )}
+            >
+              <div className="text-primary font-medium text-lg sm:text-xl  line-clamp-1">
                 {ayat.nama}
               </div>
 
               <button
                 onClick={() => toggleBookmark(ayat)}
                 className={cn(
-                  "order-0 sm:order-1 bg-gradient-to-br from-muted to-accent p-3 rounded-xl",
+                  "order-0 sm:order-1 bg-gradient-to-br from-muted to-accent size-9 [&_svg]:size-5 inline-flex gap-2 items-center justify-center rounded-lg",
                   isFavorite &&
                     "from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20",
                 )}
               >
                 <Heart
                   className={cn(
-                    "w-5 h-5 text-muted-foreground",
+                    "text-muted-foreground",
                     isFavorite && "text-rose-600 dark:text-rose-400",
                   )}
                 />
               </button>
             </div>
-            <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
+            <div className="w-full text-right flex gap-x-2.5 items-start justify-end px-4">
               <div
                 className={cn(
                   "relative text-right text-primary my-5 font-lpmq",
@@ -132,10 +149,10 @@ export default function Sholawat() {
                 {ayat.arab}
               </div>
             </div>
-            <div className="">
+            <div className="px-4">
               {opts?.font_latin === "on" && (
                 <div
-                  className="latin-text prose max-w-none text-muted-foreground"
+                  className="latin-text prose max-w-none border-b pb-2 mb-2 italic"
                   dangerouslySetInnerHTML={{
                     __html: ayat.latin,
                   }}
