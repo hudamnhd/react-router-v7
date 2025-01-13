@@ -704,7 +704,7 @@ const SuratDetail: React.FC<SuratProps> = ({ surat }) => {
                 buttonVariants({ size: "icon", variant: "outline" }),
                 "[&_svg]:size-5",
               )}
-              to={`/muslim/quran-kemenag/${parseInt(surat.number) - 1}`}
+              to={`/muslim/quran/${parseInt(surat.number) - 1}`}
               disabled={parseInt(surat.number) === 1}
             >
               <span className="sr-only">Go to previous page</span>
@@ -719,7 +719,7 @@ const SuratDetail: React.FC<SuratProps> = ({ surat }) => {
                 buttonVariants({ size: "icon", variant: "outline" }),
                 "[&_svg]:size-5",
               )}
-              to={`/muslim/quran-kemenag/${parseInt(surat.number) + 1}`}
+              to={`/muslim/quran/${parseInt(surat.number) + 1}`}
               disabled={parseInt(surat.number) === 114}
             >
               <span className="sr-only">Go to next page</span>

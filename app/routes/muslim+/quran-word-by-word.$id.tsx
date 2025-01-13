@@ -1,4 +1,5 @@
 import { motion, useSpring, useScroll } from "framer-motion";
+import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { cn } from "#app/utils/misc.tsx";
 import { Link, useLoaderData } from "@remix-run/react";
 import React, { useState } from "react";
@@ -75,7 +76,25 @@ export default function RouteX() {
   });
 
   return (
-    <div className="prose-base dark:prose-invert w-full border-x divide-y pb-10">
+    <div className="prose-base dark:prose-invert w-full max-w-xl mx-auto border-x">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6",
+            )}
+            to="/muslim/quran"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">
+            {surat.number}. {surat.name_id}{" "}
+          </span>
+        </div>
+
+        <DisplaySetting themeSwitchOnly={true} />
+      </div>
       <div className="text-3xl font-bold md:text-4xl w-fit mx-auto text-primary pb-3">
         {surat.name_id}
         <span className="ml-2 underline-offset-4 group-hover:underline font-indopak">
@@ -162,6 +181,10 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
   const [slices, setSlices] = useState<string[]>(ayat_shuffle || []);
   const [userAnswer, setUserAnswer] = useState<string[]>([]);
   const [isCorrect, setIsCorrect] = useState<boolean>(null);
+
+  React.useEffect(() => {
+    setSlices(ayat_shuffle); // Kembalikan slice ke dalam slices
+  }, [ayat_shuffle]);
 
   const handleClickSlice = (slice: string) => {
     // Jika bagian sudah ada di userAnswer, hapus dari urutan

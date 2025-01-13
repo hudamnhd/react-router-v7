@@ -749,21 +749,21 @@ const Exercise: React.FC<{
       const isCorrect = similarityPercentage >= 90; // Toleransi 90% dianggap benar
 
       // Ambil data yang sudah ada di local storage
-      const storedData = JSON.parse(
-        localStorage.getItem("ayatCheckerData") || "{}",
-      );
+      // const storedData = JSON.parse(
+      //   localStorage.getItem("ayatCheckerData") || "{}",
+      // );
 
       // Update object dengan input baru dan hasil pengecekan
-      const updatedData = {
-        ...storedData,
-        [`${page}${surat}${ayat}`]: {
-          value: inputValue,
-          isCorrect: isCorrect, // Simpan status pengecekan
-        },
-      };
+      // const updatedData = {
+      //   ...storedData,
+      //   [`${page}${surat}${ayat}`]: {
+      //     value: inputValue,
+      //     isCorrect: isCorrect, // Simpan status pengecekan
+      //   },
+      // };
 
       // Simpan kembali ke local storage
-      localStorage.setItem("ayatCheckerData", JSON.stringify(updatedData));
+      // localStorage.setItem("ayatCheckerData", JSON.stringify(updatedData));
 
       if (isCorrect) {
         if (textareaRef.current) {
@@ -782,15 +782,15 @@ const Exercise: React.FC<{
     }
   };
 
-  React.useEffect(() => {
-    const storedData = JSON.parse(
-      localStorage.getItem("ayatCheckerData") || "{}",
-    );
-    const key = `${page}${surat}${ayat}`;
-    if (storedData[key] && textareaRef.current) {
-      textareaRef.current = storedData[key]; // Isi textarea dengan data yang sudah disimpan
-    }
-  }, [page, surat, ayat]);
+  // React.useEffect(() => {
+  //   const storedData = JSON.parse(
+  //     localStorage.getItem("ayatCheckerData") || "{}",
+  //   );
+  //   const key = `${page}${surat}${ayat}`;
+  //   if (storedData[key] && textareaRef.current) {
+  //     textareaRef.current = storedData[key]; // Isi textarea dengan data yang sudah disimpan
+  //   }
+  // }, [page, surat, ayat]);
   return (
     <div className="flex flex-col gap-3 items-end">
       {diffHtml && (
