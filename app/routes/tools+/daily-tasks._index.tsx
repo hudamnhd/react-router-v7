@@ -617,7 +617,7 @@ const TaskApp = ({
           >
             <ChevronLeft />
           </Link>
-          <span className="text-lg font-semibold">Daily Task</span>
+          <span className="text-lg font-semibold line-clamp-1">Daily Task</span>
         </div>
         <div className="flex-none flex items-center gap-2">
           {/*<Link
@@ -1478,7 +1478,7 @@ const CalendarMonth = ({ total_sessions }) => {
             );
           })}
         </div>
-        <div className="w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
+        <div className="sm:inline-flex hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
           <div className="">Perisai fokus</div>
           <hr className="my-3" />
           <FocusList />

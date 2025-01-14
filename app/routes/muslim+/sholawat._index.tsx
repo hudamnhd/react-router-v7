@@ -152,7 +152,7 @@ export default function Sholawat() {
             <div className="px-4">
               {opts?.font_latin === "on" && (
                 <div
-                  className="latin-text prose max-w-none border-b pb-2 mb-2 italic"
+                  className="latin-text prose max-w-none border-b pb-2 mb-2 italic text-muted-foreground"
                   dangerouslySetInnerHTML={{
                     __html: ayat.latin,
                   }}

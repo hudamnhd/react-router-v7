@@ -84,7 +84,7 @@ export default function RouteX() {
               buttonVariants({ size: "icon", variant: "outline" }),
               "prose-none [&_svg]:size-6",
             )}
-            to="/muslim/quran"
+            to="/muslim/quran-word-by-word"
           >
             <ChevronLeft />
           </Link>
@@ -278,107 +278,12 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
   return (
     <div
       className={cn(
-        " transition-all duration-300 relative flex flex-col items-start gap-2 animate-slide-top [animation-fill-mode:backwards] group relative py-5 pr-4 pl-2 sm:px-5",
+        " transition-all duration-300 relative flex flex-col items-start gap-2 animate-slide-top [animation-fill-mode:backwards] group relative py-3 pr-4 pl-2 border-t",
         isCorrect && "bg-muted/30",
         isCorrect === false && "bg-destructive/5",
       )}
     >
-      <div className="space-y-2">
-        <div dir="rtl" className="flex flex-wrap gap-2 items-center">
-          {/* Menampilkan potongan teks */}
-          {slices.length === 0 ? (
-            // Menampilkan pesan jika slices kosong
-            <div className="text-center text-sm text-muted-foreground w-full">
-              Cek Jawaban
-            </div>
-          ) : (
-            slices.map((slice) => (
-              <Button
-                variant="outline"
-                className="font-indopak py-8 px-2"
-                key={slice.index}
-                onPress={() => handleClickSlice(slice)}
-              >
-                {slice.text}
-              </Button>
-            ))
-          )}
-
-          {slices.length > 0 && (
-            <span className="font-uthmani sm:inline-flex hidden">
-              {toArabicNumber(ayat_number)}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-2 text-right border-t pt-2">
-        <div className="flex flex-wrap gap-2 justify-start">
-          {userAnswer.length > 0 && (
-            <React.Fragment>
-              {userAnswer.map((slice, index) => (
-                <div
-                  className={cn(
-                    buttonVariants({ size: "lg", variant: "secondary" }),
-                    "font-indopak py-8 px-2",
-                  )}
-                  draggable
-                  key={slice.index}
-                  onDragStart={(event) => handleDragStart(event, index)}
-                  onDragEnd={(event) => handleDragEnd(event, index)}
-                  onDragOver={handleDragOver}
-                  onClick={() => handleClickSlice(slice)}
-                  onDrop={(event) => handleDrop(event, index)}
-                >
-                  {slice.text}
-                </div>
-              ))}
-
-              <span
-                className={cn(
-                  buttonVariants({ size: "lg", variant: "secondary" }),
-                  "font-uthmani py-7 px-2 hidden sm:inline-flex",
-                )}
-              >
-                {toArabicNumber(ayat_number)}
-              </span>
-            </React.Fragment>
-          )}
-        </div>
-      </div>
-
-      {userAnswer.length > 0 ? (
-        <Button
-          dir="rtl"
-          variant={
-            isCorrect === true
-              ? "outline"
-              : isCorrect === false
-                ? "destructive"
-                : "secondary"
-          }
-          className="mt-3 transition-all duration-300"
-          onPress={checkAnswer}
-        >
-          {isCorrect === null ? (
-            "Cek Jawaban"
-          ) : isCorrect ? (
-            <>
-              Correct <Check />
-            </>
-          ) : (
-            <>
-              Wrong <X />
-            </>
-          )}
-        </Button>
-      ) : (
-        <div className="text-sm text-muted-foreground w-full">
-          Belum ada Jawaban
-        </div>
-      )}
-
-      <details className="group [&_summary::-webkit-details-marker]:hidden mt-2">
+      <details className="group [&_summary::-webkit-details-marker]:hidden mb-2">
         <summary className="flex cursor-pointer items-center gap-1.5 outline-none">
           <svg
             className="size-4 shrink-0 transition duration-300 group-open:-rotate-180 text-indigo-600 dark:text-indigo-400 opacity-80"
@@ -415,6 +320,100 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
           </span>
         </div>
       </details>
+      <div className="space-y-2">
+        <div dir="rtl" className="flex flex-wrap gap-2 items-center">
+          {/* Menampilkan potongan teks */}
+          {slices.length === 0 ? (
+            // Menampilkan pesan jika slices kosong
+            <div className="text-center text-sm text-muted-foreground w-full">
+              {isCorrect ? "Correct" : "Cek Jawaban"}
+            </div>
+          ) : (
+            slices.map((slice) => (
+              <Button
+                variant="outline"
+                className="font-indopak py-8 px-2"
+                key={slice.index}
+                onPress={() => handleClickSlice(slice)}
+              >
+                {slice.text}
+              </Button>
+            ))
+          )}
+
+          {slices.length > 0 && (
+            <span className="font-uthmani sm:inline-flex hidden">
+              {toArabicNumber(ayat_number)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2 text-right border-t pt-2">
+        <div className="flex flex-wrap gap-2 justify-start">
+          {userAnswer.length > 0 && (
+            <React.Fragment>
+              {userAnswer.map((slice, index) => (
+                <div
+                  className={cn(
+                    buttonVariants({ size: "lg", variant: "outline" }),
+                    "font-indopak py-8 px-2",
+                  )}
+                  draggable
+                  key={slice.index}
+                  onDragStart={(event) => handleDragStart(event, index)}
+                  onDragEnd={(event) => handleDragEnd(event, index)}
+                  onDragOver={handleDragOver}
+                  onClick={() => handleClickSlice(slice)}
+                  onDrop={(event) => handleDrop(event, index)}
+                >
+                  {slice.text}
+                </div>
+              ))}
+
+              {slices.length === 0 && (
+                <span className="font-uthmani sm:inline-flex hidden">
+                  {toArabicNumber(ayat_number)}
+                </span>
+              )}
+            </React.Fragment>
+          )}
+        </div>
+      </div>
+
+      {userAnswer.length > 0 ? (
+        <Button
+          dir="rtl"
+          variant={
+            isCorrect === true
+              ? "outline"
+              : isCorrect === false
+                ? "destructive"
+                : "secondary"
+          }
+          className={cn(
+            "mt-3 transition-all duration-300",
+            isCorrect && "bg-teal-400 dark:bg-teal-600",
+          )}
+          onPress={checkAnswer}
+        >
+          {isCorrect === null ? (
+            "Cek Jawaban"
+          ) : isCorrect ? (
+            <>
+              Correct <Check />
+            </>
+          ) : (
+            <>
+              Wrong <X />
+            </>
+          )}
+        </Button>
+      ) : (
+        <div className="text-sm text-muted-foreground w-full">
+          Belum ada Jawaban
+        </div>
+      )}
     </div>
   );
 };

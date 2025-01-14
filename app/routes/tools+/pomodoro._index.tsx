@@ -105,12 +105,12 @@ const App: React.FC = () => {
 
   return (
     <div className="max-w-xl mx-auto border-x min-h-screen">
-      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
         <div className="flex items-center gap-x-2">
           <Link
             className={cn(
               buttonVariants({ size: "icon", variant: "outline" }),
-              "prose-none [&_svg]:size-6",
+              "prose-none [&_svg]:size-6 bg-background",
             )}
             to="/tools"
           >

@@ -277,7 +277,7 @@ const DoaView = ({ items, children }) => {
                       </div>
                       <div className="mt-3 space-y-3 px-4">
                         <div
-                          className="translation-text prose leading-6  max-w-none"
+                          className="translation-text prose leading-6  max-w-none text-muted-foreground"
                           dangerouslySetInnerHTML={{
                             __html: doa.indo,
                           }}

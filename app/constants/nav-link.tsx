@@ -10,6 +10,7 @@ import {
   Timer,
   Repeat,
   Info,
+  Puzzle,
 } from "lucide-react";
 
 const muslimLinks: {
@@ -18,18 +19,25 @@ const muslimLinks: {
   description: string;
   icon: SVGSVGElement;
 }[] = [
-  // {
-  //   title: "Bookmarks",
-  //   href: "/tools/bookmarks",
-  //   description: "List Bookmark ayah, doa and anymore.",
-  //   icon: Heart,
-  // },
   {
     title: "Al Qur'an",
     href: "/muslim/quran",
     description: "Temukan ketenangan melalui ayat-ayat Al Qur'an.",
     icon: Book,
   },
+  {
+    title: "Game Al Qur'an",
+    href: "/muslim/quran-word-by-word",
+    description: "Game susun kata setiap ayat quran",
+    icon: Puzzle,
+  },
+
+  // {
+  //   title: "Bookmarks",
+  //   href: "/tools/bookmarks",
+  //   description: "List Bookmark ayah, doa and anymore.",
+  //   icon: Heart,
+  // },
   {
     title: "Sholawat",
     href: "/muslim/sholawat",

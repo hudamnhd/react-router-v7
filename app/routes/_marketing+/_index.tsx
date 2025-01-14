@@ -1,6 +1,8 @@
-import { Button } from "#app/components/ui/button";
+import { Button, buttonVariants } from "#app/components/ui/button";
+import { cn } from "#app/utils/misc";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Wrench, Info, BookOpenText, Frame } from "lucide-react";
+import React from "react";
 import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
 import { useNavigate, NavLink, Link } from "@remix-run/react";
 
@@ -10,8 +12,25 @@ export function headers() {
   };
 }
 
-export default function Example() {
+export default function Index() {
   const navigate = useNavigate();
+  const [last_used, set_last_used] = React.useState([]);
+  const data = [...muslimLinks, ...toolsLinks];
+
+  React.useEffect(() => {
+    const lastUsedRoutes = JSON.parse(
+      localStorage.getItem("lastUsedRoutes") || "[]",
+    );
+
+    if (lastUsedRoutes.length > 0) {
+      const filteredLinks = lastUsedRoutes
+        .map((route) => data.find((link) => link.href === route))
+        .filter(Boolean);
+
+      set_last_used(filteredLinks);
+    }
+  }, []);
+
   return (
     <div className="border-x h-[calc(100vh)] max-w-xl mx-auto pb-2 relative">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
@@ -20,7 +39,18 @@ export default function Example() {
           <span className="font-bold  sm:text-sm text-base">Doti</span>
         </NavLink>
 
-        <DisplaySetting themeSwitchOnly={true} />
+        <div className="flex items-center gap-1">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "bg-transparent",
+            )}
+            to="/about"
+          >
+            <Info />
+          </Link>
+          <DisplaySetting themeSwitchOnly={true} />
+        </div>
       </div>
       <div className="text-center pt-3">
         <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
@@ -74,30 +104,45 @@ export default function Example() {
             </div>
           </div>
         </li>
-        <li
-          onClick={() => navigate("/about")}
-          className="col-span-1 flex shadow-sm rounded-md"
-        >
-          <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
-            <Info className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
-            <div className="flex-1 px-4 py-2 text-sm truncate">
-              <Link
-                to="/about"
-                className="font-semibold hover:text-muted-foreground cursor-pointer"
-              >
-                About
-              </Link>
-              <p className="text-muted-foreground line-clamp-1">
-                Informasi Aplikasi
-              </p>
-            </div>
-          </div>
-        </li>
       </ul>
+
+      {last_used.length > 0 && (
+        <React.Fragment>
+          <div className="px-3 mt-2 text-muted-foreground">
+            Terakhir digunakan
+          </div>
+          <ul role="list" className="grid grid-cols-1 gap-2 p-2.5 sm:p-3">
+            {last_used.map((action, actionIdx) => (
+              <li
+                onClick={() => navigate(action.href)}
+                key={actionIdx}
+                className="col-span-1 flex shadow-sm rounded-md"
+              >
+                <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
+                  <action.icon className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
+                  <div className="flex-1 px-4 py-2 text-sm truncate">
+                    <Link
+                      to={action.href}
+                      className="font-semibold hover:text-muted-foreground cursor-pointer"
+                    >
+                      {action.title}
+                    </Link>
+                    <p className="text-muted-foreground line-clamp-1">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </React.Fragment>
+      )}
       <div className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 text-sm">
-        <span className="text-muted-foreground">© 2025 Huda</span>
+        <Link to="/about" className="text-muted-foreground">
+          © 2025 Huda
+        </Link>
       </div>
     </div>
   );
