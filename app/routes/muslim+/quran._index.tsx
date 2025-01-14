@@ -3,7 +3,12 @@ import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { motion, useSpring, useScroll } from "framer-motion";
 import { cn } from "#app/utils/misc.tsx";
 import Fuse from "fuse.js";
-import { Search as SearchIcon, ChevronLeft, Check } from "lucide-react";
+import {
+  Search as SearchIcon,
+  ChevronLeft,
+  ChevronDown,
+  Check,
+} from "lucide-react";
 import { useLoaderData, Link } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import { Scroll, Minus, Dot } from "lucide-react";
@@ -110,7 +115,7 @@ function SurahView() {
   return (
     <div className="max-w-xl mx-auto border-x">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
-        <div className="flex items-center gap-x-1.5">
+        <div className="flex items-center gap-x-2">
           <Link
             className={cn(
               buttonVariants({ size: "icon", variant: "outline" }),
@@ -122,13 +127,13 @@ function SurahView() {
           </Link>
           <Select
             aria-label="Select Type List"
-            className="text-lg font-semibold min-w-[170px]"
+            className="text-lg font-semibold min-w-[140px]"
             placeholder="Daftar Surat"
             selectedKey={version}
             onSelectionChange={(selected) => setVersion(selected)}
           >
-            <SelectTrigger className="data-[focus-visible]:ring-none">
-              <SelectValue className="text-md font-semibold" />
+            <SelectTrigger className="data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px] underline underline-offset-4">
+              <SelectValue className="text-lg font-semibold" />
             </SelectTrigger>
             <SelectPopover>
               <SelectListBox>

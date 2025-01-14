@@ -464,13 +464,13 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       })
     : null;
 
-  useEffect(() => {
-    if (surat?.ayat_number !== null) {
-      setTimeout(() => {
-        scrollToAyat(parseInt(surat?.ayat_number) + 1);
-      }, 1000);
-    }
-  }, [surat?.ayat_number]);
+  // useEffect(() => {
+  //   if (surat?.ayat_number !== null) {
+  //     setTimeout(() => {
+  //       scrollToAyat(parseInt(surat?.ayat_number) + 1);
+  //     }, 1000);
+  //   }
+  // }, [surat?.ayat_number]);
 
   return (
     <React.Fragment>
@@ -543,7 +543,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                   key={key}
                   className="group relative p-3"
                 >
-                  <div className="absolute flex gap-x-1.5 justify-center w-full -translate-y-7 items-center">
+                  <div className="absolute flex justify-center w-full -translate-y-7 items-center max-w-[95%] mx-auto">
                     {isLastRead && (
                       <div
                         className={cn(
@@ -556,11 +556,13 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                             "fill-blue-500 text-blue-500 dark:text-blue-400 dark:fill-blue-400",
                           )}
                         />
-                        {relativeTime}
+                        <span className="truncate max-w-[135px]">
+                          {relativeTime}
+                        </span>
                       </div>
                     )}
                   </div>
-                  <div className="absolute flex gap-x-1.5 justify-end w-full -translate-y-7 items-center right-3">
+                  <div className="absolute flex gap-x-1 justify-end w-full -translate-y-7 items-center max-w-[95%] mx-auto right-2">
                     {isFavorite && (
                       <Button
                         onPress={() => toggleBookmark(key)}

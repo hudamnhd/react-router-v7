@@ -132,18 +132,18 @@ const App: React.FC = () => {
             Terakhir dibaca
           </div>
           <div>
-            <div className="group relative px-4 pb-4 sm:px-5 rounded-md border-t">
-              <div className="flex items-center justify-between gap-x-2 pt-2">
-                <div className="font-bold text-lg">{lastRead.title}</div>
-
-                <Button
-                  id="goto-last"
-                  size="icon"
-                  variant="outline"
-                  onPress={() => navigate(`/muslim/quran/${lastRead.surah}`)}
+            <div className="group relativel p-3 border-t">
+              <div className="flex items-center justify-between gap-x-2">
+                <Link
+                  to={lastRead.source}
+                  className={cn(
+                    buttonVariants({ variant: "link" }),
+                    "gap-2 p-0 -mt-2",
+                  )}
                 >
-                  <ExternalLink />
-                </Button>
+                  {lastRead.title}
+                </Link>
+                <div className="absolute flex gap-x-1.5 justify-end w-full -translate-y-7 items-center right-3"></div>
               </div>
               <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
                 <div
