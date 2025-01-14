@@ -1,8 +1,12 @@
 import React from "react";
 import { Icon } from "#app/components/ui/icon.tsx";
+import {
+  type loader as RootLoader,
+  type action as RootAction,
+} from "#app/root.tsx";
 import { z } from "zod";
 import { parseWithZod } from "@conform-to/zod";
-import { type Theme, setTheme, getTheme } from "#app/utils/theme.server.ts";
+import { type Theme } from "#app/utils/theme.server.ts";
 import { useForm, getFormProps } from "@conform-to/react";
 import { prefs } from "#app/utils/prefs.server";
 import { Switch } from "#app/components/ui/switch";
@@ -30,11 +34,7 @@ import {
   CardHeader,
   CardTitle,
 } from "#app/components/ui/card";
-import {
-  json,
-  type ActionFunctionArgs,
-  LoaderFunctionArgs,
-} from "@remix-run/node";
+import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher, useFetchers, useRouteLoaderData } from "@remix-run/react";
 
 const ThemeFormSchema = z.object({
@@ -58,6 +58,7 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   });
 }
+
 function useOptimisticThemeMode() {
   const fetchers = useFetchers();
   const themeFetcher = fetchers.find((f) => f.formAction === "/");
@@ -74,7 +75,7 @@ function useOptimisticThemeMode() {
 }
 
 function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
-  const fetcher = useFetcher<typeof action>();
+  const fetcher = useFetcher<typeof RootAction>();
 
   const [form] = useForm({
     id: "theme-switch",
@@ -124,9 +125,11 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
 
 import { fontOptions, fontSizeOpt } from "#/app/constants/prefs";
 
-export function DisplaySetting({ themeSwitchOnly }) {
+export function DisplaySetting({
+  themeSwitchOnly,
+}: { themeSwitchOnly?: boolean }) {
   // Daftar variasi font dengan nama dan font-weight yang sesuai
-  const loaderRoot = useRouteLoaderData("root");
+  const loaderRoot = useRouteLoaderData<typeof RootLoader>("root");
   const opts = loaderRoot?.opts || {};
 
   const fetcher = useFetcher();
@@ -174,7 +177,7 @@ export function DisplaySetting({ themeSwitchOnly }) {
                         name="font_weight"
                         selectedKey={fontWeight}
                         onSelectionChange={(selected) =>
-                          setFontWeight(selected)
+                          setFontWeight(selected as string)
                         }
                       >
                         <Label>Font Weight</Label>
@@ -203,7 +206,9 @@ export function DisplaySetting({ themeSwitchOnly }) {
                         placeholder="Select an font"
                         name="font_size"
                         selectedKey={fontSize}
-                        onSelectionChange={(selected) => setFontSize(selected)}
+                        onSelectionChange={(selected) =>
+                          setFontSize(selected as string)
+                        }
                       >
                         <Label>Font Size</Label>
                         <SelectTrigger>
@@ -238,7 +243,7 @@ export function DisplaySetting({ themeSwitchOnly }) {
                         <Switch
                           name="font_translation"
                           id="translationtext"
-                          defaultChecked={showTranslation}
+                          defaultSelected={showTranslation}
                         />
                       </div>
                       <div className="flex items-center justify-between space-x-2">
@@ -254,7 +259,7 @@ export function DisplaySetting({ themeSwitchOnly }) {
                         <Switch
                           id="latintext"
                           name="font_latin"
-                          defaultChecked={showLatin}
+                          defaultSelected={showLatin}
                         />
                       </div>
                     </div>
@@ -270,7 +275,7 @@ export function DisplaySetting({ themeSwitchOnly }) {
           </Popover>
         </PopoverTrigger>
       )}
-      <ThemeSwitch userPreference={loaderRoot.requestInfo.userPrefs.theme} />
+      <ThemeSwitch userPreference={loaderRoot?.requestInfo.userPrefs.theme} />
     </div>
   );
 }

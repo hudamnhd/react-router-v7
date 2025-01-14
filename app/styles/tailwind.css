@@ -164,14 +164,6 @@ code {
   line-height: 4rem; /* 36px */
 }
 
-.dragging {
-  margin: 0;
-  padding: 0;
-  opacity: 0.5;
-  background-color: red;
-  transform: "translate(0, 0)";
-}
-
 .div1 {
   background: url("") top left no-repeat;
   overflow: hidden;

@@ -5,6 +5,10 @@ export interface AyatBookmark {
   title: string;
   arab: string;
   latin: string | null;
+  tafsir: {
+    source: string | null;
+    text: string | null;
+  } | null;
   translation: string | null;
   source: string;
 }

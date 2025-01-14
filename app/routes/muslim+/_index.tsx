@@ -1,9 +1,9 @@
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { cn } from "#app/utils/misc.tsx";
 import { buttonVariants } from "#app/components/ui/button";
-import { Frame, ChevronLeft } from "lucide-react";
-import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
-import { useNavigate, NavLink, Link } from "@remix-run/react";
+import { ChevronLeft } from "lucide-react";
+import { muslimLinks } from "#app/constants/nav-link";
+import { useNavigate, Link } from "@remix-run/react";
 
 export function headers() {
   return {
@@ -14,6 +14,7 @@ export function headers() {
 export default function Example() {
   const data = muslimLinks;
   const navigate = useNavigate();
+
   return (
     <div className="border-x min-h-[calc(100vh)] max-w-xl mx-auto pb-2">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
@@ -46,7 +47,7 @@ export default function Example() {
           <li
             onClick={() => navigate(action.href)}
             key={actionIdx}
-            className="col-span-1 flex shadow-sm rounded-md"
+            className="col-span-1 flex shadow-sm rounded-md hover:bg-accent cursor-pointer"
           >
             <div className="flex-shrink-0 flex items-center justify-center w-16 text-sm font-medium rounded-l-md bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20">
               <action.icon className="h-5 w-5" aria-hidden="true" />

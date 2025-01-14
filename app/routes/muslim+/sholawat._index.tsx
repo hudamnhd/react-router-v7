@@ -1,4 +1,4 @@
-import data from "#/app/constants/sholawat";
+import data from "#/app/constants/sholawat.json";
 import { buttonVariants } from "#app/components/ui/button";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { useRouteLoaderData, Link } from "@remix-run/react";
@@ -94,11 +94,11 @@ export default function Sholawat() {
 
         <DisplaySetting />
       </div>
-      <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
+      <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-3">
         Sholawat
       </div>
 
-      {sholawat.map((d, index) => {
+      {sholawat.map((d, index: number) => {
         const ayat = {
           ...d,
           index: index.toString(),

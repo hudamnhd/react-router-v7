@@ -1,14 +1,18 @@
 import { cn } from "#app/utils/misc.tsx";
+import { id } from "date-fns/locale";
+import { formatDistanceToNow } from "date-fns";
+import { ScrollToFirstIndex } from "#app/components/custom/scroll-to-top.tsx";
+import { type loader as RootLoader } from "#app/root.tsx";
 import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import React, { useState, useEffect } from "react";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import {
   ChevronLeft,
-  ArrowUp,
   ChevronRight,
   Bookmark,
   Heart,
+  Star,
   Ellipsis,
   Dot,
   Minus,
@@ -18,12 +22,16 @@ import {
 import ky from "ky";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
-import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
+import {
+  save_bookmarks,
+  type Bookmark as BookmarkType,
+} from "#app/utils/bookmarks";
 
 import { type MetaFunction } from "@remix-run/node";
 
-export const meta: MetaFunction = ({ data }) => {
-  return [{ title: "Doti App" }];
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const surat = data?.number + ". " + data?.name_latin;
+  return [{ title: surat + " | Doti App" }];
 };
 
 export function headers() {
@@ -32,23 +40,55 @@ export function headers() {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export type Ayat = {
+  number: string;
+  name: string;
+  name_latin: string;
+  number_of_ayah: string;
+  text: { [key: string]: string };
+  translations: {
+    id: {
+      name: string;
+      text: { [key: string]: string };
+    };
+  };
+  tafsir: {
+    id: {
+      kemenag: {
+        name: string;
+        source: string;
+        text: { [key: string]: string };
+      };
+    };
+  };
+};
+
+type Surah = Record<string, Ayat>; // Object with dynamic string keys
+
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const api = ky.create({
     prefixUrl:
       "https://raw.githubusercontent.com/rioastamal/quran-json/refs/heads/master/surah",
   });
 
+  const url = new URL(request.url);
+  const ayat_number = url.searchParams.get("ayat");
   const { id } = params;
 
-  const surat = await api.get(`${id}.json`).json();
+  const surat = await api.get(`${id}.json`).json<Surah>();
 
   const parse = Object.values(surat);
+  const ayat = parse[0];
 
-  if (!parse[0] && !parse[0].number) {
+  if (!ayat) {
     throw new Response("Not Found", { status: 404 });
   }
+  const data = {
+    ...ayat,
+    ayat_number,
+  };
 
-  return json(parse[0], {
+  return json(data, {
     headers: {
       "Cache-Control": "public, max-age=31560000",
     },
@@ -62,532 +102,6 @@ const LASTREAD_KEY = "LASTREAD";
 
 import { fontSizeOpt } from "#/app/constants/prefs";
 
-export default function RouteX() {
-  const loaderData = useLoaderData();
-  return <SuratDetail surat={loaderData} />;
-}
-
-function Route() {
-  const renderCount = React.useRef(0);
-  renderCount.current++;
-
-  const loaderData = useLoaderData();
-  const loaderRoot = useRouteLoaderData("root");
-  const opts = loaderRoot?.opts || {};
-  const [lastRead, setLastRead] = useState<number | null>(null);
-  const [bookmarks, setBookmarks] = React.useState<Bookmark[]>([]);
-
-  React.useEffect(() => {
-    const load_bookmark_from_lf = async () => {
-      const storedBookmarks = await get_cache(BOOKMARK_KEY);
-      const storedLastRead = await get_cache(LASTREAD_KEY);
-      if (storedLastRead !== null) {
-        setLastRead(storedLastRead);
-      }
-      if (storedBookmarks) {
-        setBookmarks(storedBookmarks);
-      }
-    };
-
-    load_bookmark_from_lf();
-  }, []);
-
-  const bookmarks_ayah = bookmarks
-    .filter((item) => item.type === "ayat") // Hanya ambil item dengan type "ayat"
-    .map((item) => {
-      const params = new URLSearchParams(item.source.split("?")[1]); // Ambil query string setelah "?"
-      return {
-        created_at: item.created_at,
-        id: params.get("ayat"),
-      }; // Ambil nilai "ayat"
-    });
-
-  React.useEffect(() => {
-    const save_bookmark_to_lf = async (bookmarks) => {
-      await set_cache(BOOKMARK_KEY, bookmarks);
-    };
-    save_bookmark_to_lf(bookmarks);
-  }, [bookmarks]);
-
-  // Simpan ayat terakhir dibaca ke localForage
-
-  useEffect(() => {
-    if (lastRead !== null) {
-      const saveLastRead = async (lastRead) => {
-        await set_cache(LASTREAD_KEY, lastRead);
-      };
-      saveLastRead(lastRead);
-    }
-  }, [lastRead]);
-
-  // Fungsi untuk toggle favorit
-  const toggleBookmark = (ayat) => {
-    const newBookmarks = save_bookmarks(
-      "ayat",
-      {
-        title: `${ayat.surah_name}:${ayat.id}`,
-        arab: ayat.arab,
-        latin: ayat.latin,
-        translation: ayat.text,
-        source: `/muslim/quran/${ayat.page}?ayat=${ayat.id}&surah=${ayat.surah}&juz=${ayat.juz}`,
-      },
-      [...bookmarks],
-    );
-
-    const is_saved = bookmarks_ayah.find((fav) => fav.id === ayat.id);
-
-    if (is_saved) {
-      const newBookmarks = bookmarks?.filter(
-        (d) => d.created_at !== is_saved.created_at,
-      );
-      setBookmarks(newBookmarks);
-    } else {
-      setBookmarks(newBookmarks);
-    }
-  };
-
-  // Tandai ayat sebagai terakhir dibaca
-  const handleRead = (ayat) => {
-    const isLastRead = lastRead?.id === ayat.id;
-    if (isLastRead) {
-      setLastRead(null);
-    } else {
-      setLastRead(ayat);
-    }
-  };
-  const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
-
-  return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto w-full border-x divide-y">
-      <div className="p-1.5 flex xl:justify-end justify-between gap-x-3">
-        <Link
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "xl:hidden flex",
-          )}
-          to="/muslim/quran/"
-        >
-          <BookOpen size={16} strokeWidth={2} aria-hidden="true" />
-          <span>List</span>
-        </Link>
-        <DisplaySetting opts={opts} />
-      </div>
-      {/*{renderCount.current}*/}
-      {/*{Object.values(group_surat).map((d) => {
-        const first_ayah = d.ayat[0]?.ayah;
-        const last_ayah = d.ayat[d.ayat.length - 1]?.ayah;
-        return (
-          <React.Fragment key={d.surah.number}>
-            <div className="prose dark:prose-invert max-w-none">
-              <React.Fragment>
-                <DialogTrigger type="modal">
-                  <ButtonTrigger className="w-full">
-                    <div className="text-3xl font-bold md:text-4xl w-fit mx-auto mt-2 mb-3">
-                      {d.surah.name_id}
-                      <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
-                        ( {d.surah.name_short} )
-                      </span>
-                      <div className="flex items-center text-base font-medium justify-center">
-                        Hal {id}
-                        <Dot />
-                        <span>Ayat {first_ayah}</span>
-                        <Minus />
-                        <span>{last_ayah}</span>
-                      </div>
-                    </div>
-                  </ButtonTrigger>
-                  <ModalOverlay
-                    isDismissable
-                    className={({ isEntering, isExiting }) =>
-                      cn(
-                        "fixed inset-0 z-50 bg-black/80",
-                        isEntering
-                          ? "animate-in fade-in duration-300 ease-out"
-                          : "",
-                        isExiting
-                          ? "animate-out fade-out duration-300 ease-in"
-                          : "",
-                      )
-                    }
-                  >
-                    <Modal
-                      className={({ isEntering, isExiting }) =>
-                        cn(
-                          "fixed z-50 w-full bg-background sm:rounded-md inset-x-0 bottom-0 px-2 pb-4 outline-none sm:max-w-3xl mx-auto",
-                          isEntering
-                            ? "animate-in slide-in-from-bottom duration-300"
-                            : "",
-                          isExiting
-                            ? "animate-out slide-out-to-bottom duration-300"
-                            : "",
-                        )
-                      }
-                    >
-                      <Dialog
-                        role="alertdialog"
-                        className="outline-none relative"
-                      >
-                        {({ close }) => (
-                          <div className="grid gap-2.5 px-2">
-                            <div className="w-fit mx-auto">
-                              <Button
-                                onPress={close}
-                                size="sm"
-                                className="mt-4 mb-3 h-2 w-[100px] rounded-full bg-muted"
-                              />
-                            </div>
-                            <p className="-translate-y-0 text-xl sm:text-2xl font-semibold font-lpmq-2 text-center mb-1.5">
-                              {d.surah.name_long}
-                            </p>
-                            <Heading>
-                              {d.surah.number}. {d.surah.name_id}
-                              <span className="ml-2 font-normal">
-                                ( {d.surah.translation_id} )
-                              </span>
-                            </Heading>
-
-                            <div className="flex items-center text-muted-foreground gap-1">
-                              <span>{d.surah.revelation_id}</span>
-                              <div className="w-2 relative">
-                                <Dot className="absolute -left-2 -top-3" />
-                              </div>
-                              <span>{d.surah.number_of_verses} ayat</span>
-                            </div>
-
-                            <div className="max-h-[70vh] overflow-y-auto">
-                              <div className="mb-4">
-                                <h3 className="font-bold text-lg">Tafsir</h3>
-                                <p className="prose max-w-none">
-                                  {d.surah.tafsir}
-                                </p>
-                              </div>
-
-                              <div className="mb-4">
-                                <h3 className="font-bold mb-1">Audio</h3>
-                                <audio controls className="w-full">
-                                  <source
-                                    src={d.surah.audio_url}
-                                    type="audio/mpeg"
-                                  />
-                                  Your browser does not support the audio
-                                  element.
-                                </audio>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-center w-full outline-none">
-                              <Button
-                                onPress={close}
-                                variant="outline"
-                                className="w-full"
-                              >
-                                <X />
-                                Close
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </Dialog>
-                    </Modal>
-                  </ModalOverlay>
-                </DialogTrigger>
-              </React.Fragment>
-
-              <div className="">
-                {d.ayat.map((_dt) => {
-                  const surah_name = d.surah.name_id;
-                  const dt = {
-                    ..._dt,
-                    surah_name,
-                  };
-                  const isFavorite = bookmarks_ayah.some(
-                    (fav) => fav.id === dt.id,
-                  );
-                  const isLastRead = lastRead?.id === dt.id;
-
-                  return (
-                    <div className="border-t" key={dt.id}>
-                      <div
-                        className={cn(
-                          "group relative py-4 px-4 sm:px-5",
-                          isFavorite &&
-                            "shadow-md shadow-pink-500 bg-gradient-to-bl from-background via-background to-pink-400/50 dark:to-pink-600/50",
-                          isLastRead &&
-                            "shadow-md shadow-blue-500 bg-gradient-to-bl from-background via-background to-blue-400/50 dark:to-blue-600/50",
-                        )}
-                      >
-                        <div className="w-full text-right flex gap-x-2.5 items-center justify-between">
-                          <div className="flex items-center gap-x-3">
-                            {isLastRead ? (
-                              <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl">
-                                <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                              </div>
-                            ) : isFavorite ? (
-                              <div className="bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl">
-                                <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-                              </div>
-                            ) : (
-                              <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 p-3 rounded-xl">
-                                <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                            )}
-                            <div className="grid text-left">
-                              <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                                Ayat {dt.ayah}
-                              </span>
-                              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                Juz {dt.juz} • Hal {dt.page}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-x-2">
-                            <MenuTrigger>
-                              <Button
-                                aria-label="Menu"
-                                variant="secondary"
-                                size="icon"
-                                className={cn(
-                                  "[&_svg]:size-5 rounded-xl h-9 w-9",
-                                  isFavorite &&
-                                    "bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl text-rose-600 dark:text-rose-400",
-                                  isLastRead &&
-                                    "bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl text-blue-600 dark:text-blue-400",
-                                )}
-                              >
-                                <Ellipsis />
-                              </Button>
-                              <Popover className=" bg-background p-1 w-44 overflow-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5 entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left">
-                                <Menu className="outline-none">
-                                  <ActionItem
-                                    id="new"
-                                    onAction={() => toggleBookmark(dt)}
-                                  >
-                                    <Heart
-                                      className={cn(
-                                        "mr-1 w-4 h-4",
-                                        isFavorite &&
-                                          "fill-rose-500 text-rose-500",
-                                      )}
-                                    />
-                                    Bookmark
-                                  </ActionItem>
-                                  <ActionItem
-                                    id="open"
-                                    onAction={() => handleRead(dt)}
-                                  >
-                                    <Bookmark
-                                      className={cn(
-                                        "mr-1 w-4 h-4",
-                                        isLastRead &&
-                                          "fill-blue-500 text-blue-500",
-                                      )}
-                                    />
-                                    Terakhir Baca
-                                  </ActionItem>
-                                </Menu>
-                              </Popover>
-                            </MenuTrigger>
-                          </div>
-                        </div>
-                        <div className="w-full text-right flex gap-x-2.5 items-end justify-end">
-                          <div
-                            className={cn(
-                              "relative text-right text-primary my-5 font-lpmq",
-                            )}
-                            style={{
-                              fontWeight: opts.font_weight,
-                              fontSize: font_size_opts?.fontSize || "1.5rem",
-                              lineHeight:
-                                font_size_opts?.lineHeight || "3.5rem",
-                            }}
-                          >
-                            {dt.arab}
-                          </div>
-                        </div>
-                        {opts?.font_latin === "on" && (
-                          <div className="translation-text">
-                            <div
-                              className="max-w-none prose-normal duration-300 text-muted-foreground mb-2"
-                              dangerouslySetInnerHTML={{
-                                __html: dt.latin,
-                              }}
-                            />
-                          </div>
-                        )}
-
-                        {opts?.font_translation === "on" && (
-                          <div className="translation-text">
-                            <div
-                              className="max-w-none prose text-accent-foreground"
-                              dangerouslySetInnerHTML={{
-                                __html: dt.text,
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </React.Fragment>
-        );
-      })}*/}
-      <div className="">
-        {loaderData.text.map((_dt) => {
-          const surah_name = d.surah.name_id;
-          const dt = {
-            ..._dt,
-            surah_name,
-          };
-          const isFavorite = bookmarks_ayah.some((fav) => fav.id === dt.id);
-          const isLastRead = lastRead?.id === dt.id;
-
-          return (
-            <div className="border-t" key={dt.id}>
-              <div
-                className={cn(
-                  "group relative py-4 px-4 sm:px-5",
-                  isFavorite &&
-                    "shadow-md shadow-pink-500 bg-gradient-to-bl from-background via-background to-pink-400/50 dark:to-pink-600/50",
-                  isLastRead &&
-                    "shadow-md shadow-blue-500 bg-gradient-to-bl from-background via-background to-blue-400/50 dark:to-blue-600/50",
-                )}
-              >
-                <div className="w-full text-right flex gap-x-2.5 items-center justify-between">
-                  <div className="flex items-center gap-x-3">
-                    {isLastRead ? (
-                      <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl">
-                        <Bookmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                    ) : isFavorite ? (
-                      <div className="bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl">
-                        <Heart className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-                      </div>
-                    ) : (
-                      <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 p-3 rounded-xl">
-                        <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                    )}
-                    <div className="grid text-left">
-                      <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                        Ayat {dt.ayah}
-                      </span>
-                      <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        Juz {dt.juz} • Hal {dt.page}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    <MenuTrigger>
-                      <Button
-                        aria-label="Menu"
-                        variant="secondary"
-                        size="icon"
-                        className={cn(
-                          "[&_svg]:size-5 rounded-xl h-9 w-9",
-                          isFavorite &&
-                            "bg-gradient-to-br from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20 p-3 rounded-xl text-rose-600 dark:text-rose-400",
-                          isLastRead &&
-                            "bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-2 rounded-xl text-blue-600 dark:text-blue-400",
-                        )}
-                      >
-                        <Ellipsis />
-                      </Button>
-                      <Popover className=" bg-background p-1 w-44 overflow-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5 entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left">
-                        <Menu className="outline-none">
-                          <ActionItem
-                            id="new"
-                            onAction={() => toggleBookmark(dt)}
-                          >
-                            <Heart
-                              className={cn(
-                                "mr-1 w-4 h-4",
-                                isFavorite && "fill-rose-500 text-rose-500",
-                              )}
-                            />
-                            Bookmark
-                          </ActionItem>
-                          <ActionItem id="open" onAction={() => handleRead(dt)}>
-                            <Bookmark
-                              className={cn(
-                                "mr-1 w-4 h-4",
-                                isLastRead && "fill-blue-500 text-blue-500",
-                              )}
-                            />
-                            Terakhir Baca
-                          </ActionItem>
-                        </Menu>
-                      </Popover>
-                    </MenuTrigger>
-                  </div>
-                </div>
-                <div className="w-full text-right flex gap-x-2.5 items-end justify-end">
-                  <div
-                    className={cn(
-                      "relative text-right text-primary my-5 font-lpmq",
-                    )}
-                    style={{
-                      fontWeight: opts.font_weight,
-                      fontSize: font_size_opts?.fontSize || "1.5rem",
-                      lineHeight: font_size_opts?.lineHeight || "3.5rem",
-                    }}
-                  >
-                    {dt.arab}
-                  </div>
-                </div>
-                {opts?.font_latin === "on" && (
-                  <div className="translation-text">
-                    <div
-                      className="max-w-none prose-normal duration-300 text-muted-foreground mb-2"
-                      dangerouslySetInnerHTML={{
-                        __html: dt.latin,
-                      }}
-                    />
-                  </div>
-                )}
-
-                {opts?.font_translation === "on" && (
-                  <div className="translation-text">
-                    <div
-                      className="max-w-none prose text-accent-foreground"
-                      dangerouslySetInnerHTML={{
-                        __html: dt.text,
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {/* Pagination Controls */}
-      {/*<div className="ml-auto flex items-center justify-center gap-3 py-5 border-t ">
-        <Link
-          className={cn(buttonVariants({ size: "icon", variant: "outline" }))}
-          to={`/muslim/quran/${parseInt(id) - 1}`}
-          disabled={parseInt(id) === 1}
-        >
-          <span className="sr-only">Go to previous page</span>
-          <ChevronLeft />
-        </Link>
-
-        <span className="text-accent-foreground text-sm">
-          Halaman <strong>{id}</strong> dari <strong>604</strong>
-        </span>
-        <Link
-          className={cn(buttonVariants({ size: "icon", variant: "outline" }))}
-          to={`/muslim/quran/${parseInt(id) + 1}`}
-          disabled={parseInt(id) === 604}
-        >
-          <span className="sr-only">Go to next page</span>
-          <ChevronRight />
-        </Link>
-      </div>*/}
-    </div>
-  );
-}
 import { Menu, MenuItem, MenuTrigger, Popover } from "react-aria-components";
 import type { MenuItemProps } from "react-aria-components";
 
@@ -595,7 +109,7 @@ function ActionItem(props: MenuItemProps) {
   return (
     <MenuItem
       {...props}
-      className="bg-background relative flex gap-1.5 select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50  [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0"
+      className="bg-background relative flex gap-1 select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50  [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-sm"
     />
   );
 }
@@ -651,13 +165,11 @@ type SuratProps = {
   };
 };
 
-import { motion, useSpring, useScroll } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-const SuratDetail: React.FC<SuratProps> = ({ surat }) => {
-  const ayatKeys = Object.keys(surat.text); // Mendapatkan list nomor ayat
-
-  const loaderRoot = useRouteLoaderData("root");
+const SuratDetail: React.FC = () => {
+  const surat = useLoaderData<typeof loader>();
+  const loaderRoot = useRouteLoaderData<typeof RootLoader>("root");
   const opts = loaderRoot?.opts || {};
   const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
 
@@ -683,7 +195,7 @@ const SuratDetail: React.FC<SuratProps> = ({ surat }) => {
           <DisplaySetting />
         </div>
 
-        <VirtualizedListSurah items={ayatKeys}>
+        <VirtualizedListSurah>
           <div className="text-3xl font-bold md:text-4xl w-fit mx-auto text-primary pb-3 pt-1">
             {surat.name_latin}
             <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq">
@@ -698,29 +210,33 @@ const SuratDetail: React.FC<SuratProps> = ({ surat }) => {
             </div>
           </div>
 
-          <div className="ml-auto flex items-center justify-center gap-3 pt-4 border-t ">
+          <div className="ml-auto flex items-center justify-center gap-3 py-5 ">
             <Link
               className={cn(
                 buttonVariants({ size: "icon", variant: "outline" }),
-                "[&_svg]:size-5",
               )}
-              to={`/muslim/quran/${parseInt(surat.number) - 1}`}
-              disabled={parseInt(surat.number) === 1}
+              to={
+                parseInt(surat?.number as string) === 1
+                  ? "#"
+                  : `/muslim/quran-word-by-word/${parseInt(surat?.number as string) - 1}`
+              }
             >
               <span className="sr-only">Go to previous page</span>
               <ChevronLeft />
             </Link>
 
             <span className="text-accent-foreground text-sm">
-              Surat <strong>{surat.number}</strong> dari <strong>114</strong>
+              Surat <strong>{surat?.number}</strong> dari <strong>114</strong>
             </span>
             <Link
               className={cn(
                 buttonVariants({ size: "icon", variant: "outline" }),
-                "[&_svg]:size-5",
               )}
-              to={`/muslim/quran/${parseInt(surat.number) + 1}`}
-              disabled={parseInt(surat.number) === 114}
+              to={
+                parseInt(surat?.number as string) === 114
+                  ? "#"
+                  : `/muslim/quran-word-by-word/${parseInt(surat?.number as string) + 1}`
+              }
             >
               <span className="sr-only">Go to next page</span>
               <ChevronRight />
@@ -800,121 +316,11 @@ const SuratDetail: React.FC<SuratProps> = ({ surat }) => {
   );
 };
 
-const TafsirText: React.FC<{ text?: string }> = ({ text }) => {
-  if (!text) {
-    return <p className="text-gray-500 italic">Tafsir tidak tersedia.</p>;
-  }
-
-  // Memformat teks menjadi paragraf panjang dengan gaya tailwind prose
-  const formattedText = text.split("\n").map((line, index) => {
-    // Jika line mengandung nomor poin (1., 2., 3.) atau huruf (a., b., c.), tambahkan bold
-    if (/^\d+\./.test(line.trim())) {
-      return (
-        <p
-          key={index}
-          className="pl-2 max-w-none prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap"
-        >
-          {line.trim()}
-        </p>
-      );
-    } else if (/^[a-z]\./.test(line.trim())) {
-      return (
-        <p
-          key={index}
-          className="pl-4 max-w-none prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap"
-        >
-          {line.trim()}
-        </p>
-      );
-    } else {
-      return (
-        <p
-          key={index}
-          className="max-w-none prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap"
-        >
-          {line.trim()}
-        </p>
-      ); // Line biasa tanpa format khusus
-    }
-  });
-
-  return (
-    <div className="max-w-none prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap mb-3">
-      {formattedText}
-    </div>
-  );
-};
-
-const GoTopButton = ({ container }) => {
-  const [showGoTop, setShowGoTop] = useState(false);
-
-  const handleVisibleButton = () => {
-    const shouldShow = container.current.scrollTop > 50;
-    if (shouldShow !== showGoTop) {
-      setShowGoTop(shouldShow);
-    }
-  };
-
-  const handleScrollUp = () => {
-    container?.current?.scrollTo({ left: 0, top: 0, behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    const currentContainer = container?.current;
-    if (!currentContainer) return;
-
-    currentContainer.addEventListener("scroll", handleVisibleButton);
-
-    return () => {
-      currentContainer.removeEventListener("scroll", handleVisibleButton);
-    };
-  }, [container, showGoTop]); // Dependency array dengan `showGoTop`
-
-  return (
-    <div
-      className={cn(
-        "sticky inset-x-0 ml-auto w-fit -translate-x-3 z-[60] bottom-0 -mt-11",
-        !showGoTop && "hidden",
-      )}
-    >
-      <Button onPress={handleScrollUp} variant="default" size="icon">
-        <ArrowUp />
-      </Button>
-    </div>
-  );
-};
-
-const ScroolIndicator = ({ container }) => {
-  const { scrollYProgress } = useScroll({
-    container: container,
-  });
-
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-  return (
-    <motion.div
-      id="scroll-indicator"
-      className="z-[60] bg-gradient-to-r from-fuchsia-500 to-cyan-500 dark:from-fuchsia-400 dark:to-cyan-400 max-w-xl mx-auto"
-      style={{
-        scaleX,
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 5,
-        originX: 0,
-      }}
-    />
-  );
-};
-
 import { motion, useSpring, useScroll } from "framer-motion";
-const VirtualizedListSurah = ({ children }) => {
+
+const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
   const [children1, children2] = React.Children.toArray(children);
-  const surat = useLoaderData();
+  const surat = useLoaderData<typeof loader>();
   const items = Object.keys(surat.text); // Mendapatkan list nomor ayat
   const parentRef = React.useRef<HTMLDivElement>(null);
   // Gunakan useVirtualizer
@@ -924,7 +330,7 @@ const VirtualizedListSurah = ({ children }) => {
     estimateSize: () => 56, // Perkiraan tinggi item (70px)
   });
 
-  const loaderRoot = useRouteLoaderData("root");
+  const loaderRoot = useRouteLoaderData<typeof RootLoader>("root");
   const opts = loaderRoot?.opts || {};
   const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
 
@@ -942,6 +348,130 @@ const VirtualizedListSurah = ({ children }) => {
     restDelta: 0.001,
   });
 
+  const [lastRead, setLastRead] = useState<any | null>(null);
+  const [bookmarks, setBookmarks] = React.useState<BookmarkType[]>([]);
+
+  React.useEffect(() => {
+    const load_bookmark_from_lf = async () => {
+      const storedBookmarks = await get_cache(BOOKMARK_KEY);
+      const storedLastRead = await get_cache(LASTREAD_KEY);
+      if (storedLastRead !== null) {
+        setLastRead(storedLastRead);
+      }
+      if (storedBookmarks) {
+        setBookmarks(storedBookmarks);
+      }
+    };
+
+    load_bookmark_from_lf();
+  }, []);
+
+  const bookmarks_ayah = bookmarks
+    .filter((item) => item.type === "ayat") // Hanya ambil item dengan type "ayat"
+    .map((item) => {
+      const params = new URLSearchParams(item.source.split("?")[1]); // Ambil query string setelah "?"
+      return {
+        created_at: item.created_at,
+        id: params.get("ayat"),
+      }; // Ambil nilai "ayat"
+    });
+
+  React.useEffect(() => {
+    const save_bookmark_to_lf = async (bookmarks) => {
+      await set_cache(BOOKMARK_KEY, bookmarks);
+    };
+    save_bookmark_to_lf(bookmarks);
+  }, [bookmarks]);
+
+  // Simpan ayat terakhir dibaca ke localForage
+
+  useEffect(() => {
+    if (lastRead !== null) {
+      const saveLastRead = async (lastRead) => {
+        await set_cache(LASTREAD_KEY, lastRead);
+      };
+      saveLastRead(lastRead);
+    }
+  }, [lastRead]);
+
+  // Fungsi untuk toggle favorit
+  const toggleBookmark = (key: string) => {
+    const data_bookmark = {
+      title: `${surat.name_latin}:${key}`,
+      arab: surat.text[key],
+      latin: "",
+      tafsir: {
+        source: surat.tafsir.id.kemenag.source,
+        text: surat.tafsir.id.kemenag.text[key],
+      },
+      translation: surat.translations.id.text[key],
+      source: `/muslim/quran/${surat.number}?ayat=${key}`,
+    };
+    const newBookmarks = save_bookmarks("ayat", data_bookmark, [...bookmarks]);
+
+    const is_saved = bookmarks_ayah.find((fav) => fav.id === key);
+
+    if (is_saved) {
+      const newBookmarks = bookmarks?.filter(
+        (d) => d.created_at !== is_saved.created_at,
+      );
+      setBookmarks(newBookmarks);
+    } else {
+      setBookmarks(newBookmarks);
+    }
+  };
+
+  // Tandai ayat sebagai terakhir dibaca
+  const handleRead = (key: string) => {
+    const data_bookmark = {
+      id: key,
+      title: `${surat.name_latin}:${key}`,
+      arab: surat.text[key],
+      latin: "",
+      tafsir: {
+        source: surat.tafsir.id.kemenag.source,
+        text: surat.tafsir.id.kemenag.text[key],
+      },
+      translation: surat.translations.id.text[key],
+      source: `/muslim/quran/${surat.number}?ayat=${key}`,
+      created_at: new Date().toISOString(),
+    };
+    const isLastRead = lastRead?.id === key;
+    if (isLastRead) {
+      setLastRead(null);
+    } else {
+      setLastRead(data_bookmark);
+    }
+  };
+
+  const scrollToAyat = (index: number) => {
+    rowVirtualizer.scrollToIndex(index, {
+      align: "center",
+    });
+  };
+
+  const scrollToFirstAyat = () => {
+    rowVirtualizer.scrollToIndex(0, {
+      align: "center",
+    });
+  };
+
+  const relativeTime = lastRead
+    ? formatDistanceToNow(new Date(lastRead.created_at), {
+        addSuffix: true,
+        includeSeconds: true,
+        locale: id,
+      })
+    : null;
+
+  useEffect(() => {
+    if (surat?.ayat_number !== null) {
+      setTimeout(() => {
+        scrollToAyat(parseInt(surat?.ayat_number) + 1);
+      }, 1000);
+    }
+  }, [surat?.ayat_number]);
+
   return (
     <React.Fragment>
       <motion.div
@@ -957,10 +487,12 @@ const VirtualizedListSurah = ({ children }) => {
         }}
       />
 
+      {/*<Button onPress={() => scrollToAyat(200)}>OK</Button>*/}
       <div
         ref={parentRef}
         className="h-[calc(100vh-55px)]"
         style={{
+          overflowAnchor: "none",
           overflow: "auto",
           position: "relative",
           contain: "strict",
@@ -990,6 +522,8 @@ const VirtualizedListSurah = ({ children }) => {
           )}
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const key = items[virtualRow.index];
+            const isFavorite = bookmarks_ayah.some((fav) => fav.id === key);
+            const isLastRead = lastRead?.id === key;
 
             return (
               <div
@@ -1001,11 +535,90 @@ const VirtualizedListSurah = ({ children }) => {
                   top: 0,
                   left: 0,
                   width: "100%",
-                  // transform: `translateY(${virtualRow.start}px)`,
                   transform: `translateY(${virtualRow.start + (children ? 93 : 0)}px)`, // Tambahkan offset untuk children
                 }}
               >
-                <div key={key} className="group relative p-3 border-t">
+                <div
+                  id={"quran" + surat.number + key}
+                  key={key}
+                  className="group relative p-3"
+                >
+                  <div className="absolute flex gap-x-1.5 justify-center w-full -translate-y-7 items-center">
+                    {isLastRead && (
+                      <div
+                        className={cn(
+                          buttonVariants({ variant: "outline" }),
+                          "h-8 px-2 text-xs gap-1",
+                        )}
+                      >
+                        <Bookmark
+                          className={cn(
+                            "fill-blue-500 text-blue-500 dark:text-blue-400 dark:fill-blue-400",
+                          )}
+                        />
+                        {relativeTime}
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute flex gap-x-1.5 justify-end w-full -translate-y-7 items-center right-3">
+                    {isFavorite && (
+                      <Button
+                        onPress={() => toggleBookmark(key)}
+                        aria-label="Menu"
+                        variant="outline"
+                        size="icon"
+                        className={cn("h-8 w-8")}
+                      >
+                        <Star
+                          className={cn(
+                            "fill-orange-500 text-orange-500 dark:text-orange-400 dark:fill-orange-400",
+                          )}
+                        />
+                      </Button>
+                    )}
+                    <MenuTrigger>
+                      <Button
+                        aria-label="Menu"
+                        variant="outline"
+                        size="icon"
+                        className={cn("h-8 w-8")}
+                      >
+                        <Ellipsis />
+                      </Button>
+                      <Popover className=" bg-background p-1 w-44 overflow-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5 entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left">
+                        <div className="px-2 py-1.5 text-sm font-semibold border-b mb-1">
+                          {surat.name_latin} - Ayat {key}{" "}
+                        </div>
+                        <Menu className="outline-none">
+                          <ActionItem
+                            id="new"
+                            onAction={() => toggleBookmark(key)}
+                          >
+                            <Star
+                              className={cn(
+                                "mr-1 size-3",
+                                isFavorite &&
+                                  "fill-orange-500 text-orange-500 dark:text-orange-400 dark:fill-orange-400",
+                              )}
+                            />
+                            Bookmark
+                          </ActionItem>
+                          <ActionItem
+                            id="open"
+                            onAction={() => handleRead(key)}
+                          >
+                            <Bookmark
+                              className={cn(
+                                "mr-1 w-4 h-4",
+                                isLastRead && "fill-blue-500 text-blue-500",
+                              )}
+                            />
+                            Terakhir Baca
+                          </ActionItem>
+                        </Menu>
+                      </Popover>
+                    </MenuTrigger>
+                  </div>
                   <div dir="rtl" className="break-normal pr-2.5">
                     <div
                       className={cn("text-primary my-3 font-lpmq")}
@@ -1016,8 +629,8 @@ const VirtualizedListSurah = ({ children }) => {
                       }}
                     >
                       {surat.text[key]}
-                      <span className="text-4xl inline-flex mx-1">
-                        {toArabicNumber(key)}
+                      <span className="text-4xl inline-flex mx-1 font-uthmani">
+                        {toArabicNumber(Number(key))}
                       </span>{" "}
                     </div>
                   </div>
@@ -1087,7 +700,9 @@ const VirtualizedListSurah = ({ children }) => {
           )}
         </div>
       </div>
-      <GoTopButton container={parentRef} />
+      <ScrollToFirstIndex handler={scrollToFirstAyat} container={parentRef} />
     </React.Fragment>
   );
 };
+
+export default SuratDetail;

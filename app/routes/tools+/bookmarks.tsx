@@ -1,20 +1,11 @@
 import React from "react";
 import { data as daftar_surat } from "#app/constants/daftar-surat.json";
 // Define types for bookmark data
-import {
-  Trash2,
-  ExternalLink,
-  Heart,
-  Ellipsis,
-  Dot,
-  Minus,
-  X,
-  BookOpen,
-} from "lucide-react";
-import { Button } from "#app/components/ui/button";
+import { ExternalLink, Heart, Ellipsis, ChevronLeft } from "lucide-react";
+import { Button, buttonVariants } from "#app/components/ui/button";
 import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { useRouteLoaderData, useNavigate } from "@remix-run/react";
+import { useRouteLoaderData, Link, useNavigate } from "@remix-run/react";
 import { fontSizeOpt } from "#/app/constants/prefs";
 import { cn } from "#app/utils/misc.tsx";
 import { Menu, MenuItem, MenuTrigger, Popover } from "react-aria-components";
@@ -118,21 +109,32 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="prose dark:prose-invert max-w-4xl mx-auto border-x border-b">
-      <div className="p-1.5 flex justify-end">
-        <DisplaySetting opts={opts} />
+    <div className="prose dark:prose-invert max-w-xl mx-auto border-x border-b min-h-screen">
+      <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
+        <div className="flex items-center gap-x-2">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6",
+            )}
+            to="/muslim"
+          >
+            <ChevronLeft />
+          </Link>
+          <span className="text-lg font-semibold">Bookmarks</span>
+        </div>
+
+        <DisplaySetting />
       </div>
       {lastRead && (
         <React.Fragment>
-          <div className="bg-gradient-to-b from-background via-background to-blue-400/50 dark:to-blue-600/50 text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3">
-            Last Read
+          <div className="text-center text-xl font-bold leading-tight tracking-tighter capitalize py-2">
+            Terakhir dibaca
           </div>
           <div>
             <div className="group relative px-4 pb-4 sm:px-5 rounded-md border-t">
               <div className="flex items-center justify-between gap-x-2 pt-2">
-                <div className="font-bold text-lg">
-                  {lastRead.surah_name}:{lastRead.ayah}
-                </div>
+                <div className="font-bold text-lg">{lastRead.title}</div>
 
                 <Button
                   id="goto-last"
@@ -181,14 +183,12 @@ const App: React.FC = () => {
       )}
       <div
         className={cn(
-          "border-b text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize border-t py-3",
-          bookmarks?.length > 3 &&
-            "bg-gradient-to-b from-background via-background to-pink-400/50 dark:to-pink-600/50 ",
+          "text-center text-xl font-bold leading-tight tracking-tighter capitalize py-2 border-y",
         )}
       >
         Bookmarks
       </div>
-      <div>
+      <div className="divide-y">
         {bookmarks?.length > 0 ? (
           bookmarks.map((d, index) => {
             if (
@@ -197,49 +197,57 @@ const App: React.FC = () => {
               d.type === "sholawat"
             ) {
               return (
-                <div
-                  key={index}
-                  className="group relative px-4 pb-4 sm:px-5 rounded-md border-t"
-                >
-                  <div className="flex items-center justify-between gap-x-2 pt-2">
-                    <div className="font-bold text-lg">{d.title}</div>
-
-                    <MenuTrigger>
-                      <Button
-                        aria-label="Menu"
-                        variant="secondary"
-                        size="icon"
-                        className="[&_svg]:size-5 rounded-xl h-9 w-9"
-                      >
-                        <Ellipsis />
-                      </Button>
-                      <Popover
-                        placement="start"
-                        className=" bg-background p-1 w-50 overflow-auto rounded-md shadow-lg border entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left"
-                      >
-                        <Menu className="outline-none">
-                          <ActionItem
-                            id="new"
-                            onAction={() => handleDeleteBookmark(d.created_at)}
-                          >
-                            <Heart className="fill-rose-500 text-rose-500 mr-1.5 w-4 h-4" />
-                            Delete bookmark
-                          </ActionItem>
-                          <ActionItem
-                            id="goto"
-                            onAction={() => navigate(d.source)}
-                          >
-                            <ExternalLink className="mr-1.5 w-4 h-4" />
-                            Go to ayat
-                          </ActionItem>
-                        </Menu>
-                      </Popover>
-                    </MenuTrigger>
+                <div key={index} className="group relative p-3">
+                  <div className="flex items-center justify-between gap-x-2">
+                    <Link
+                      to={d.source}
+                      className={cn(
+                        buttonVariants({ variant: "link" }),
+                        "gap-2 p-0 -mt-2",
+                      )}
+                    >
+                      {d.title}
+                    </Link>
+                    <div className="absolute flex gap-x-1.5 justify-end w-full -translate-y-7 items-center right-3">
+                      <MenuTrigger>
+                        <Button
+                          aria-label="Menu"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                        >
+                          <Ellipsis />
+                        </Button>
+                        <Popover
+                          placement="start"
+                          className=" bg-background p-1 w-50 overflow-auto rounded-md shadow-lg border entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left"
+                        >
+                          <Menu className="outline-none">
+                            <ActionItem
+                              id="new"
+                              onAction={() =>
+                                handleDeleteBookmark(d.created_at)
+                              }
+                            >
+                              <Heart className="fill-rose-500 text-rose-500 mr-1.5 w-4 h-4" />
+                              Delete bookmark
+                            </ActionItem>
+                            <ActionItem
+                              id="goto"
+                              onAction={() => navigate(d.source)}
+                            >
+                              <ExternalLink className="mr-1.5 w-4 h-4" />
+                              Go to ayat
+                            </ActionItem>
+                          </Menu>
+                        </Popover>
+                      </MenuTrigger>
+                    </div>
                   </div>
                   <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
                     <div
                       className={cn(
-                        "relative text-right text-primary my-5 font-lpmq",
+                        "relative text-right text-primary my-3 font-lpmq",
                       )}
                       style={{
                         fontWeight: opts.font_weight,
@@ -261,11 +269,52 @@ const App: React.FC = () => {
                     )}
                     {opts?.font_translation === "on" && (
                       <div
-                        className="translation-text mt-3 prose max-w-none text-accent-foreground italic"
+                        className="translation-text mt-3 prose max-w-none leading-6 text-accent-foreground"
                         dangerouslySetInnerHTML={{
                           __html: d.translation,
                         }}
                       />
+                    )}
+                    {d.tafsir && (
+                      <details className="group [&_summary::-webkit-details-marker]:hidden mt-3">
+                        <summary className="flex cursor-pointer items-center gap-1.5 outline-none">
+                          <div className="group-open:animate-slide-left [animation-fill-mode:backwards] group-open:block hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
+                            Hide Tafsir
+                          </div>
+                          <div className="animate-slide-left group-open:hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
+                            View Tafsir
+                          </div>
+
+                          <svg
+                            className="size-4 shrink-0 transition duration-300 group-open:-rotate-180 text-indigo-600 dark:text-indigo-400 opacity-80"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </summary>
+
+                        <div className="group-open:animate-slide-left group-open:[animation-fill-mode:backwards] group-open:transition-all group-open:duration-300">
+                          <div className="max-w-none prose-lg my-2.5 font-semibold whitespace-pre-wrap text-accent-foreground border-b">
+                            Tafsir {d.title}
+                          </div>
+                          <p className="max-w-none leading-7 prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap">
+                            {d.tafsir.text}
+                          </p>
+                          <div className="text-muted-foreground text-xs prose-xs">
+                            Sumber:
+                            <br />
+                            {d.tafsir.source}
+                          </div>
+                        </div>
+                      </details>
                     )}
                   </div>
                 </div>
@@ -288,7 +337,7 @@ function ActionItem(props: MenuItemProps) {
   return (
     <MenuItem
       {...props}
-      className="bg-background relative flex gap-1.5 select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50  [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0"
+      className="bg-background relative flex gap-1 select-none items-center rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50  [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-sm"
     />
   );
 }

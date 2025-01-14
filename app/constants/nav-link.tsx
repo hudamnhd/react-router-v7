@@ -1,24 +1,37 @@
 import {
   Book,
+  BookOpen,
+  Circle,
   Activity,
   Heart,
-  Star,
   Bookmark,
   Sun,
   List,
   Calculator,
   Timer,
   Repeat,
-  Info,
+  Star,
   Puzzle,
+  type LucideProps,
 } from "lucide-react";
+import React from "react";
 
-const muslimLinks: {
+export type Links = {
   title: string;
   href: string;
   description: string;
-  icon: SVGSVGElement;
-}[] = [
+  icon: React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >;
+};
+
+const muslimLinks: Links[] = [
+  {
+    title: "Bookmarks",
+    href: "/tools/bookmarks",
+    description: "List Bookmark ayah, doa and anymore.",
+    icon: Star,
+  },
   {
     title: "Al Qur'an",
     href: "/muslim/quran",
@@ -31,13 +44,6 @@ const muslimLinks: {
     description: "Game susun kata setiap ayat quran",
     icon: Puzzle,
   },
-
-  // {
-  //   title: "Bookmarks",
-  //   href: "/tools/bookmarks",
-  //   description: "List Bookmark ayah, doa and anymore.",
-  //   icon: Heart,
-  // },
   {
     title: "Sholawat",
     href: "/muslim/sholawat",
@@ -48,13 +54,13 @@ const muslimLinks: {
     title: "Dzikir",
     href: "/muslim/dzikir",
     description: "Hiasi hari dengan dzikir dan ingat Allah selalu.",
-    icon: Star,
+    icon: BookOpen,
   },
   {
     title: "Tahlil",
     href: "/muslim/tahlil",
     description: "Doakan yang tercinta dengan tahlil penuh makna.",
-    icon: Bookmark,
+    icon: Circle,
   },
   {
     title: "Kumpulan Do'a",
@@ -70,12 +76,7 @@ const muslimLinks: {
   },
 ];
 
-const toolsLinks: {
-  title: string;
-  href: string;
-  description: string;
-  icon: SVGSVGElement;
-}[] = [
+const toolsLinks: Links[] = [
   {
     title: "Kalkulator",
     href: "/tools/calculator",
