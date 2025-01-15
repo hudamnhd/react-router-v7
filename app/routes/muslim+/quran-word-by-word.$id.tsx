@@ -1,4 +1,5 @@
 import { motion, useSpring, useScroll } from "framer-motion";
+import { ScrollToFirstIndex } from "#app/components/custom/scroll-to-top.tsx";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { cn } from "#app/utils/misc.tsx";
 import { Link, useLoaderData } from "@remix-run/react";
@@ -131,7 +132,7 @@ export default function RouteX() {
       </div>
 
       <VirtualizedListSurah>
-        <div className="text-3xl font-semibold w-fit mx-auto text-primary pb-3 pt-2">
+        <div className="text-3xl font-semibold w-fit mx-auto text-primary pt-2">
           {surat?.name_id}
           <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq-2 text-2xl">
             ( {surat?.name_short} )
@@ -204,6 +205,12 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
     restDelta: 0.001,
   });
 
+  const scrollToFirstAyat = () => {
+    rowVirtualizer.scrollToIndex(0, {
+      align: "center",
+    });
+  };
+
   return (
     <React.Fragment>
       <motion.div
@@ -265,7 +272,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                   left: 0,
                   width: "100%",
                   // transform: `translateY(${virtualRow.start}px)`,
-                  transform: `translateY(${virtualRow.start + (children ? 93 : 0)}px)`, // Tambahkan offset untuk children
+                  transform: `translateY(${virtualRow.start + (children ? 70 : 0)}px)`, // Tambahkan offset untuk children
                 }}
               >
                 <PuzzleGame
@@ -293,7 +300,8 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
           )}
         </div>
       </div>
-      <GoTopButton container={parentRef} />
+
+      <ScrollToFirstIndex handler={scrollToFirstAyat} container={parentRef} />
     </React.Fragment>
   );
 };
@@ -409,7 +417,7 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
     <div
       dir="rtl"
       className={cn(
-        " transition-all duration-300 relative flex flex-col items-start gap-2 animate-slide-top [animation-fill-mode:backwards] group relative py-3 pr-4 pl-2 border-t",
+        " transition-all duration-300 relative flex flex-col items-start gap-2 animate-slide-top [animation-fill-mode:backwards] group relative py-3 pr-4 pl-2",
         isCorrect && "bg-muted/30",
         isCorrect === false && "bg-destructive/5",
       )}
@@ -557,47 +565,4 @@ const toArabicNumber = (number: number) => {
     .split("")
     .map((digit) => arabicDigits[parseInt(digit)])
     .join("");
-};
-
-const GoTopButton = ({
-  container,
-}: { container: React.RefObject<HTMLDivElement> | null }) => {
-  const [showGoTop, setShowGoTop] = useState(false);
-
-  const handleVisibleButton = () => {
-    if (container?.current) {
-      const shouldShow = container.current.scrollTop > 50;
-      if (shouldShow !== showGoTop) {
-        setShowGoTop(shouldShow);
-      }
-    }
-  };
-
-  const handleScrollUp = () => {
-    container?.current?.scrollTo({ left: 0, top: 0, behavior: "smooth" });
-  };
-
-  React.useEffect(() => {
-    const currentContainer = container?.current;
-    if (!currentContainer) return;
-
-    currentContainer.addEventListener("scroll", handleVisibleButton);
-
-    return () => {
-      currentContainer.removeEventListener("scroll", handleVisibleButton);
-    };
-  }, [container, showGoTop]); // Dependency array dengan `showGoTop`
-
-  return (
-    <div
-      className={cn(
-        "sticky inset-x-0 ml-auto w-fit -translate-x-3 z-[60] bottom-0 -mt-11",
-        !showGoTop && "hidden",
-      )}
-    >
-      <Button onPress={handleScrollUp} variant="default" size="icon">
-        <ArrowUp />
-      </Button>
-    </div>
-  );
 };

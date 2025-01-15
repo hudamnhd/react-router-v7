@@ -150,7 +150,7 @@ export default function Index() {
         <Link
           className={cn(
             buttonVariants({ variant: "ghost" }),
-            "text-muted-foreground gap-1 uppercase",
+            "text-muted-foreground gap-1 uppercase text-xs [&_svg]:size-3",
           )}
           to="/about"
         >

@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, buttonVariants } from "#app/components/ui/button";
+import { ScrollToFirstIndex } from "#app/components/custom/scroll-to-top.tsx";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
 import { Badge } from "#app/components/ui/badge";
@@ -44,6 +45,12 @@ function App() {
     getScrollElement: () => parentRef.current, // Elemen tempat scrolling
     estimateSize: () => 35,
   });
+
+  const scrollToFirstAyat = () => {
+    rowVirtualizer.scrollToIndex(0, {
+      align: "center",
+    });
+  };
   return (
     <div className="w-full max-w-xl mx-auto border-x">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
@@ -69,7 +76,7 @@ function App() {
         style={{
           overflow: "auto",
         }}
-        className="h-[calc(100vh-57px)] prose dark:prose-invert max-w-4xl mx-auto border-x"
+        className="h-[calc(100vh-57px)] prose dark:prose-invert max-w-4xl mx-auto"
       >
         <div className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] capitalize py-3">
           Do'a Sehari-hari
@@ -108,11 +115,7 @@ function App() {
                   }}
                 >
                   <div className="border-t" key={dt.id}>
-                    <div
-                      className={cn(
-                        "group relative py-4 px-4 sm:px-5 md:border-t",
-                      )}
-                    >
+                    <div className={cn("group relative py-4 px-4 sm:px-5")}>
                       <div className="w-full text-right flex gap-x-2.5 items-center justify-between">
                         <div className="flex items-center gap-x-3">
                           <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/20 dark:to-teal-500/20 p-3 rounded-xl">
@@ -187,6 +190,7 @@ function App() {
           </div>
         </div>
       </div>
+      <ScrollToFirstIndex handler={scrollToFirstAyat} container={parentRef} />
     </div>
   );
 }

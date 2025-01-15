@@ -39,12 +39,6 @@ const muslimLinks: Links[] = [
     icon: Book,
   },
   {
-    title: "Game Al Qur'an",
-    href: "/muslim/quran-word-by-word",
-    description: "Game susun kata setiap ayat quran",
-    icon: Puzzle,
-  },
-  {
     title: "Sholawat",
     href: "/muslim/sholawat",
     description: "Dekatkan diri dengan Rasulullah melalui sholawat.",
@@ -73,6 +67,12 @@ const muslimLinks: Links[] = [
     href: "/muslim/doa-sehari-hari",
     description: "Awali hari dengan doa untuk keberkahan hidup.",
     icon: Activity,
+  },
+  {
+    title: "Game Al Qur'an",
+    href: "/muslim/quran-word-by-word",
+    description: "Game susun kata setiap ayat quran",
+    icon: Puzzle,
   },
 ];
 

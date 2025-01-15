@@ -58,7 +58,7 @@
     --chart-5: 340 75% 55%;
   }
 
-  * {
+  /** {
     scrollbar-width: auto;
   }
 
@@ -79,6 +79,7 @@
   *::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--primary));
   }
+*/
 }
 
 * {
@@ -184,4 +185,24 @@ code {
 
 .tab-content[data-state="active"] {
   display: block; /* Tampilkan hanya konten tab yang aktif */
+}
+
+@keyframes bounceLeftRight {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+.bounce-left-right {
+  animation: bounceLeftRight 2s ease-in-out infinite;
 }

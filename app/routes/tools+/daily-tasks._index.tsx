@@ -3058,6 +3058,7 @@ const DragDropList: React.FC = ({ data, tasks: _tasks, date, active_task }) => {
       const dragImage = document.createElement("div");
 
       const isDarkMode = document.documentElement.classList.contains("dark");
+      const client_width = event.currentTarget.clientWidth + 25 + "px";
 
       // Atur warna berdasarkan tema
       if (isDarkMode) {
@@ -3069,7 +3070,7 @@ const DragDropList: React.FC = ({ data, tasks: _tasks, date, active_task }) => {
         dragImage.style.border = "1px solid black";
         dragImage.style.color = "black"; // Warna teks jika ada
       }
-      dragImage.style.width = "732px";
+      dragImage.style.width = client_width;
       dragImage.style.paddingBottom = "2px"; // Hanya padding bawah
       dragImage.style.paddingTop = "10px"; // Pastikan padding lainnya diatur sesuai kebutuhan
       dragImage.style.paddingLeft = "10px";
@@ -3200,6 +3201,7 @@ const DragDropListSubTask: React.FC = ({
 
       const isDarkMode = document.documentElement.classList.contains("dark");
 
+      const client_width = event.currentTarget.clientWidth + 25 + "px";
       // Atur warna berdasarkan tema
       if (isDarkMode) {
         dragImage.style.backgroundColor = "black";
@@ -3210,7 +3212,7 @@ const DragDropListSubTask: React.FC = ({
         dragImage.style.border = "1px solid black";
         dragImage.style.color = "black"; // Warna teks jika ada
       }
-      dragImage.style.width = "732px";
+      dragImage.style.width = client_width;
       dragImage.style.paddingBottom = "2px"; // Hanya padding bawah
       dragImage.style.paddingTop = "10px"; // Pastikan padding lainnya diatur sesuai kebutuhan
       dragImage.style.paddingLeft = "10px";

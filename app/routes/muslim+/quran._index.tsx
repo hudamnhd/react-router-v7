@@ -1,4 +1,5 @@
 import { Button, buttonVariants } from "#app/components/ui/button";
+import { Badge } from "#app/components/ui/badge";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { motion, useSpring, useScroll } from "framer-motion";
 import { cn } from "#app/utils/misc.tsx";
@@ -6,7 +7,9 @@ import Fuse from "fuse.js";
 import {
   Search as SearchIcon,
   ChevronLeft,
-  ChevronDown,
+  Puzzle,
+  MoveRight,
+  Bookmark,
   Check,
 } from "lucide-react";
 import { useLoaderData, Link } from "@remix-run/react";
@@ -88,7 +91,7 @@ import {
 } from "#app/components/ui/select";
 
 function SurahView() {
-  const { id, surat, juz_amma } = useLoaderData();
+  const { id, surat, juz_amma } = useLoaderData<typeof loader>();
   const [input, setInput] = useState("");
   const [query, setQuery] = useState("");
 
@@ -112,14 +115,15 @@ function SurahView() {
   const data_placeholder =
     version === "all" ? "Cari Surat.." : "Cari Surat Juz Amma..";
 
+  const selectedIds = ["67", "36", "75", "18", "48", "55"]; // Daftar ID yang ingin ditampilkan
   return (
-    <div className="max-w-xl mx-auto border-x">
+    <div className="max-w-xl mx-auto border-x h-screen">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
         <div className="flex items-center gap-x-2">
           <Link
             className={cn(
               buttonVariants({ size: "icon", variant: "outline" }),
-              "prose-none [&_svg]:size-6",
+              "prose-none [&_svg]:size-6 mr-0.5",
             )}
             to="/muslim"
           >
@@ -127,18 +131,18 @@ function SurahView() {
           </Link>
           <Select
             aria-label="Select Type List"
-            className="text-lg font-semibold min-w-[140px]"
+            className="text-lg font-semibold min-w-[120px]"
             placeholder="Daftar Surat"
             selectedKey={version}
             onSelectionChange={(selected) => setVersion(selected)}
           >
-            <SelectTrigger className="data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px] underline underline-offset-4">
+            <SelectTrigger className="data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px] underline underline-offset-4">
               <SelectValue className="text-lg font-semibold" />
             </SelectTrigger>
             <SelectPopover>
               <SelectListBox>
-                <SelectItem id="all" textValue="Daftar Surat">
-                  Daftar Surat
+                <SelectItem id="all" textValue="Al-Quran">
+                  Al-Quran
                 </SelectItem>
                 <SelectItem id="j30" textValue="Jus Amma">
                   Jus Amma
@@ -152,10 +156,12 @@ function SurahView() {
           <DisplaySetting themeSwitchOnly={true} />
         </div>
       </div>
+      <LastRead />
+
       <div className="relative">
         <input
           id="input-26"
-          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full px-3 py-6 bg-background"
+          className="h-10 peer pe-9 ps-9 outline-none focus-visible:ring-0 focus-visible:ring-none border-b rounded-t-lg w-full text-sm p-3 bg-background"
           placeholder={data_placeholder}
           type="search"
           value={input}
@@ -172,6 +178,46 @@ function SurahView() {
         </div>
       </div>
 
+      <div className="px-1.5 mt-1.5 border-b pb-1.5">
+        <div className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+          Surat Favorit
+        </div>
+
+        <div className="grid grid-cols-3 gap-1.5 mt-1">
+          {surat
+            .filter((navItem) => selectedIds.includes(navItem.number))
+            .map((item) => {
+              const to = `/muslim/quran/${item.number}`;
+              return (
+                <Link
+                  key={item.number}
+                  to={to}
+                  className="col-span-1 flex shadow-sm rounded-md hover:bg-accent"
+                >
+                  <div className="flex-1 flex items-center justify-between border  rounded-md truncate">
+                    <div className="flex-1 px-2.5 py-2 text-sm truncate">
+                      <Link
+                        to="/muslim"
+                        className="font-semibold hover:text-muted-foreground cursor-pointer"
+                      >
+                        <span className="font-semibold">
+                          {item.name_id}
+                        </span>{" "}
+                      </Link>
+                      <p className="text-muted-foreground line-clamp-1">
+                        {item.translation_id}
+
+                        <span className="sm:inline-flex hidden ml-1 text-xs">
+                          - <span>{item.number_of_verses} ayat</span>
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+        </div>
+      </div>
       <SearchHandler
         data={data_surat}
         searchKey={["name_id", "number", "translation_id"]}
@@ -181,13 +227,20 @@ function SurahView() {
             return <VirtualizedListSurah items={filteredData} id={id} />;
           } else {
             return (
-              <div className="py-6 text-center text-sm h-[calc(100vh-105px)] flex items-center justify-center">
+              <div className="py-6 text-center text-sm h-[calc(100vh-300px)] border-b flex items-center justify-center">
                 No results found.
               </div>
             );
           }
         }}
       />
+      <Link
+        to="/muslim/quran-word-by-word"
+        className="p-3 border-t flex items-center justify-center gap-x-2 bg-secondary text-sm [&_svg]:size-4 font-medium"
+      >
+        <Puzzle /> Susun Ayat{" "}
+        <Badge className="bg-lime-400 text-black">New</Badge>
+      </Link>
     </div>
   );
 }
@@ -228,7 +281,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
       />
       <div
         ref={parentRef}
-        className="h-[calc(100vh-105px)] pb-3"
+        className="h-[calc(100vh-344px)] border-b"
         style={{
           overflow: "auto",
         }}
@@ -259,7 +312,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
                 <Link
                   to={to}
                   className={cn(
-                    "relative flex cursor-pointer select-none items-start px-3 py-2.5 sm:py-1.5 outline-none hover:bg-accent hover:text-accent-foreground sm:text-base text-sm",
+                    "relative flex cursor-pointer select-none items-start px-3 py-2 outline-none hover:bg-accent hover:text-accent-foreground text-sm",
                   )}
                 >
                   {item.number}.
@@ -358,3 +411,33 @@ function ShippingOption({ name, time, price }) {
     </Radio>
   );
 }
+
+import { get_cache, set_cache } from "#app/utils/cache-client.ts";
+const LASTREAD_KEY = "LASTREAD";
+
+const LastRead = () => {
+  const [lastRead, setLastRead] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const load_bookmark_from_lf = async () => {
+      const storedLastRead = await get_cache(LASTREAD_KEY);
+      if (storedLastRead !== null) {
+        setLastRead(storedLastRead);
+      }
+    };
+
+    load_bookmark_from_lf();
+  }, []);
+
+  if (!lastRead) return null;
+
+  return (
+    <Link
+      to={lastRead.source}
+      className="p-3 border-b flex items-center gap-x-3 bg-muted"
+    >
+      <p className="text-sm">Lanjutkan Membaca {lastRead.title} </p>
+      <MoveRight className={cn("h-4 w-4 bounce-left-right opacity-80")} />
+    </Link>
+  );
+};

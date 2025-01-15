@@ -1,4 +1,5 @@
 import { DisplaySetting } from "#app/routes/resources+/prefs";
+import { ScrollToFirstIndex } from "#app/components/custom/scroll-to-top.tsx";
 import { Heart, ArrowUp, ChevronLeft } from "lucide-react";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import { ClientOnly } from "remix-utils/client-only";
@@ -175,6 +176,12 @@ const DoaView = ({ items, children }) => {
     restDelta: 0.001,
   });
 
+  const scrollToFirstAyat = () => {
+    rowVirtualizer.scrollToIndex(0, {
+      align: "center",
+    });
+  };
+
   return (
     <React.Fragment>
       <motion.div
@@ -292,7 +299,7 @@ const DoaView = ({ items, children }) => {
         </div>
       </div>
 
-      <GoTopButton container={parentRef} />
+      <ScrollToFirstIndex handler={scrollToFirstAyat} container={parentRef} />
     </React.Fragment>
   );
 };
