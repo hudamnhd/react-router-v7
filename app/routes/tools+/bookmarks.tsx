@@ -1,7 +1,11 @@
 import React from "react";
-import { data as daftar_surat } from "#app/constants/daftar-surat.json";
-// Define types for bookmark data
-import { ExternalLink, Heart, Ellipsis, ChevronLeft } from "lucide-react";
+import {
+  ExternalLink,
+  Heart,
+  Ellipsis,
+  ChevronLeft,
+  MoveRight,
+} from "lucide-react";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import { save_bookmarks, type Bookmark } from "#app/utils/bookmarks";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
@@ -126,64 +130,9 @@ const App: React.FC = () => {
 
         <DisplaySetting />
       </div>
-      {lastRead && (
-        <React.Fragment>
-          <div className="text-center text-xl font-bold leading-tight tracking-tighter capitalize py-2">
-            Terakhir dibaca
-          </div>
-          <div>
-            <div className="group relativel p-3 border-t">
-              <div className="flex items-center justify-between gap-x-2">
-                <Link
-                  to={lastRead.source}
-                  className={cn(
-                    buttonVariants({ variant: "link" }),
-                    "gap-2 p-0 -mt-2",
-                  )}
-                >
-                  {lastRead.title}
-                </Link>
-                <div className="absolute flex gap-x-1.5 justify-end w-full -translate-y-7 items-center right-3"></div>
-              </div>
-              <div className="w-full text-right flex gap-x-2.5 items-start justify-end">
-                <div
-                  className={cn(
-                    "relative text-right text-primary my-5 font-lpmq",
-                  )}
-                  style={{
-                    fontWeight: opts.font_weight,
-                    fontSize: font_size_opts?.fontSize || "1.5rem",
-                    lineHeight: font_size_opts?.lineHeight || "3.5rem",
-                  }}
-                >
-                  {lastRead.arab}
-                </div>
-              </div>
-              <div className="">
-                {opts?.font_latin === "on" && (
-                  <div
-                    className="latin-text prose max-w-none text-muted-foreground"
-                    dangerouslySetInnerHTML={{
-                      __html: lastRead.latin,
-                    }}
-                  />
-                )}
-                {opts?.font_translation === "on" && (
-                  <div
-                    className="translation-text mt-3 prose max-w-none text-accent-foreground italic"
-                    dangerouslySetInnerHTML={{
-                      __html: lastRead.text,
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </React.Fragment>
-      )}
       <div
         className={cn(
-          "text-center text-xl font-bold leading-tight tracking-tighter capitalize py-2 border-y",
+          "text-center text-3xl font-bold leading-tight tracking-tighter capitalize py-2 border-b",
         )}
       >
         Bookmarks
@@ -203,7 +152,7 @@ const App: React.FC = () => {
                       to={d.source}
                       className={cn(
                         buttonVariants({ variant: "link" }),
-                        "gap-2 p-0 -mt-2",
+                        "gap-2 p-0 -mt-2 text-lg",
                       )}
                     >
                       {d.title}
@@ -259,17 +208,17 @@ const App: React.FC = () => {
                     </div>
                   </div>
                   <div className="">
-                    {opts?.font_latin === "on" && (
+                    {opts?.font_latin === "on" && d.latin && (
                       <div
-                        className="latin-text prose max-w-none text-muted-foreground"
+                        className="latin-text prose prose dark:prose-invert max-w-none leading-6"
                         dangerouslySetInnerHTML={{
                           __html: d.latin,
                         }}
                       />
                     )}
-                    {opts?.font_translation === "on" && (
+                    {opts?.font_translation === "on" && d.translation && (
                       <div
-                        className="translation-text mt-3 prose max-w-none leading-6 text-accent-foreground"
+                        className="translation-text mt-3 prose prose dark:prose-invert max-w-none leading-6"
                         dangerouslySetInnerHTML={{
                           __html: d.translation,
                         }}

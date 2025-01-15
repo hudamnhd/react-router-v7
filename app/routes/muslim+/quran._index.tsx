@@ -3,7 +3,7 @@ import { Badge } from "#app/components/ui/badge";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { motion, useSpring, useScroll } from "framer-motion";
 import { cn } from "#app/utils/misc.tsx";
-import Fuse from "fuse.js";
+import Fuse, { FuseOptionKey, FuseResult } from "fuse.js";
 import {
   Search as SearchIcon,
   ChevronLeft,
@@ -57,9 +57,13 @@ import lodash from "lodash";
 
 interface SearchProps<T> {
   data: T[];
-  searchKey: keyof T;
+  searchKey: FuseOptionKey<T>[] | undefined;
   query: string;
-  render: (filteredData: T[]) => JSX.Element;
+  render: (
+    filteredData: {
+      item: T;
+    }[],
+  ) => JSX.Element;
 }
 
 function SearchHandler<T>({ data, searchKey, query, render }: SearchProps<T>) {
@@ -134,9 +138,9 @@ function SurahView() {
             className="text-lg font-semibold min-w-[120px]"
             placeholder="Daftar Surat"
             selectedKey={version}
-            onSelectionChange={(selected) => setVersion(selected)}
+            onSelectionChange={(selected) => setVersion(selected as string)}
           >
-            <SelectTrigger className="data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px] underline underline-offset-4">
+            <SelectTrigger className="data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px]">
               <SelectValue className="text-lg font-semibold" />
             </SelectTrigger>
             <SelectPopover>
@@ -224,10 +228,10 @@ function SurahView() {
         query={query}
         render={(filteredData) => {
           if (filteredData.length > 0) {
-            return <VirtualizedListSurah items={filteredData} id={id} />;
+            return <VirtualizedListSurah items={filteredData} />;
           } else {
             return (
-              <div className="py-6 text-center text-sm h-[calc(100vh-300px)] border-b flex items-center justify-center">
+              <div className="py-6 text-center text-sm h-[calc(100vh-341px)] border-b flex items-center justify-center">
                 No results found.
               </div>
             );
@@ -236,7 +240,7 @@ function SurahView() {
       />
       <Link
         to="/muslim/quran-word-by-word"
-        className="p-3 border-t flex items-center justify-center gap-x-2 bg-secondary text-sm [&_svg]:size-4 font-medium"
+        className="p-3 flex items-center justify-center gap-x-2 bg-secondary text-sm [&_svg]:size-4 font-medium"
       >
         <Puzzle /> Susun Ayat{" "}
         <Badge className="bg-lime-400 text-black">New</Badge>
@@ -281,7 +285,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
       />
       <div
         ref={parentRef}
-        className="h-[calc(100vh-344px)] border-b"
+        className="h-[calc(100vh-341px)] border-b"
         style={{
           overflow: "auto",
         }}

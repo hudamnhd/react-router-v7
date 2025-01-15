@@ -1478,7 +1478,7 @@ const CalendarMonth = ({ total_sessions }) => {
             );
           })}
         </div>
-        <div className="sm:inline-flex hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
+        <div className="sm:block hidden w-full max-w-[240px] rounded bg-gray-50 p-5 dark:bg-gray-800">
           <div className="">Perisai fokus</div>
           <hr className="my-3" />
           <FocusList />

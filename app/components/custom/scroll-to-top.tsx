@@ -49,9 +49,11 @@ export const ScrollTopButton = ({
 export const ScrollToFirstIndex = ({
   handler,
   container,
+  className,
 }: {
   handler: () => void;
   container: React.RefObject<HTMLDivElement> | null;
+  className?: string;
 }) => {
   const [showGoTop, setShowGoTop] = React.useState(false);
 
@@ -84,6 +86,7 @@ export const ScrollToFirstIndex = ({
       className={cn(
         "sticky inset-x-0 ml-auto w-fit -translate-x-5 z-[60] bottom-0 -mt-11",
         !showGoTop && "hidden",
+        className,
       )}
     >
       <Button onPress={handleScrollUp} variant="default" size="icon">

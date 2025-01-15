@@ -1,83 +1,115 @@
-import * as React from 'react'
-
-import * as ReactAria from 'react-aria-components'
+import * as React from "react";
 
 import { cn } from "#app/utils/misc.tsx";
-import { type ButtonProps } from './button'
-import { Input, type InputProps } from './input'
+import { Button } from "./button";
+import { FieldError, FieldGroup, Label } from "./field";
 
-export const NumberField = ({
-  className,
-  ...props
-}: ReactAria.NumberFieldProps) => {
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+import {
+  ButtonProps as AriaButtonProps,
+  Input as AriaInput,
+  InputProps as AriaInputProps,
+  NumberField as AriaNumberField,
+  NumberFieldProps as AriaNumberFieldProps,
+  ValidationResult as AriaValidationResult,
+  composeRenderProps,
+  Text,
+} from "react-aria-components";
+
+const NumberField = AriaNumberField;
+
+function NumberFieldInput({ className, ...props }: AriaInputProps) {
   return (
-    <ReactAria.NumberField className={cn('w-full', className)} {...props} />
-  )
+    <AriaInput
+      className={composeRenderProps(className, (className) =>
+        cn(
+          "w-fit min-w-0 flex-1 border-r border-transparent bg-background pr-2 outline outline-0 placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden",
+          className,
+        ),
+      )}
+      {...props}
+    />
+  );
 }
 
-export const NumberInputGroup = (props: ReactAria.GroupProps) => {
-  return <ReactAria.Group {...props} />
-}
-
-export const NumberInputStepper = ({
+function NumberFieldSteppers({
   className,
   ...props
-}: React.HTMLAttributes<HTMLElement>) => {
+}: React.ComponentProps<"div">) {
   return (
     <div
       className={cn(
-        'absolute right-0 top-0 z-10 m-px flex h-[calc(100%-2px)] w-6 flex-col',
+        "absolute right-0 flex h-full flex-col border-l",
         className,
       )}
       {...props}
+    >
+      <NumberFieldStepper slot="increment">
+        <ChevronUp aria-hidden className="size-4" />
+      </NumberFieldStepper>
+      <div className="border-b" />
+      <NumberFieldStepper slot="decrement">
+        <ChevronDown aria-hidden className="size-4" />
+      </NumberFieldStepper>
+    </div>
+  );
+}
+
+function NumberFieldStepper({ className, ...props }: AriaButtonProps) {
+  return (
+    <Button
+      className={composeRenderProps(className, (className) =>
+        cn("w-auto grow rounded-none px-0.5 text-muted-foreground", className),
+      )}
+      variant={"ghost"}
+      size={"icon"}
+      {...props}
     />
-  )
+  );
 }
 
-export const NumberInput = ({ className, ...props }: InputProps) => {
-  return <Input className={cn('pr-6', className)} {...props} />
+interface JollyNumberFieldProps extends AriaNumberFieldProps {
+  label?: string;
+  description?: string;
+  errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
-export const NumberIncrementStepper = ({
+function JollyNumberField({
+  label,
+  description,
+  errorMessage,
   className,
   ...props
-}: ButtonProps) => {
+}: JollyNumberFieldProps) {
   return (
-    <ReactAria.Button
-      slot="increment"
-      className={cn(
-        [
-          'flex flex-1 select-none items-center justify-center rounded-tr-md border-l border-gray-300 leading-none text-black transition-colors duration-100 dark:border-slate-700 dark:text-white',
-          // Pressed
-          'pressed:bg-slate-100 dark:pressed:bg-slate-700',
-          // Disabled
-          'disabled:opacity-40 disabled:cursor-not-allowed',
-        ],
-        className,
+    <NumberField
+      className={composeRenderProps(className, (className) =>
+        cn("group flex flex-col gap-2", className),
       )}
       {...props}
-    />
-  )
+    >
+      <Label>{label}</Label>
+      <FieldGroup>
+        <NumberFieldInput />
+        <NumberFieldSteppers />
+      </FieldGroup>
+      {description && (
+        <Text className="text-sm text-muted-foreground" slot="description">
+          {description}
+        </Text>
+      )}
+      <FieldError>{errorMessage}</FieldError>
+    </NumberField>
+  );
 }
 
-export const NumberDecrementStepper = ({
-  className,
-  ...props
-}: ButtonProps) => {
-  return (
-    <ReactAria.Button
-      slot="decrement"
-      className={cn(
-        [
-          'flex flex-1 select-none items-center justify-center rounded-br-md border-l border-t border-gray-300 leading-none text-black transition-colors duration-100 dark:border-slate-700 dark:text-white',
-          // Pressed
-          'pressed:bg-slate-100 dark:pressed:bg-slate-700',
-          // Disabled
-          'disabled:opacity-40 disabled:cursor-not-allowed',
-        ],
-        className,
-      )}
-      {...props}
-    />
-  )
-}
+export {
+  NumberField,
+  NumberFieldInput,
+  NumberFieldSteppers,
+  NumberFieldStepper,
+  JollyNumberField,
+};
+
+export type { JollyNumberFieldProps };

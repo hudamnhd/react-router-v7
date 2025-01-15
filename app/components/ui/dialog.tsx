@@ -75,7 +75,7 @@ interface DialogContentProps
 
 const baseDialog = cn(
   "fixed bottom-0 sm:bottom-auto sm:top-[50%] sm:left-[50%] ",
-  "sm:translate-x-[-50%] sm:translate-y-[-50%] w-full sm:max-w-lg sm:w-full ",
+  "sm:translate-x-[-50%] sm:translate-y-[-50%] translate-y-[0%] w-full sm:max-w-lg sm:w-full ",
   "z-50 ",
   "border p-5 ",
   "bg-background shadow-lg ",

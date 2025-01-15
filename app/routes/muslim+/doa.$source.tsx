@@ -135,6 +135,7 @@ const DoaView = ({ items, children }) => {
         title: doa.judul,
         arab: doa.arab,
         latin: null,
+        tafsir: null,
         translation: doa.indo,
         source: `/muslim/doa?index=${doa.index}&source=${doa.source}`,
       },
@@ -196,110 +197,120 @@ const DoaView = ({ items, children }) => {
           originX: 0,
         }}
       />
-      <div ref={parentRef} className="h-[calc(100vh-55px)] overflow-y-auto">
-        <div>
-          <div
-            className="space-y-0.5 py-2"
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: "relative",
-            }}
-          >
-            {children && (
+      <div
+        ref={parentRef}
+        className="h-[calc(100vh-55px)]"
+        style={{
+          overflowAnchor: "none",
+          overflow: "auto",
+          position: "relative",
+          contain: "strict",
+        }}
+      >
+        <div
+          className="py-2"
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {children && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                transform: `translateY(0px)`,
+                paddingBottom: "1px",
+              }}
+            >
+              {children}
+            </div>
+          )}
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const d = items[virtualRow.index];
+            const doa = {
+              ...d,
+              index: virtualRow.index.toString(),
+            };
+
+            const _source = `/muslim/doa?index=${doa.index}&source=${doa.source}`;
+
+            const isFavorite = bookmarks_ayah.some(
+              (fav) => fav.source === _source,
+            );
+            return (
               <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
                 style={{
                   position: "absolute",
                   top: 0,
                   left: 0,
                   width: "100%",
-                  transform: `translateY(0px)`,
-                  paddingBottom: "1px",
+                  transform: `translateY(${virtualRow.start + (children ? 79 : 0)}px)`, // Tambahkan offset untuk children
                 }}
               >
-                {children}
-              </div>
-            )}
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const d = items[virtualRow.index];
-              const doa = {
-                ...d,
-                index: virtualRow.index.toString(),
-              };
+                <div key={virtualRow.index} className="w-full border-b pb-5">
+                  <div className="group relative w-full">
+                    <div
+                      className={cn(
+                        "flex items-center justify-between gap-x-2 mb-2 border-b py-2.5 px-4 bg-gradient-to-br from-muted/20 to-accent/20",
+                        isFavorite &&
+                          "from-primary/10 to-secondary/10 dark:from-primary/20 dark:to-secondary/20",
+                      )}
+                    >
+                      <div className="text-primary font-medium text-lg line-clamp-1">
+                        {doa.judul}
+                      </div>
 
-              const _source = `/muslim/doa?index=${doa.index}&source=${doa.source}`;
-
-              const isFavorite = bookmarks_ayah.some(
-                (fav) => fav.source === _source,
-              );
-              return (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  ref={rowVirtualizer.measureElement}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    transform: `translateY(${virtualRow.start + (children ? 81 : 0)}px)`, // Tambahkan offset untuk children
-                  }}
-                >
-                  <div key={virtualRow.index} className="w-full border-b pb-5">
-                    <div className="group relative w-full">
-                      <div
+                      <button
+                        onClick={() => toggleBookmark(doa)}
                         className={cn(
-                          "flex items-center justify-between gap-x-2 mb-2 border-b py-2.5 px-4 bg-gradient-to-br from-muted/20 to-accent/20",
+                          "flex-none  bg-gradient-to-br from-muted to-accent size-9 [&_svg]:size-5 inline-flex gap-2 items-center justify-center rounded-lg",
                           isFavorite &&
-                            "from-primary/10 to-secondary/10 dark:from-primary/20 dark:to-secondary/20",
+                            "from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20",
                         )}
                       >
-                        <div className="text-primary font-medium text-lg line-clamp-1">
-                          {doa.judul}
-                        </div>
-
-                        <button
-                          onClick={() => toggleBookmark(doa)}
+                        <Heart
                           className={cn(
-                            "order-0 sm:order-1 bg-gradient-to-br from-muted to-accent size-9 [&_svg]:size-5 inline-flex gap-2 items-center justify-center rounded-lg",
-                            isFavorite &&
-                              "from-rose-500/10 to-pink-500/10 dark:from-rose-500/20 dark:to-pink-500/20",
+                            "text-muted-foreground",
+                            isFavorite && "text-rose-600 dark:text-rose-400",
                           )}
-                        >
-                          <Heart
-                            className={cn(
-                              "text-muted-foreground",
-                              isFavorite && "text-rose-600 dark:text-rose-400",
-                            )}
-                          />
-                        </button>
-                      </div>
+                        />
+                      </button>
+                    </div>
 
-                      <div className="w-full px-4 text-right flex gap-x-2.5 items-start justify-end">
-                        <p
-                          className="relative mt-2 font-lpmq text-right text-primary"
-                          dangerouslySetInnerHTML={{
-                            __html: doa.arab,
-                          }}
-                        />
-                      </div>
-                      <div className="mt-3 space-y-3 px-4">
-                        <div
-                          className="translation-text prose leading-6  max-w-none text-muted-foreground"
-                          dangerouslySetInnerHTML={{
-                            __html: doa.indo,
-                          }}
-                        />
-                      </div>
+                    <div className="w-full px-4 text-right flex gap-x-2.5 items-start justify-end">
+                      <p
+                        className="relative mt-2 font-lpmq text-right text-primary"
+                        dangerouslySetInnerHTML={{
+                          __html: doa.arab,
+                        }}
+                      />
+                    </div>
+                    <div className="mt-3 space-y-3 px-4">
+                      <div
+                        className="translation-text prose leading-6 max-w-none"
+                        dangerouslySetInnerHTML={{
+                          __html: doa.indo,
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      <ScrollToFirstIndex handler={scrollToFirstAyat} container={parentRef} />
+      <ScrollToFirstIndex
+        handler={scrollToFirstAyat}
+        container={parentRef}
+        className="bottom-3"
+      />
     </React.Fragment>
   );
 };
@@ -309,42 +320,3 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 export default function Route() {
   return <ClientOnly fallback={<Loader />}>{() => <Doa />}</ClientOnly>;
 }
-
-const GoTopButton = ({ container }) => {
-  const [showGoTop, setShowGoTop] = React.useState(false);
-
-  const handleVisibleButton = () => {
-    const shouldShow = container.current.scrollTop > 50;
-    if (shouldShow !== showGoTop) {
-      setShowGoTop(shouldShow);
-    }
-  };
-
-  const handleScrollUp = () => {
-    container?.current?.scrollTo({ left: 0, top: 0, behavior: "smooth" });
-  };
-
-  React.useEffect(() => {
-    const currentContainer = container?.current;
-    if (!currentContainer) return;
-
-    currentContainer.addEventListener("scroll", handleVisibleButton);
-
-    return () => {
-      currentContainer.removeEventListener("scroll", handleVisibleButton);
-    };
-  }, [container, showGoTop]); // Dependency array dengan `showGoTop`
-
-  return (
-    <div
-      className={cn(
-        "sticky inset-x-0 ml-auto w-fit -translate-x-3 z-[60] bottom-0 -mt-11",
-        !showGoTop && "hidden",
-      )}
-    >
-      <Button onPress={handleScrollUp} variant="default" size="icon">
-        <ArrowUp />
-      </Button>
-    </div>
-  );
-};
