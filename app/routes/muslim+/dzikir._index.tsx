@@ -170,7 +170,7 @@ export default function DzikrView() {
                     <div className="">
                       <div className="translation-text">
                         <div
-                          className="max-w-none prose text-accent-foreground"
+                          className="max-w-none  prose dark:prose-invert  text-accent-foreground"
                           dangerouslySetInnerHTML={{
                             __html: translateContent,
                           }}
@@ -178,13 +178,13 @@ export default function DzikrView() {
                       </div>
 
                       <div
-                        className="max-w-none prose text-muted-foreground italic pl-3 border-l-2"
+                        className="max-w-none  prose dark:prose-invert  text-muted-foreground italic pl-3 border-l-2"
                         dangerouslySetInnerHTML={{
                           __html: ayat.faedah,
                         }}
                       />
                       <div
-                        className="max-w-none prose text-muted-foreground italic"
+                        className="max-w-none  prose dark:prose-invert  text-muted-foreground italic"
                         dangerouslySetInnerHTML={{
                           __html: ayat.narrator,
                         }}
@@ -265,7 +265,7 @@ export default function DzikrView() {
                     <div className="mt-3 space-y-3">
                       <div className="translation-text">
                         <div
-                          className="max-w-none prose text-accent-foreground"
+                          className="max-w-none  prose dark:prose-invert  text-accent-foreground"
                           dangerouslySetInnerHTML={{
                             __html: translateContent,
                           }}
@@ -273,13 +273,13 @@ export default function DzikrView() {
                       </div>
 
                       <div
-                        className="max-w-none prose text-muted-foreground italic pl-3 border-l-2"
+                        className="max-w-none  prose dark:prose-invert  text-muted-foreground italic pl-3 border-l-2"
                         dangerouslySetInnerHTML={{
                           __html: ayat.faedah,
                         }}
                       />
                       <div
-                        className="max-w-none prose text-muted-foreground italic"
+                        className="max-w-none  prose dark:prose-invert  text-muted-foreground italic"
                         dangerouslySetInnerHTML={{
                           __html: ayat.narrator,
                         }}

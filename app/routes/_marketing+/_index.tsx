@@ -75,12 +75,9 @@ export default function Index() {
             </div>
             <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
               <div className="flex-1 px-4 py-2 text-sm truncate">
-                <Link
-                  to="/muslim"
-                  className="font-semibold hover:text-muted-foreground cursor-pointer"
-                >
+                <div className="font-semibold hover:text-muted-foreground cursor-pointer">
                   Muslim
-                </Link>
+                </div>
                 <p className="text-muted-foreground line-clamp-1">
                   Berisi Al-Quran, Sholawat dan doa sehari-hari
                 </p>
@@ -96,12 +93,9 @@ export default function Index() {
             </div>
             <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
               <div className="flex-1 px-4 py-2 text-sm truncate">
-                <Link
-                  to="/tools"
-                  className="font-semibold hover:text-muted-foreground cursor-pointer"
-                >
+                <div className="font-semibold hover:text-muted-foreground cursor-pointer">
                   Tools
-                </Link>
+                </div>
                 <p className="text-muted-foreground line-clamp-1">
                   Berisi calculator, todolist dan lain-lain
                 </p>
@@ -128,12 +122,9 @@ export default function Index() {
                     </div>
                     <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
                       <div className="flex-1 px-4 py-2 text-sm truncate">
-                        <Link
-                          to={action.href}
-                          className="font-semibold hover:text-muted-foreground cursor-pointer"
-                        >
+                        <div className="font-semibold hover:text-muted-foreground cursor-pointer">
                           {action.title}
-                        </Link>
+                        </div>
                         <p className="text-muted-foreground line-clamp-1">
                           {action.description}
                         </p>

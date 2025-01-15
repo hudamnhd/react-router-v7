@@ -121,7 +121,7 @@ function SurahView() {
 
   const selectedIds = ["67", "36", "75", "18", "48", "55"]; // Daftar ID yang ingin ditampilkan
   return (
-    <div className="max-w-xl mx-auto border-x h-screen">
+    <div className="max-w-xl mx-auto border-x">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
         <div className="flex items-center gap-x-2">
           <Link
@@ -200,14 +200,11 @@ function SurahView() {
                 >
                   <div className="flex-1 flex items-center justify-between border  rounded-md truncate">
                     <div className="flex-1 px-2.5 py-2 text-sm truncate">
-                      <Link
-                        to="/muslim"
-                        className="font-semibold hover:text-muted-foreground cursor-pointer"
-                      >
+                      <div className="font-semibold hover:text-muted-foreground cursor-pointer">
                         <span className="font-semibold">
                           {item.name_id}
                         </span>{" "}
-                      </Link>
+                      </div>
                       <p className="text-muted-foreground line-clamp-1">
                         {item.translation_id}
 
@@ -433,7 +430,12 @@ const LastRead = () => {
     load_bookmark_from_lf();
   }, []);
 
-  if (!lastRead) return null;
+  if (!lastRead)
+    return (
+      <div className="p-3 border-b flex items-center gap-x-3 bg-muted w-full">
+        <p className="text-sm text-center mx-auto">Yuk baca quran </p>
+      </div>
+    );
 
   return (
     <Link

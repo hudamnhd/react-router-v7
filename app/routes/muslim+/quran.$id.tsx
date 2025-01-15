@@ -387,24 +387,9 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       }; // Ambil nilai "ayat"
     });
 
-  React.useEffect(() => {
-    const save_bookmark_to_lf = async (bookmarks) => {
-      await set_cache(BOOKMARK_KEY, bookmarks);
-    };
-    save_bookmark_to_lf(bookmarks);
-  }, [bookmarks]);
-
-  // Simpan ayat terakhir dibaca ke localForage
-
-  useEffect(() => {
-    if (lastRead !== null) {
-      const saveLastRead = async (lastRead) => {
-        await set_cache(LASTREAD_KEY, lastRead);
-      };
-      saveLastRead(lastRead);
-    }
-  }, [lastRead]);
-
+  const save_bookmark_to_lf = async (bookmarks) => {
+    await set_cache(BOOKMARK_KEY, bookmarks);
+  };
   // Fungsi untuk toggle favorit
   const toggleBookmark = (key: string) => {
     const data_bookmark = {
@@ -423,15 +408,21 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
     const is_saved = bookmarks_ayah.find((fav) => fav.id === key);
 
     if (is_saved) {
-      const newBookmarks = bookmarks?.filter(
+      const _newBookmarks = bookmarks?.filter(
         (d) => d.created_at !== is_saved.created_at,
       );
-      setBookmarks(newBookmarks);
+      setBookmarks(_newBookmarks);
+
+      save_bookmark_to_lf(_newBookmarks);
     } else {
       setBookmarks(newBookmarks);
+      save_bookmark_to_lf(newBookmarks);
     }
   };
 
+  const saveLastRead = async (lastRead) => {
+    await set_cache(LASTREAD_KEY, lastRead);
+  };
   // Tandai ayat sebagai terakhir dibaca
   const handleRead = (key: string) => {
     const id = `${surat.number}-${key}`;
@@ -449,10 +440,13 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       created_at: new Date().toISOString(),
     };
     const isLastRead = lastRead?.id === id;
+    console.warn("DEBUGPRINT[1]: quran.$id.tsx:451: isLastRead=", isLastRead);
     if (isLastRead) {
       setLastRead(null);
+      saveLastRead(null);
     } else {
       setLastRead(data_bookmark);
+      saveLastRead(data_bookmark);
     }
   };
 
@@ -484,7 +478,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
   //   }
   // }, [surat?.ayat_number]);
 
-  const maxValue = items.length + 1;
+  const maxValue = items.length;
   return (
     <React.Fragment>
       <motion.div
@@ -599,34 +593,38 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                   key={key}
                   className="group relative p-3 mb-3"
                 >
-                  <div className="absolute grid grid-cols-3  w-full -translate-y-7 items-center max-w-[95%] mx-auto">
-                    <Badge
-                      className="rounded-md bg-background w-fit"
-                      variant="outline"
-                    >
-                      Ayat {key}
-                    </Badge>
-                    {isLastRead ? (
-                      <div
-                        className={cn(
-                          buttonVariants({ variant: "outline" }),
-                          "h-8 px-2 text-xs gap-1 mx-auto justify-center",
-                        )}
+                  <div className="absolute flex justify-between w-full -translate-y-7 items-center max-w-[95%] mx-auto">
+                    <div className="w-1/4">
+                      <Badge
+                        className="rounded-md bg-background w-fit"
+                        variant="outline"
                       >
-                        <Bookmark
+                        Ayat {key}
+                      </Badge>
+                    </div>
+                    <div className="w-2/4 flex items-center justify-center">
+                      {isLastRead ? (
+                        <div
                           className={cn(
-                            "fill-blue-500 text-blue-500 dark:text-blue-400 dark:fill-blue-400",
+                            buttonVariants({ variant: "outline" }),
+                            "h-8 px-2 text-xs gap-1 mx-auto",
                           )}
-                        />
-                        <span className="truncate max-w-[135px]">
-                          {relativeTime}
-                        </span>
-                      </div>
-                    ) : (
-                      <div />
-                    )}
+                        >
+                          <Bookmark
+                            className={cn(
+                              "fill-blue-500 text-blue-500 dark:text-blue-400 dark:fill-blue-400",
+                            )}
+                          />
+                          <span className="truncate max-w-[135px]">
+                            {relativeTime}
+                          </span>
+                        </div>
+                      ) : (
+                        <div />
+                      )}
+                    </div>
 
-                    <div className="flex items-center gap-x-1.5 justify-end">
+                    <div className="flex items-center gap-x-1 justify-end w-1/4">
                       {isFavorite && (
                         <Button
                           onPress={() => toggleBookmark(key)}
@@ -651,7 +649,10 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                         >
                           <Ellipsis />
                         </Button>
-                        <Popover className=" bg-background p-1 w-44 overflow-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5 entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left">
+                        <Popover
+                          placement="left"
+                          className=" bg-background p-1 w-44 overflow-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5 entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95 fill-mode-forwards origin-top-left"
+                        >
                           <div className="px-2 py-1.5 text-sm font-semibold border-b mb-1">
                             {surat.name_latin} - Ayat {key}{" "}
                           </div>

@@ -67,7 +67,7 @@ export default function Route() {
             </div>
             {opts?.font_translation === "on" && (
               <div
-                className="translation-text prose leading-7 max-w-none text-muted-foreground"
+                className="translation-text prose dark:prose-invert leading-6 max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: translateContent,
                 }}

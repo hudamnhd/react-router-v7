@@ -224,7 +224,7 @@ const TodoNavigator = ({ data }) => {
   const streak_data = calculateStreak(data);
 
   return (
-    <div className="pb-4 pt-2">
+    <div className="pb-4">
       <TaskApp
         data={data}
         todos={todos}
@@ -606,7 +606,7 @@ const TaskApp = ({
   return (
     <div className="">
       {/*<RenderTracker name="TASK APP" stateName={totalTargetSessions} />*/}
-      <section className="px-1.5 pb-2 flex justify-between gap-x-3 border-b mb-4">
+      <section className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
         <div className="flex items-center gap-x-2">
           <Link
             className={cn(
