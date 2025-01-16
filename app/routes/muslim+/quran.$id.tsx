@@ -7,13 +7,12 @@ import {
 import { id } from "date-fns/locale";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollToFirstIndex } from "#app/components/custom/scroll-to-top.tsx";
-import { type loader as RootLoader } from "#app/root.tsx";
+import type { loader as RootLoader } from "#app/root.tsx";
 import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import { Badge } from "#app/components/ui/badge";
-import { Input } from "#app/components/ui/input";
 import { FieldGroup, Label } from "#app/components/ui/field";
 import {
   NumberField,
@@ -30,18 +29,31 @@ import {
   Dot,
 } from "lucide-react";
 import ky from "ky";
-import { data as daftar_surat } from "#app/constants/daftar-surat.json";
-import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
-import {
-  save_bookmarks,
-  type Bookmark as BookmarkType,
-} from "#app/utils/bookmarks";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
+import { save_bookmarks } from "#app/utils/bookmarks";
+import type { AyatBookmark } from "#app/utils/bookmarks";
 
-import { type MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  const surat = data?.number + ". " + data?.name_latin;
-  return [{ title: surat + " | Doti App" }];
+export const meta: MetaFunction = (m) => {
+  const data = m.data as Ayat;
+  const error = m.error;
+  const surat = error
+    ? "oops!"
+    : data
+      ? data?.number + ". " + data?.name_latin
+      : "Loading..";
+  return [
+    { title: surat + " | Doti App" },
+    {
+      property: "og:title",
+      content: "Surah quran",
+    },
+    {
+      name: "description",
+      content: "Baca quran",
+    },
+  ];
 };
 
 export function headers() {
@@ -73,46 +85,22 @@ export type Ayat = {
   };
 };
 
-type Surah = Record<string, Ayat>; // Object with dynamic string keys
-
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const api = ky.create({
-    prefixUrl:
-      "https://raw.githubusercontent.com/rioastamal/quran-json/refs/heads/master/surah",
-  });
-
-  const url = new URL(request.url);
-  const ayat_number = url.searchParams.get("ayat");
-  const { id } = params;
-
-  const surat = await api.get(`${id}.json`).json<Surah>();
-
-  const parse = Object.values(surat);
-  const ayat = parse[0];
-
-  if (!ayat) {
-    throw new Response("Not Found", { status: 404 });
-  }
-  const data = {
-    ...ayat,
-    ayat_number,
-  };
-
-  return json(data, {
-    headers: {
-      "Cache-Control": "public, max-age=31560000",
-    },
-  });
-}
-
 import { get_cache, set_cache } from "#app/utils/cache-client.ts";
 
 const BOOKMARK_KEY = "BOOKMARK";
 const LASTREAD_KEY = "LASTREAD";
 
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+  const { id } = params;
+  const serverData = await ky.get(`/resources/quran?surah=${id}`).json<Ayat>();
+  return serverData;
+}
+
+clientLoader.hydrate = true;
+
 import { fontSizeOpt } from "#/app/constants/prefs";
 
-import { Menu, MenuItem, MenuTrigger, Popover } from "react-aria-components";
+import { Menu, MenuItem, MenuTrigger } from "react-aria-components";
 import type { MenuItemProps } from "react-aria-components";
 
 function ActionItem(props: MenuItemProps) {
@@ -134,54 +122,10 @@ const toArabicNumber = (number: number) => {
     .join("");
 };
 
-const AyatList: React.FC<{ ayats: { number: number; text: string }[] }> = ({
-  ayats,
-}) => {
-  return (
-    <div className="mt-4">
-      {ayats.map((ayat) => (
-        <div
-          key={ayat.number}
-          className="flex items-center gap-2 border-b py-2"
-        >
-          <span className="text-xl font-bold">
-            {toArabicNumber(ayat.number)}
-          </span>
-          <p className="text-right text-lg font-serif">{ayat.text}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-type SuratProps = {
-  surat: {
-    text: Record<string, string>; // Ayat Arab
-    translations: {
-      id: {
-        name: string;
-        text: Record<string, string>; // Terjemahan
-      };
-    };
-    tafsir: {
-      id: {
-        kemenag: {
-          name: string;
-          source: string;
-          text: Record<string, string>; // Tafsir
-        };
-      };
-    };
-  };
-};
-
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 const SuratDetail: React.FC = () => {
-  const surat = useLoaderData<typeof loader>();
-  const loaderRoot = useRouteLoaderData<typeof RootLoader>("root");
-  const opts = loaderRoot?.opts || {};
-  const font_size_opts = fontSizeOpt.find((d) => d.label === opts?.font_size);
+  const surat = useLoaderData<typeof clientLoader>();
 
   return (
     <React.Fragment>
@@ -253,74 +197,6 @@ const SuratDetail: React.FC = () => {
             </Link>
           </div>
         </VirtualizedListSurah>
-        <div className="">
-          {/*{ayatKeys.map((key) => (*/}
-          {[].map((key) => (
-            <div key={key} className="group relative p-2.5 border-t">
-              {/* Ayat Arab */}
-              <div dir="rtl" className="break-normal pr-2.5">
-                <div
-                  className={cn("text-primary my-3 font-lpmq")}
-                  style={{
-                    fontWeight: opts.font_weight,
-                    fontSize: font_size_opts?.fontSize || "1.5rem",
-                    lineHeight: font_size_opts?.lineHeight || "3.5rem",
-                  }}
-                >
-                  {surat.text[key]}
-                  <span className="text-4xl inline-flex mx-1">
-                    {toArabicNumber(key)}
-                  </span>{" "}
-                </div>
-              </div>
-
-              <div className="max-w-none prose prose-base leading-[26px] prose-gray dark:prose-invert whitespace-pre-wrap mb-2">
-                {surat.translations.id.text[key]}
-              </div>
-
-              <details className="group [&_summary::-webkit-details-marker]:hidden">
-                <summary className="flex cursor-pointer items-center gap-1.5 outline-none">
-                  <div className="group-open:animate-slide-left [animation-fill-mode:backwards] group-open:block hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
-                    Hide Tafsir {surat.name_latin}:{key}{" "}
-                  </div>
-                  <div className="animate-slide-left group-open:hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
-                    View Tafsir {surat.name_latin}:{key}{" "}
-                  </div>
-
-                  <svg
-                    className="size-4 shrink-0 transition duration-300 group-open:-rotate-180 text-indigo-600 dark:text-indigo-400 opacity-80"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </summary>
-
-                <div className="group-open:animate-slide-left group-open:[animation-fill-mode:backwards] group-open:transition-all group-open:duration-300">
-                  <div className="max-w-none prose-lg my-2.5 font-semibold whitespace-pre-wrap text-accent-foreground border-b">
-                    Tafsir {surat.name_latin}:{key}{" "}
-                  </div>
-                  <p className="max-w-none leading-7 prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap">
-                    {surat.tafsir.id.kemenag.text[key]}
-                  </p>
-                  {/*<TafsirText text={surat.tafsir.id.kemenag.text[key]} />*/}
-                  <div className="text-muted-foreground text-xs prose-xs">
-                    Sumber:
-                    <br />
-                    {surat.tafsir.id.kemenag.source}
-                  </div>
-                </div>
-              </details>
-            </div>
-          ))}
-        </div>
       </div>
     </React.Fragment>
   );
@@ -330,7 +206,7 @@ import { motion, useSpring, useScroll } from "framer-motion";
 
 const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
   const [children1, children2] = React.Children.toArray(children);
-  const surat = useLoaderData<typeof loader>();
+  const surat = useLoaderData<typeof clientLoader>();
   const items = Object.keys(surat.text); // Mendapatkan list nomor ayat
   const parentRef = React.useRef<HTMLDivElement>(null);
   const toAyatRef = React.useRef<number>(1);
@@ -359,8 +235,8 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
     restDelta: 0.001,
   });
 
-  const [lastRead, setLastRead] = useState<any | null>(null);
-  const [bookmarks, setBookmarks] = React.useState<BookmarkType[]>([]);
+  const [lastRead, setLastRead] = React.useState<any | null>(null);
+  const [bookmarks, setBookmarks] = React.useState<AyatBookmark[]>([]);
 
   React.useEffect(() => {
     const load_bookmark_from_lf = async () => {
@@ -387,7 +263,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       }; // Ambil nilai "ayat"
     });
 
-  const save_bookmark_to_lf = async (bookmarks) => {
+  const save_bookmark_to_lf = async (bookmarks: AyatBookmark[]) => {
     await set_cache(BOOKMARK_KEY, bookmarks);
   };
   // Fungsi untuk toggle favorit
@@ -420,7 +296,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const saveLastRead = async (lastRead) => {
+  const saveLastRead = async (lastRead: any) => {
     await set_cache(LASTREAD_KEY, lastRead);
   };
   // Tandai ayat sebagai terakhir dibaca
@@ -440,7 +316,6 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       created_at: new Date().toISOString(),
     };
     const isLastRead = lastRead?.id === id;
-    console.warn("DEBUGPRINT[1]: quran.$id.tsx:451: isLastRead=", isLastRead);
     if (isLastRead) {
       setLastRead(null);
       saveLastRead(null);
@@ -504,7 +379,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
             <MoveDown />
           </Button>
           <Popover isNonModal={false} placement="bottom">
-            <PopoverDialog className="max-w-[140px] space-y-1.5 mx-2 bg-background border rounded-md">
+            <PopoverDialog className="max-w-[140px] space-y-1.5 bg-background rounded-md">
               {({ close }) => (
                 <React.Fragment>
                   <NumberField

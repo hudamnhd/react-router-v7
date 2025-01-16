@@ -156,7 +156,16 @@ function SurahView() {
           </Select>
         </div>
 
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-1">
+          <Link
+            className={cn(
+              buttonVariants({ size: "icon", variant: "outline" }),
+              "prose-none [&_svg]:size-6 mr-0.5",
+            )}
+            to="/muslim/quran-v2/1"
+          >
+            V2
+          </Link>
           <DisplaySetting themeSwitchOnly={true} />
         </div>
       </div>
@@ -200,7 +209,7 @@ function SurahView() {
                 >
                   <div className="flex-1 flex items-center justify-between border  rounded-md truncate">
                     <div className="flex-1 px-2.5 py-2 text-sm truncate">
-                      <div className="font-semibold hover:text-muted-foreground cursor-pointer">
+                      <div className="font-semibold cursor-pointer">
                         <span className="font-semibold">
                           {item.name_id}
                         </span>{" "}
@@ -237,7 +246,7 @@ function SurahView() {
       />
       <Link
         to="/muslim/quran-word-by-word"
-        className="p-3 flex items-center justify-center gap-x-2 bg-secondary text-sm [&_svg]:size-4 font-medium"
+        className="p-3 flex items-center justify-center gap-x-2 bg-muted/30 text-sm [&_svg]:size-4 font-medium"
       >
         <Puzzle /> Susun Ayat{" "}
         <Badge className="bg-lime-400 text-black">New</Badge>
@@ -432,8 +441,8 @@ const LastRead = () => {
 
   if (!lastRead)
     return (
-      <div className="p-3 border-b flex items-center gap-x-3 bg-muted w-full">
-        <p className="text-sm text-center mx-auto">Yuk baca quran </p>
+      <div className="p-3 border-b flex items-center gap-x-3 bg-background w-full">
+        <p className="text-sm text-center mx-auto">Baca quran, Yuk!</p>
       </div>
     );
 

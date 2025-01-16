@@ -42,10 +42,7 @@ export default function Route() {
         const arabicContent = ayat?.arabic;
         const translateContent = ayat?.translation;
         return (
-          <div
-            key={index}
-            className="group relative px-4 py-4 sm:py-4 sm:px-5 rounded-md border-t"
-          >
+          <div key={index} className="group relative p-4 border-t">
             <div>
               <div className="font-semibold text-lg leading-6">
                 {ayat.title}

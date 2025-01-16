@@ -497,7 +497,7 @@ function App() {
         {/*<Navbar>
           <ThemeSwitch userPreference={data.requestInfo.userPrefs.theme} />
         </Navbar>*/}
-        <div id="container-outlet" className="2xl:px-0 2xl:container">
+        <div id="container-outlet">
           <Outlet />
         </div>
         <EpicToaster closeButton position="top-center" theme={theme} />

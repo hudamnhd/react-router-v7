@@ -1,4 +1,4 @@
-type BookmarkType = "ayat" | "doa" | "sholawat" | "dzikir" | "link";
+type BookmarkType = "ayat" | "doa" | "sholawat" | "dzikir";
 
 export interface AyatBookmark {
   type: "ayat" | "doa" | "sholawat" | "dzikir";
@@ -11,6 +11,7 @@ export interface AyatBookmark {
   } | null;
   translation: string | null;
   source: string;
+  created_at?: string;
 }
 
 export interface LinkBookmark {
@@ -19,23 +20,15 @@ export interface LinkBookmark {
   title: string;
 }
 
-export type Bookmark = (AyatBookmark | LinkBookmark) & {
-  created_at: string;
-};
+export type Bookmark = AyatBookmark;
 
 // Function to save a bookmark
 export function save_bookmarks(
   type: BookmarkType,
-  data: Omit<AyatBookmark, "type"> | Omit<LinkBookmark, "type">,
+  data: Omit<AyatBookmark, "type">,
   bookmarks: Bookmark[],
 ): Bookmark[] {
-  const allowedTypes: BookmarkType[] = [
-    "ayat",
-    "dzikir",
-    "doa",
-    "sholawat",
-    "link",
-  ];
+  const allowedTypes: BookmarkType[] = ["ayat", "dzikir", "doa", "sholawat"];
 
   if (!allowedTypes.includes(type)) {
     throw new Error(
@@ -58,11 +51,6 @@ export function save_bookmarks(
     const { arab, source } = data as Omit<AyatBookmark, "type">;
     if (!arab || !source) {
       throw new Error(`Missing required fields for type '${type}'.`);
-    }
-  } else if (type === "link") {
-    const { path } = data as Omit<LinkBookmark, "type">;
-    if (!path) {
-      throw new Error(`Missing required field 'path' for type 'link'.`);
     }
   }
 

@@ -4,14 +4,6 @@ import { cn } from "#app/utils/misc.tsx";
 import { buttonVariants } from "#app/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { type MetaFunction } from "@remix-run/node";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "#app/components/ui/card";
 export const meta: MetaFunction = () => [{ title: "About | Doti App" }];
 
 export default function Index() {
