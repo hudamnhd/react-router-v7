@@ -34,39 +34,61 @@ export default function Index() {
           <dt className="text-sm font-medium text-muted-foreground">
             Developer
           </dt>
-          <dd className="mt-1 text-sm text-foreground">Huda</dd>
+          <dd className="mt-1 text-sm text-foreground">
+            <Link to="https://www.linkedin.com/in/hudamnhd/">Huda</Link>
+          </dd>
         </div>
         <div className="px-4 pb-3">
-          <dt className="text-sm font-medium text-muted-foreground">Name</dt>
-          <dd className="mt-1 text-sm text-foreground">Doti App</dd>
+          <dt className="text-sm font-medium text-muted-foreground">Nama</dt>
+          <dd className="mt-1 text-sm text-foreground">Doti</dd>
         </div>
         <div className="px-4 pb-3">
           <dt className="text-sm font-medium text-muted-foreground">
-            Description
+            Deskripsi
           </dt>
           <dd className="mt-1 text-sm text-foreground">
-            Simple application for everyday
+            Aplikasi sederhana untuk sehari-hari
           </dd>
         </div>
         <div className="px-4 pb-3">
           <dt className="text-sm font-medium text-muted-foreground">
-            Source Api Quran
+            Sumber API
           </dt>
           <dd className="text-sm text-foreground">
             <ul className="list-disc list-inside">
-              <li className="break-all">
+              <li className="break-all line-clam-1">
+                <Link to="https://raw.githubusercontent.com/rioastamal/quran-json/refs/heads/master/surah">
+                  Al Quran per surah
+                </Link>
+              </li>
+              <li className="break-all line-clam-1">
                 <Link to="https://api.myquran.com/v2/quran">
-                  https://api.myquran.com/v2/quran
+                  Al Quran per halaman
                 </Link>
               </li>
-              <li className="break-all">
+              <li className="break-all line-clam-1">
                 <Link to="https://api.myquran.com/v2/doa">
-                  https://api.myquran.com/v2/doa
+                  Kumpulan doa berbagai sumber
                 </Link>
               </li>
-              <li className="break-all">
+              <li className="break-all line-clam-1">
                 <Link to="https://gist.github.com/autotrof/172eb06313bebaefbc88ec1b04da4fef">
-                  https://gist.github.com/autotrof/172eb06313bebaefbc88ec1b04da4fef
+                  Doa Sehari-hari
+                </Link>
+              </li>
+              <li className="break-all line-clam-1">
+                <Link to="https://github.com/wahyall/islamic-bit/blob/main/sholawat/sholawat.json">
+                  Sholawa.
+                </Link>
+              </li>
+              <li className="break-all line-clam-1">
+                <Link to="https://github.com/wahyall/islamic-bit/blob/main/sholawat/sholawat.json">
+                  Sholawat
+                </Link>
+              </li>
+              <li className="break-all line-clam-1">
+                <Link to="https://islamic-api-zhirrr.vercel.app/api/tahlil">
+                  Tahlil
                 </Link>
               </li>
             </ul>
@@ -74,12 +96,26 @@ export default function Index() {
         </div>
         <div className="px-4 pb-3">
           <dt className="text-sm font-medium text-muted-foreground">
-            Font Quran Kemenag (LPMQ)
+            Huruf Arab
           </dt>
           <dd className="mt-1 text-sm text-foreground">
-            <Link to="https://lajnah.kemenag.go.id/unduhan.html">
-              https://lajnah.kemenag.go.id/unduhan.html
-            </Link>
+            <ul className="list-disc list-inside">
+              <li className="break-all line-clam-1">
+                <Link to="https://lajnah.kemenag.go.id/unduhan.html">
+                  Kemenag (LPMQ)
+                </Link>
+              </li>
+              <li className="break-all line-clam-1">
+                <Link to="https://github.com/marwan/quranwbw/tree/main/static/fonts/indopak">
+                  Indopak
+                </Link>
+              </li>
+              <li className="break-all line-clam-1">
+                <Link to="https://github.com/marwan/quranwbw/tree/main/static/fonts/hafs">
+                  Uthmani
+                </Link>
+              </li>
+            </ul>
           </dd>
         </div>
         <div className="px-4 pb-3">
@@ -140,6 +176,9 @@ export default function Index() {
               </li>
               <li>
                 <Link to="https://redux.js.org/">Redux.js</Link>
+              </li>
+              <li>
+                <Link to="https://motion.dev/">Motion</Link>
               </li>
             </ul>
           </dd>

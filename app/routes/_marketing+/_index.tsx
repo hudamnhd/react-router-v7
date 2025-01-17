@@ -10,7 +10,7 @@ import {
 } from "#app/components/ui/command";
 import { cn } from "#app/utils/misc";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
-import { Wrench, Copyright, BookOpenText, Search } from "lucide-react";
+import { Wrench, Info, Copyright, BookOpenText, Search } from "lucide-react";
 import React from "react";
 import { muslimLinks, toolsLinks } from "#app/constants/nav-link";
 import { useNavigate, NavLink, Link } from "@remix-run/react";
@@ -44,7 +44,10 @@ export default function Index() {
     <div className="flex flex-col justify-between border-x h-[calc(100vh)] max-w-xl mx-auto relative">
       <div>
         <div className="px-1.5 pt-2.5 pb-2 flex items-center justify-between gap-x-3 border-b sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
-          <NavLink className="pl-1 flex items-center gap-1 font-medium" to="/">
+          <NavLink
+            className="pl-1 flex items-center gap-1 font-medium"
+            to="/about"
+          >
             <Frame className="w-5 h-5 text-foreground" />
             <span className="text-lg">Doti</span>
           </NavLink>
@@ -292,6 +295,12 @@ const navigate_link = [
     href: "/resources/reset",
     description: "Reset data local",
     icon: TimerReset,
+  },
+  {
+    title: "Info",
+    href: "/about",
+    description: "Info website",
+    icon: Info,
   },
 ];
 

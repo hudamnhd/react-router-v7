@@ -232,7 +232,7 @@ const SuratDetail: React.FC = () => {
               to={
                 parseInt(surat?.number as string) === 1
                   ? "#"
-                  : `/muslim/quran-word-by-word/${parseInt(surat?.number as string) - 1}`
+                  : `/muslim/quran/${parseInt(surat?.number as string) - 1}`
               }
             >
               <span className="sr-only">Go to previous page</span>
@@ -249,7 +249,7 @@ const SuratDetail: React.FC = () => {
               to={
                 parseInt(surat?.number as string) === 114
                   ? "#"
-                  : `/muslim/quran-word-by-word/${parseInt(surat?.number as string) + 1}`
+                  : `/muslim/quran/${parseInt(surat?.number as string) + 1}`
               }
             >
               <span className="sr-only">Go to next page</span>

@@ -132,12 +132,9 @@ function Doa() {
                   </div>
                   <div className="flex-1 flex items-center justify-between border-t border-r border-b  rounded-r-md truncate">
                     <div className="flex-1 px-4 py-2 text-sm truncate">
-                      <Link
-                        to={to}
-                        className="capitalize font-semibold hover:text-muted-foreground cursor-pointer"
-                      >
+                      <div className="capitalize font-semibold hover:text-muted-foreground cursor-pointer">
                         Do'a {d}
-                      </Link>
+                      </div>
                       <p className="text-muted-foreground line-clamp-1">
                         Kumpulan Do'a {d}
                       </p>

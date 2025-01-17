@@ -79,7 +79,16 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const { toast, headers: toastHeaders } = await getToast(request);
   const honeyProps = honeypot.getInputProps();
   const cookieHeader = request.headers.get("Cookie");
-  const prefsCookie = (await prefs.parse(cookieHeader)) || {};
+  const prefsCookie = (await prefs.parse(cookieHeader)) || {
+    opts: {
+      font_type: "font-lpmq-2",
+      font_weight: "400",
+      font_size: "text-2xl",
+      font_translation: "on",
+      font_latin: "on",
+      font_tafsir: "on",
+    },
+  };
   return json(
     {
       requestInfo: {
@@ -334,7 +343,7 @@ function Navbar({ children }) {
     </React.Fragment>
   );
 }
-import { TimerReset, Menu, Frame } from "lucide-react";
+import { TimerReset, Info, Menu, Frame } from "lucide-react";
 import { cn } from "#app/utils/misc.tsx";
 import {
   Command,
@@ -578,6 +587,12 @@ const CommandMenu = () => {
       description: "Reset data local",
       icon: TimerReset,
     },
+    {
+      title: "Info",
+      href: "/about",
+      description: "Info website",
+      icon: Info,
+    },
   ];
   return (
     <KeyboardModalTrigger keyboardShortcut="/">
@@ -620,7 +635,7 @@ const CommandMenu = () => {
                         {navigate_link.map((navItem, index) => (
                           <CommandItem
                             key={index}
-                            value={index}
+                            value={navItem.title}
                             className="flex items-center gap-2.5 p-2.5"
                             onSelect={() => {
                               close();

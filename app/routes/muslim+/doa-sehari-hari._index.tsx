@@ -155,7 +155,7 @@ function App() {
 
                     {opts?.font_latin === "on" && (
                       <div
-                        className="latin-text prose max-w-none text-muted-foreground leading-6"
+                        className="latin-text prose dark:prose-invert max-w-none leading-6"
                         dangerouslySetInnerHTML={{
                           __html: dt.latin,
                         }}
@@ -164,7 +164,7 @@ function App() {
 
                     {opts?.font_translation === "on" && (
                       <div
-                        className="translation-text mt-3 prose max-w-none text-accent-foreground leading-6"
+                        className="translation-text mt-3 prose dark:prose-invert max-w-none leading-6 text-primary"
                         dangerouslySetInnerHTML={{
                           __html: dt.arti,
                         }}
@@ -174,7 +174,7 @@ function App() {
                     {dt.footnote && (
                       <div className="note-text mt-3">
                         <div
-                          className="border-l-2 max-w-none prose text-accent-foreground ml-1.5 italic text-muted-foreground px-2.5 text-sm"
+                          className="border-l-2 max-w-none prose dark:prose-invert  ml-1.5 italic px-2.5 text-sm"
                           dangerouslySetInnerHTML={{
                             __html: dt.footnote,
                           }}
