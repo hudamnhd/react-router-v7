@@ -272,13 +272,14 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [range_ayat, set_range_ayat] = React.useState({
     start: 0,
-    end: datas.length - 1,
+    end: datas.length + 1,
   });
 
   const ayat = searchParams.get("ayat");
   const items = datas.slice(range_ayat.start, range_ayat.end); // Mendapatkan list nomor ayat
   const parentRef = React.useRef<HTMLDivElement>(null);
   const toAyatRef = React.useRef<number>(1);
+
   // Gunakan useVirtualizer
   const rowVirtualizer = useVirtualizer({
     count: items.length, // Jumlah total item
@@ -325,6 +326,13 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
 
     load_bookmark_from_lf();
   }, []);
+
+  React.useEffect(() => {
+    set_range_ayat({
+      start: 0,
+      end: datas.length + 1,
+    });
+  }, [datas.length]);
 
   const bookmarks_ayah = bookmarks
     .filter((item) => item.type === "ayat") // Hanya ambil item dengan type "ayat"
@@ -451,7 +459,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                     onChangeEnd={(v) =>
                       set_range_ayat({
                         start: v[0] - 1,
-                        end: v[1] - 1,
+                        end: v[1],
                       })
                     }
                     label="Jumlah Ayat"

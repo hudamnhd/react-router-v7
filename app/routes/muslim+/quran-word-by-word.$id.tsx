@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import {
   ArrowUp,
+  CircleCheckBig,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -75,6 +76,25 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const ayats = Object.values(surat) as Ayat[];
 
+  if (!surat) {
+    throw new Response("Not Found", { status: 404 });
+  }
+
+  return json(
+    { ayats, surat: detail },
+    {
+      headers: {
+        "Cache-Control": "public, max-age=31560000",
+      },
+    },
+  );
+}
+
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+export default function RouteX() {
+  const { ayats, surat } = useLoaderData<typeof loader>();
+
   const words = ayats.map((d) => {
     const original = d.w.map((w, index) => {
       let obj = {
@@ -90,25 +110,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
       shuffled,
     };
   });
-
-  if (!surat) {
-    throw new Response("Not Found", { status: 404 });
-  }
-
-  return json(
-    { ayats: words, surat: detail },
-    {
-      headers: {
-        "Cache-Control": "public, max-age=31560000",
-      },
-    },
-  );
-}
-
-import { useVirtualizer } from "@tanstack/react-virtual";
-
-export default function RouteX() {
-  const { surat } = useLoaderData<typeof loader>();
 
   return (
     <div className="prose-base dark:prose-invert w-full max-w-xl mx-auto border-x">
@@ -131,8 +132,8 @@ export default function RouteX() {
         <DisplaySetting themeSwitchOnly={true} />
       </div>
 
-      <VirtualizedListSurah>
-        <div className="text-3xl font-semibold w-fit mx-auto text-primary pt-2">
+      <VirtualizedListSurah ayats={words}>
+        <div className="text-3xl font-semibold w-fit mx-auto text-center text-primary pt-2">
           {surat?.name_id}
           <span className="ml-2 underline-offset-4 group-hover:underline font-lpmq-2 text-2xl">
             ( {surat?.name_short} )
@@ -179,9 +180,11 @@ export default function RouteX() {
   );
 }
 
-const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
+const VirtualizedListSurah = ({
+  children,
+  ayats,
+}: { children: React.ReactNode }) => {
   const [children1, children2] = React.Children.toArray(children);
-  const { ayats } = useLoaderData<typeof loader>();
   const items = ayats;
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -322,6 +325,7 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
 
   React.useEffect(() => {
     setSlices(ayat_shuffle); // Kembalikan slice ke dalam slices
+    setIsCorrect(null);
   }, [ayat_shuffle]);
 
   const handleClickSlice = (slice: TextType) => {
@@ -340,6 +344,12 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
     const correctAnswer = ayat_text;
     setIsCorrect(JSON.stringify(userAnswer) === JSON.stringify(correctAnswer));
   };
+
+  React.useEffect(() => {
+    if (slices.length == 0 && userAnswer.length === ayat_shuffle.length) {
+      checkAnswer();
+    }
+  }, [userAnswer]);
 
   // Gunakan useRef untuk menyimpan draggedIndex
   const draggedIndexRef = React.useRef<number | null>(null);
@@ -417,11 +427,17 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
     <div
       dir="rtl"
       className={cn(
-        " transition-all duration-300 relative flex flex-col items-start gap-2 animate-slide-top [animation-fill-mode:backwards] group relative py-3 pr-4 pl-2",
-        isCorrect && "bg-muted/30",
+        "relative transition-all duration-300 relative flex flex-col items-start gap-2 animate-slide-top [animation-fill-mode:backwards] group relative py-3 pr-4 pl-2",
+        isCorrect && "bg-green-400/10",
         isCorrect === false && "bg-destructive/5",
       )}
     >
+      {isCorrect && (
+        <CircleCheckBig className="absolute z-[-1] left-0 top-4 w-28 h-28 text-green-500 dark:text-green-400 opacity-30" />
+      )}
+      {isCorrect === false && (
+        <X className="absolute z-[-1] left-0 top-[50%] w-28 h-28 text-red-500 dark:text-red-400 opacity-30" />
+      )}
       <details className="group [&_summary::-webkit-details-marker]:hidden mb-2">
         <summary className="flex cursor-pointer items-center gap-1.5 outline-none">
           <svg
@@ -462,12 +478,7 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
       <div className="space-y-2">
         <div dir="rtl" className="flex flex-wrap gap-2 items-center">
           {/* Menampilkan potongan teks */}
-          {slices.length === 0 ? (
-            // Menampilkan pesan jika slices kosong
-            <div className="text-center text-sm text-muted-foreground w-full">
-              {isCorrect ? "Correct" : "Cek Jawaban"}
-            </div>
-          ) : (
+          {slices.length > 0 &&
             slices.map((slice) => (
               <Button
                 variant="outline"
@@ -477,8 +488,7 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
               >
                 {slice.text}
               </Button>
-            ))
-          )}
+            ))}
 
           {slices.length > 0 && (
             <span className="font-uthmani sm:inline-flex hidden">
@@ -497,6 +507,7 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
                   className={cn(
                     buttonVariants({ size: "lg", variant: "outline" }),
                     "font-indopak py-8 px-2",
+                    isCorrect && "bg-transparent",
                   )}
                   draggable
                   key={slice.index}
@@ -519,40 +530,6 @@ const PuzzleGame: React.FC<PuzzleProps> = ({
           )}
         </div>
       </div>
-
-      {userAnswer.length > 0 ? (
-        <Button
-          dir="rtl"
-          variant={
-            isCorrect === true
-              ? "outline"
-              : isCorrect === false
-                ? "destructive"
-                : "secondary"
-          }
-          className={cn(
-            "mt-3 transition-all duration-300",
-            isCorrect && "bg-teal-400 dark:bg-teal-600",
-          )}
-          onPress={checkAnswer}
-        >
-          {isCorrect === null ? (
-            "Cek Jawaban"
-          ) : isCorrect ? (
-            <>
-              Correct <Check />
-            </>
-          ) : (
-            <>
-              Wrong <X />
-            </>
-          )}
-        </Button>
-      ) : (
-        <div className="text-sm text-muted-foreground w-full">
-          Belum ada Jawaban
-        </div>
-      )}
     </div>
   );
 };
