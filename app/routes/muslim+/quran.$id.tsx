@@ -434,12 +434,12 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
         }}
       />
 
-      <div className="relative z-[60] bg-gradient-to-r from-fuchsia-500 to-cyan-500 dark:from-fuchsia-400 dark:to-cyan-400 max-w-xl mx-auto">
+      <div className="relative bg-gradient-to-r from-fuchsia-500 to-cyan-500 dark:from-fuchsia-400 dark:to-cyan-400 max-w-xl mx-auto">
         <PopoverTrigger>
           <Button
             variant="outline"
             size="icon"
-            className="gap-2 absolute right-[87px] -mt-[45px] bg-background z-30 transition-all duration-300 data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0"
+            className="gap-2 absolute right-[87px] -mt-[45px] bg-background z-10 transition-all duration-300 data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0"
           >
             <MoveDown />
           </Button>

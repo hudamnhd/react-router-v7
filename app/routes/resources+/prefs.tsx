@@ -1,4 +1,13 @@
 import React from "react";
+import {
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
+} from "#app/components/ui/dialog";
 import { cn } from "#app/utils/misc.tsx";
 import { Icon } from "#app/components/ui/icon.tsx";
 import {
@@ -21,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#app/components/ui/select";
-import { Settings2 } from "lucide-react";
+import { Settings2, X, Save } from "lucide-react";
 import {
   Popover,
   PopoverDialog,
@@ -175,199 +184,401 @@ export function DisplaySetting({
   return (
     <div className="flex items-center gap-x-1">
       {!themeSwitchOnly && (
-        <PopoverTrigger>
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            className="bg-transparent"
-          >
-            <Settings2 size={20} />
-          </Button>
-          <Popover placement="bottom">
-            <PopoverDialog className="p-1">
-              {({ close }) => (
-                <fetcher.Form method="post" action="/resources/prefs">
-                  <Card className="shadow-none">
-                    <CardHeader>
-                      <CardTitle>Pengaturan Tampilan</CardTitle>
-                      <CardDescription>
-                        Kelola pengaturan tampilan Anda di sini.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-5 max-h-[70vh] overflow-y-auto">
-                      <div className="space-y-4 w-full">
-                        <div dir="rtl" className="break-normal pr-2.5">
-                          <div
-                            className={cn(
-                              "text-primary my-3 font-lpmq-2 transition-all duration-300",
-                              fontType,
-                            )}
-                            style={{
-                              fontWeight: fontWeight,
-                              fontSize: font_size_opts?.fontSize || "1.5rem",
-                              lineHeight:
-                                font_size_opts?.lineHeight || "3.5rem",
-                            }}
+        <React.Fragment>
+          <DialogTrigger>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="bg-transparent"
+            >
+              <Settings2 size={20} />
+            </Button>
+            <DialogOverlay>
+              <DialogContent className="relative sm:max-w-[425px] max-h-[95vh] overflow-y-auto">
+                {({ close }) => (
+                  <>
+                    <fetcher.Form method="post" action="/resources/prefs">
+                      <DialogHeader>
+                        <DialogTitle>Pengaturan Tampilan</DialogTitle>
+                        <DialogDescription>
+                          Kelola pengaturan tampilan Anda di sini.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-2 py-4">
+                        <div className="space-y-4 w-full">
+                          <div dir="rtl" className="break-normal pr-2.5">
+                            <div
+                              className={cn(
+                                "text-primary my-3 font-lpmq-2 transition-all duration-300",
+                                fontType,
+                              )}
+                              style={{
+                                fontWeight: fontWeight,
+                                fontSize: font_size_opts?.fontSize || "1.5rem",
+                                lineHeight:
+                                  font_size_opts?.lineHeight || "3.5rem",
+                              }}
+                            >
+                              {preBismillah.text.ar}
+                            </div>
+                          </div>
+                          <Select
+                            className="w-full"
+                            placeholder="Select an font"
+                            name="font_type"
+                            selectedKey={fontType}
+                            onSelectionChange={(selected) =>
+                              setFontType(selected as string)
+                            }
                           >
-                            {preBismillah.text.ar}
+                            <Label>Jenis Huruf</Label>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <SelectListBox>
+                                {fontTypeOptions.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    id={option.value}
+                                    textValue={option.value}
+                                  >
+                                    <span style={{ fontWeight: option.value }}>
+                                      {option.label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectListBox>
+                            </SelectPopover>
+                          </Select>
+                          <Select
+                            className="w-full"
+                            placeholder="Select an font"
+                            name="font_weight"
+                            selectedKey={fontWeight}
+                            onSelectionChange={(selected) =>
+                              setFontWeight(selected as string)
+                            }
+                          >
+                            <Label>Ketebalan Huruf</Label>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <SelectListBox>
+                                {fontOptions.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    id={option.value}
+                                    textValue={option.value}
+                                  >
+                                    <span style={{ fontWeight: option.value }}>
+                                      {option.label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectListBox>
+                            </SelectPopover>
+                          </Select>
+
+                          <Select
+                            className="w-full"
+                            placeholder="Select an font"
+                            name="font_size"
+                            selectedKey={fontSize}
+                            onSelectionChange={(selected) =>
+                              setFontSize(selected as string)
+                            }
+                          >
+                            <Label>Ukuran Hufuf</Label>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <SelectListBox>
+                                {fontSizeOpt.map((option) => (
+                                  <SelectItem
+                                    key={option.label}
+                                    id={option.label}
+                                    textValue={option.label}
+                                  >
+                                    <span className="capitalize">
+                                      {option.label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectListBox>
+                            </SelectPopover>
+                          </Select>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="translationtext"
+                              className="flex flex-col space-y-0.5"
+                            >
+                              <span>Tampilkan terjemahan</span>
+                              <span className="font-normal text-sm leading-snug text-muted-foreground">
+                                Tampilkan / sembunyikan terjemahan.
+                              </span>
+                            </Label>
+                            <Switch
+                              name="font_translation"
+                              id="translationtext"
+                              defaultSelected={showTranslation}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="latintext"
+                              className="flex flex-col space-y-0.5"
+                            >
+                              <span>Tampilkan latin</span>
+                              <span className="font-normal text-sm leading-snug text-muted-foreground">
+                                Tampilkan / sembunyikan latin.
+                              </span>
+                            </Label>
+                            <Switch
+                              id="latintext"
+                              name="font_latin"
+                              defaultSelected={showLatin}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="tafsirtext"
+                              className="flex flex-col space-y-0.5"
+                            >
+                              <span>Tampilkan tafsir</span>
+                              <span className="font-normal text-sm leading-snug text-muted-foreground">
+                                Tampilkan / sembunyikan tafsir.
+                              </span>
+                            </Label>
+                            <Switch
+                              id="tafsirtext"
+                              name="font_tafsir"
+                              defaultSelected={showTafsir}
+                            />
                           </div>
                         </div>
-                        <Select
-                          className="w-full"
-                          placeholder="Select an font"
-                          name="font_type"
-                          selectedKey={fontType}
-                          onSelectionChange={(selected) =>
-                            setFontType(selected as string)
-                          }
-                        >
-                          <Label>Jenis Huruf</Label>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectPopover>
-                            <SelectListBox>
-                              {fontTypeOptions.map((option) => (
-                                <SelectItem
-                                  key={option.value}
-                                  id={option.value}
-                                  textValue={option.value}
-                                >
-                                  <span style={{ fontWeight: option.value }}>
-                                    {option.label}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectListBox>
-                          </SelectPopover>
-                        </Select>
-                        <Select
-                          className="w-full"
-                          placeholder="Select an font"
-                          name="font_weight"
-                          selectedKey={fontWeight}
-                          onSelectionChange={(selected) =>
-                            setFontWeight(selected as string)
-                          }
-                        >
-                          <Label>Ketebalan Huruf</Label>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectPopover>
-                            <SelectListBox>
-                              {fontOptions.map((option) => (
-                                <SelectItem
-                                  key={option.value}
-                                  id={option.value}
-                                  textValue={option.value}
-                                >
-                                  <span style={{ fontWeight: option.value }}>
-                                    {option.label}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectListBox>
-                          </SelectPopover>
-                        </Select>
-
-                        <Select
-                          className="w-full"
-                          placeholder="Select an font"
-                          name="font_size"
-                          selectedKey={fontSize}
-                          onSelectionChange={(selected) =>
-                            setFontSize(selected as string)
-                          }
-                        >
-                          <Label>Ukuran Hufuf</Label>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectPopover>
-                            <SelectListBox>
-                              {fontSizeOpt.map((option) => (
-                                <SelectItem
-                                  key={option.label}
-                                  id={option.label}
-                                  textValue={option.label}
-                                >
-                                  <span className="capitalize">
-                                    {option.label}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectListBox>
-                          </SelectPopover>
-                        </Select>
-                        <div className="flex items-center justify-between space-x-2">
-                          <Label
-                            htmlFor="translationtext"
-                            className="flex flex-col space-y-0.5"
-                          >
-                            <span>Tampilkan terjemahan</span>
-                            <span className="font-normal text-sm leading-snug text-muted-foreground">
-                              Tampilkan / sembunyikan terjemahan.
-                            </span>
-                          </Label>
-                          <Switch
-                            name="font_translation"
-                            id="translationtext"
-                            defaultSelected={showTranslation}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between space-x-2">
-                          <Label
-                            htmlFor="latintext"
-                            className="flex flex-col space-y-0.5"
-                          >
-                            <span>Tampilkan latin</span>
-                            <span className="font-normal text-sm leading-snug text-muted-foreground">
-                              Tampilkan / sembunyikan latin.
-                            </span>
-                          </Label>
-                          <Switch
-                            id="latintext"
-                            name="font_latin"
-                            defaultSelected={showLatin}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between space-x-2">
-                          <Label
-                            htmlFor="tafsirtext"
-                            className="flex flex-col space-y-0.5"
-                          >
-                            <span>Tampilkan tafsir</span>
-                            <span className="font-normal text-sm leading-snug text-muted-foreground">
-                              Tampilkan / sembunyikan tafsir.
-                            </span>
-                          </Label>
-                          <Switch
-                            id="tafsirtext"
-                            name="font_tafsir"
-                            defaultSelected={showTafsir}
-                          />
-                        </div>
                       </div>
-                    </CardContent>
-                    <CardFooter className="w-full">
-                      <Button
-                        onPress={() => {
-                          close();
-                        }}
-                        type="submit"
-                        className="w-full"
-                      >
-                        Save
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </fetcher.Form>
-              )}
-            </PopoverDialog>
-          </Popover>
-        </PopoverTrigger>
+                      <DialogFooter className="flex flex-col">
+                        <Button
+                          onPress={close}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          <X /> Batal
+                        </Button>
+                        <Button
+                          onPress={() => {
+                            close();
+                          }}
+                          type="submit"
+                          className="w-full"
+                        >
+                          <Save /> Save
+                        </Button>
+                      </DialogFooter>
+                    </fetcher.Form>
+                  </>
+                )}
+              </DialogContent>
+            </DialogOverlay>
+          </DialogTrigger>
+          {/*<PopoverTrigger>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="bg-transparent"
+            >
+              <Settings2 size={20} />
+            </Button>
+            <Popover placement="bottom">
+              <PopoverDialog className="p-1">
+                {({ close }) => (
+                  <fetcher.Form method="post" action="/resources/prefs">
+                    <Card className="shadow-none">
+                      <CardHeader>
+                        <CardTitle>Pengaturan Tampilan</CardTitle>
+                        <CardDescription>
+                          Kelola pengaturan tampilan Anda di sini.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="grid gap-5 max-h-[70vh] overflow-y-auto">
+                        <div className="space-y-4 w-full">
+                          <div dir="rtl" className="break-normal pr-2.5">
+                            <div
+                              className={cn(
+                                "text-primary my-3 font-lpmq-2 transition-all duration-300",
+                                fontType,
+                              )}
+                              style={{
+                                fontWeight: fontWeight,
+                                fontSize: font_size_opts?.fontSize || "1.5rem",
+                                lineHeight:
+                                  font_size_opts?.lineHeight || "3.5rem",
+                              }}
+                            >
+                              {preBismillah.text.ar}
+                            </div>
+                          </div>
+                          <Select
+                            className="w-full"
+                            placeholder="Select an font"
+                            name="font_type"
+                            selectedKey={fontType}
+                            onSelectionChange={(selected) =>
+                              setFontType(selected as string)
+                            }
+                          >
+                            <Label>Jenis Huruf</Label>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <SelectListBox>
+                                {fontTypeOptions.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    id={option.value}
+                                    textValue={option.value}
+                                  >
+                                    <span style={{ fontWeight: option.value }}>
+                                      {option.label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectListBox>
+                            </SelectPopover>
+                          </Select>
+                          <Select
+                            className="w-full"
+                            placeholder="Select an font"
+                            name="font_weight"
+                            selectedKey={fontWeight}
+                            onSelectionChange={(selected) =>
+                              setFontWeight(selected as string)
+                            }
+                          >
+                            <Label>Ketebalan Huruf</Label>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <SelectListBox>
+                                {fontOptions.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    id={option.value}
+                                    textValue={option.value}
+                                  >
+                                    <span style={{ fontWeight: option.value }}>
+                                      {option.label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectListBox>
+                            </SelectPopover>
+                          </Select>
+
+                          <Select
+                            className="w-full"
+                            placeholder="Select an font"
+                            name="font_size"
+                            selectedKey={fontSize}
+                            onSelectionChange={(selected) =>
+                              setFontSize(selected as string)
+                            }
+                          >
+                            <Label>Ukuran Hufuf</Label>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <SelectListBox>
+                                {fontSizeOpt.map((option) => (
+                                  <SelectItem
+                                    key={option.label}
+                                    id={option.label}
+                                    textValue={option.label}
+                                  >
+                                    <span className="capitalize">
+                                      {option.label}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectListBox>
+                            </SelectPopover>
+                          </Select>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="translationtext"
+                              className="flex flex-col space-y-0.5"
+                            >
+                              <span>Tampilkan terjemahan</span>
+                              <span className="font-normal text-sm leading-snug text-muted-foreground">
+                                Tampilkan / sembunyikan terjemahan.
+                              </span>
+                            </Label>
+                            <Switch
+                              name="font_translation"
+                              id="translationtext"
+                              defaultSelected={showTranslation}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="latintext"
+                              className="flex flex-col space-y-0.5"
+                            >
+                              <span>Tampilkan latin</span>
+                              <span className="font-normal text-sm leading-snug text-muted-foreground">
+                                Tampilkan / sembunyikan latin.
+                              </span>
+                            </Label>
+                            <Switch
+                              id="latintext"
+                              name="font_latin"
+                              defaultSelected={showLatin}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="tafsirtext"
+                              className="flex flex-col space-y-0.5"
+                            >
+                              <span>Tampilkan tafsir</span>
+                              <span className="font-normal text-sm leading-snug text-muted-foreground">
+                                Tampilkan / sembunyikan tafsir.
+                              </span>
+                            </Label>
+                            <Switch
+                              id="tafsirtext"
+                              name="font_tafsir"
+                              defaultSelected={showTafsir}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="w-full">
+                        <Button
+                          onPress={() => {
+                            close();
+                          }}
+                          type="submit"
+                          className="w-full"
+                        >
+                          Save
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </fetcher.Form>
+                )}
+              </PopoverDialog>
+            </Popover>
+          </PopoverTrigger>*/}
+        </React.Fragment>
       )}
       <ThemeSwitch userPreference={loaderRoot?.requestInfo.userPrefs.theme} />
     </div>

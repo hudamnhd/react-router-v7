@@ -30,14 +30,7 @@ export function headers() {
 
 export async function loader() {
   const time = getWaktuSekarang();
-  return json(
-    { time },
-    {
-      headers: {
-        "Cache-Control": "public, max-age=31560000",
-      },
-    },
-  );
+  return json({ time });
 }
 
 export default function DzikrView() {
