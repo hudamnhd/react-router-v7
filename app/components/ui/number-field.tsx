@@ -4,10 +4,12 @@ import { cn } from "#app/utils/misc.tsx";
 import { Button } from "./button";
 import { FieldError, FieldGroup, Label } from "./field";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Minus, Plus, ChevronDown, ChevronUp } from "lucide-react";
 
 import {
   ButtonProps as AriaButtonProps,
+  Button as AriaButton,
+  Group,
   Input as AriaInput,
   InputProps as AriaInputProps,
   NumberField as AriaNumberField,
@@ -75,6 +77,12 @@ interface JollyNumberFieldProps extends AriaNumberFieldProps {
   errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
+interface JollyNumberFieldV2Props extends AriaNumberFieldProps {
+  label?: string;
+  description?: string;
+  errorMessage?: string | ((validation: AriaValidationResult) => string);
+}
+
 function JollyNumberField({
   label,
   description,
@@ -104,12 +112,50 @@ function JollyNumberField({
   );
 }
 
+function JollyNumberFieldV2({
+  label,
+  description,
+  errorMessage,
+  className,
+  ...props
+}: JollyNumberFieldV2Props) {
+  return (
+    <NumberField {...props}>
+      <div className="spacey-0.5">
+        <Label>{label}</Label>
+        <Group className="relative inline-flex h-9 w-full items-center overflow-hidden whitespace-nowrap rounded-lg border border-input text-sm shadow-sm shadow-black/5 transition-shadow data-[focus-within]:border-ring data-[disabled]:opacity-50 data-[focus-within]:outline-none data-[focus-within]:ring-[3px] data-[focus-within]:ring-ring/20">
+          <AriaButton
+            slot="decrement"
+            className="-ms-px flex aspect-square h-[inherit] items-center justify-center rounded-s-lg border border-input bg-background text-sm text-muted-foreground/80 transition-shadow hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Minus size={16} strokeWidth={2} aria-hidden="true" />
+          </AriaButton>
+          <AriaInput className="w-full grow bg-background  py-2 text-center tabular-nums text-foreground focus:outline-none" />
+          <AriaButton
+            slot="increment"
+            className="-me-px flex aspect-square h-[inherit] items-center justify-center rounded-e-lg border border-input bg-background text-sm text-muted-foreground/80 transition-shadow hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus size={16} strokeWidth={2} aria-hidden="true" />
+          </AriaButton>
+        </Group>
+      </div>
+      {description && (
+        <Text className="text-sm text-muted-foreground" slot="description">
+          {description}
+        </Text>
+      )}
+      <FieldError>{errorMessage}</FieldError>
+    </NumberField>
+  );
+}
+
 export {
   NumberField,
   NumberFieldInput,
   NumberFieldSteppers,
   NumberFieldStepper,
   JollyNumberField,
+  JollyNumberFieldV2,
 };
 
 export type { JollyNumberFieldProps };

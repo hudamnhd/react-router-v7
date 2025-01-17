@@ -8,6 +8,13 @@ export const fontOptions = [
   { value: "700", label: "Bold" },
   { value: "800", label: "Extrabold" },
 ];
+
+export const fontTypeOptions = [
+  { value: "font-lpmq-2", label: "LPMQ" },
+  { value: "font-uthmani-2", label: "Uthmani" },
+  { value: "font-indopak-2", label: "Indopak" },
+];
+
 export const fontSizeOpt = [
   {
     label: "text-xl",

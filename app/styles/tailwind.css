@@ -163,6 +163,14 @@ code {
   font-family: "LPMQ IsepMisbah";
 }
 
+.font-indopak-2 {
+  font-family: "IndoPak";
+}
+
+.font-uthmani-2 {
+  font-family: "Uthmani-Hafs";
+}
+
 .font-arabic {
   font-family: "LPMQ IsepMisbah";
   font-size: 1.875rem; /* 30px */

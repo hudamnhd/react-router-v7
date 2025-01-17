@@ -218,7 +218,7 @@ export default function Index() {
                 {d.ayat.map((dt) => (
                   <span
                     key={dt.id}
-                    className="text-primary font-lpmq inline"
+                    className="text-primary font-lpmq inline hover:bg-muted"
                     style={{
                       fontWeight: opts.font_weight,
                       fontSize: font_size_opts?.fontSize || "1.5rem",

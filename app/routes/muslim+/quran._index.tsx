@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useLoaderData, Link } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { Scroll, Minus, Dot } from "lucide-react";
+import { Dot } from "lucide-react";
 import { ClientOnly } from "remix-utils/client-only";
 import Loader from "#app/components/ui/loader";
 import { Spinner } from "#app/components/ui/spinner-circle";
@@ -119,7 +119,7 @@ function SurahView() {
   const data_placeholder =
     version === "all" ? "Cari Surat.." : "Cari Surat Juz Amma..";
 
-  const selectedIds = ["67", "36", "75", "18", "48", "55"]; // Daftar ID yang ingin ditampilkan
+  const selectedIds = ["87", "67", "36", "75", "18", "48", "55"]; // Daftar ID yang ingin ditampilkan
   return (
     <div className="max-w-xl mx-auto border-x">
       <div className="px-1.5 pt-2.5 pb-2 flex justify-between gap-x-3 border-b">
@@ -171,6 +171,46 @@ function SurahView() {
       </div>
       <LastRead />
 
+      <div className="px-1.5 mt-1.5 border-b pb-1.5">
+        <div className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+          Surat Favorit
+        </div>
+
+        <div className="flex max-w-xl overflow-x-auto gap-1.5 mt-1 pb-2">
+          {surat
+            .filter((navItem) => selectedIds.includes(navItem.number))
+            .map((item) => {
+              const to = `/muslim/quran/${item.number}`;
+              return (
+                <Link
+                  key={item.number}
+                  to={to}
+                  className="col-span-1 flex shadow-sm rounded-md hover:bg-accent"
+                >
+                  <div className="flex-1 flex items-center justify-between border  rounded-md truncate">
+                    <div className="flex-1 px-2.5 py-2 text-sm truncate">
+                      <div className="font-semibold cursor-pointer">
+                        <span className="font-semibold">
+                          {item.number}. {item.name_id}
+                        </span>{" "}
+                      </div>
+                      <p className="text-muted-foreground line-clamp-1">
+                        {item.translation_id}
+
+                        <span className="sm:inline-flex hidden ml-1 text-xs">
+                          <span className="mr-l">
+                            {" "}
+                            {item.number_of_verses} ayat
+                          </span>
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+        </div>
+      </div>
       <div className="relative">
         <input
           id="input-26"
@@ -191,43 +231,6 @@ function SurahView() {
         </div>
       </div>
 
-      <div className="px-1.5 mt-1.5 border-b pb-1.5">
-        <div className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-          Surat Favorit
-        </div>
-
-        <div className="grid grid-cols-3 gap-1.5 mt-1">
-          {surat
-            .filter((navItem) => selectedIds.includes(navItem.number))
-            .map((item) => {
-              const to = `/muslim/quran/${item.number}`;
-              return (
-                <Link
-                  key={item.number}
-                  to={to}
-                  className="col-span-1 flex shadow-sm rounded-md hover:bg-accent"
-                >
-                  <div className="flex-1 flex items-center justify-between border  rounded-md truncate">
-                    <div className="flex-1 px-2.5 py-2 text-sm truncate">
-                      <div className="font-semibold cursor-pointer">
-                        <span className="font-semibold">
-                          {item.name_id}
-                        </span>{" "}
-                      </div>
-                      <p className="text-muted-foreground line-clamp-1">
-                        {item.translation_id}
-
-                        <span className="sm:inline-flex hidden ml-1 text-xs">
-                          - <span>{item.number_of_verses} ayat</span>
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-        </div>
-      </div>
       <SearchHandler
         data={data_surat}
         searchKey={["name_id", "number", "translation_id"]}
@@ -237,8 +240,8 @@ function SurahView() {
             return <VirtualizedListSurah items={filteredData} />;
           } else {
             return (
-              <div className="py-6 text-center text-sm h-[calc(100vh-341px)] border-b flex items-center justify-center">
-                No results found.
+              <div className="py-6 text-center text-sm h-[calc(100vh-299px)] border-b flex items-center justify-center">
+                Surat tidak ditemukan.
               </div>
             );
           }
@@ -291,7 +294,7 @@ const VirtualizedListSurah: React.FC<{ items: any[] }> = ({ items }) => {
       />
       <div
         ref={parentRef}
-        className="h-[calc(100vh-341px)] border-b"
+        className="h-[calc(100vh-285px)] border-b"
         style={{
           overflow: "auto",
         }}

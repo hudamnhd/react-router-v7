@@ -1,4 +1,5 @@
 import { cn } from "#app/utils/misc.tsx";
+
 import {
   Popover,
   PopoverDialog,
@@ -8,17 +9,76 @@ import { id } from "date-fns/locale";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollToFirstIndex } from "#app/components/custom/scroll-to-top.tsx";
 import type { loader as RootLoader } from "#app/root.tsx";
-import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  useSearchParams,
+  useRouteLoaderData,
+} from "@remix-run/react";
 import React from "react";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { Button, buttonVariants } from "#app/components/ui/button";
 import { Badge } from "#app/components/ui/badge";
-import { FieldGroup, Label } from "#app/components/ui/field";
+import { Label } from "#app/components/ui/label";
 import {
-  NumberField,
-  NumberFieldInput,
-  NumberFieldSteppers,
-} from "#app/components/ui/number-field";
+  Slider,
+  SliderOutput,
+  SliderThumb,
+  SliderTrack,
+} from "react-aria-components";
+import type { SliderProps } from "react-aria-components";
+
+interface MySliderProps<T> extends SliderProps<T> {
+  label?: string;
+  thumbLabels?: string[];
+}
+
+function MySlider<T extends number | number[]>({
+  label,
+  thumbLabels,
+  ...props
+}: MySliderProps<T>) {
+  return (
+    <Slider {...props}>
+      {label && <Label>{label}</Label>}
+      <SliderOutput className="text-sm text-right flex justify-center">
+        {({ state }) =>
+          state.values.map((_, i) => state.getThumbValueLabel(i)).join(" – ")
+        }
+      </SliderOutput>
+      <SliderTrack className="relative w-full h-2 bg-primary/20 rounded mt-2">
+        {({ state }) => {
+          const thumb1Percent = state.getThumbPercent(0) * 100;
+          const thumb2Percent = state.getThumbPercent(1) * 100;
+
+          return (
+            <>
+              {/* Fill */}
+              <div
+                className="absolute h-full bg-primary rounded-full"
+                style={{
+                  left: `${Math.min(thumb1Percent, thumb2Percent)}%`,
+                  width: `${Math.abs(thumb2Percent - thumb1Percent)}%`,
+                }}
+              />
+              {/* Thumbs */}
+              {state.values.map((_, i) => (
+                <SliderThumb
+                  key={i}
+                  index={i}
+                  className="absolute w-4 h-4 bg-background ring-2 ring-primary rounded transform -translate-x-1/2 -translate-y-1/2 top-1/2"
+                  aria-label={thumbLabels?.[i]}
+                />
+              ))}
+            </>
+          );
+        }}
+      </SliderTrack>
+    </Slider>
+  );
+}
+
+import { JollyNumberFieldV2 } from "#app/components/ui/number-field";
 import {
   ChevronLeft,
   ChevronRight,
@@ -207,7 +267,16 @@ import { motion, useSpring, useScroll } from "framer-motion";
 const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
   const [children1, children2] = React.Children.toArray(children);
   const surat = useLoaderData<typeof clientLoader>();
-  const items = Object.keys(surat.text); // Mendapatkan list nomor ayat
+  const datas = Object.keys(surat.text); // Mendapatkan list nomor ayat
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [range_ayat, set_range_ayat] = React.useState({
+    start: 0,
+    end: datas.length - 1,
+  });
+
+  const ayat = searchParams.get("ayat");
+  const items = datas.slice(range_ayat.start, range_ayat.end); // Mendapatkan list nomor ayat
   const parentRef = React.useRef<HTMLDivElement>(null);
   const toAyatRef = React.useRef<number>(1);
   // Gunakan useVirtualizer
@@ -247,6 +316,10 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       }
       if (storedBookmarks) {
         setBookmarks(storedBookmarks);
+      }
+
+      if (ayat !== null) {
+        scrollToAyat(parseInt(ayat) - 1);
       }
     };
 
@@ -345,15 +418,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
       })
     : null;
 
-  // useEffect(() => {
-  //   if (surat?.ayat_number !== null) {
-  //     setTimeout(() => {
-  //       scrollToAyat(parseInt(surat?.ayat_number) + 1);
-  //     }, 1000);
-  //   }
-  // }, [surat?.ayat_number]);
-
-  const maxValue = items.length;
+  const maxValue = datas.length;
   return (
     <React.Fragment>
       <motion.div
@@ -379,23 +444,32 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
             <MoveDown />
           </Button>
           <Popover isNonModal={false} placement="bottom">
-            <PopoverDialog className="max-w-[140px] space-y-1.5 bg-background rounded-md">
+            <PopoverDialog className="max-w-[180px] space-y-2.5 bg-background rounded-md">
               {({ close }) => (
                 <React.Fragment>
-                  <NumberField
+                  <MySlider
+                    onChangeEnd={(v) =>
+                      set_range_ayat({
+                        start: v[0] - 1,
+                        end: v[1] - 1,
+                      })
+                    }
+                    label="Jumlah Ayat"
+                    defaultValue={[range_ayat.start + 1, range_ayat.end + 1]}
+                    minValue={1}
+                    maxValue={maxValue}
+                    thumbLabels={["start", "end"]}
+                  />
+                  <JollyNumberFieldV2
                     onChange={(value) => {
                       toAyatRef.current = value - 1;
                     }}
-                    defaultValue={toAyatRef.current}
-                    minValue={1}
-                    maxValue={maxValue}
-                  >
-                    <Label>Pergi Ke Ayat</Label>
-                    <FieldGroup>
-                      <NumberFieldInput />
-                      <NumberFieldSteppers />
-                    </FieldGroup>
-                  </NumberField>
+                    defaultValue={range_ayat.start + 1}
+                    minValue={range_ayat.start + 1}
+                    maxValue={range_ayat.end + 1}
+                    className="w-full"
+                    label="Ke ayat"
+                  />
                   <Button
                     className="w-full"
                     onPress={() => {
@@ -564,7 +638,10 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                   </div>
                   <div dir="rtl" className="break-normal pr-2.5">
                     <div
-                      className={cn("text-primary my-3 font-lpmq")}
+                      className={cn(
+                        "text-primary my-3 font-lpmq",
+                        opts?.font_type,
+                      )}
                       style={{
                         fontWeight: opts.font_weight,
                         fontSize: font_size_opts?.fontSize || "1.5rem",
@@ -572,56 +649,66 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                       }}
                     >
                       {surat.text[key]}
-                      <span className="text-4xl inline-flex mx-1 font-uthmani">
+                      <span
+                        className={cn(
+                          "text-4xl inline-flex mx-1 font-uthmani",
+
+                          opts?.font_type === "font-indopak-2" && "mr-5",
+                        )}
+                      >
                         {toArabicNumber(Number(key))}
                       </span>{" "}
                     </div>
                   </div>
 
-                  <div className="max-w-none prose prose-base leading-[26px] prose-gray dark:prose-invert whitespace-pre-wrap mb-2">
-                    {surat.translations.id.text[key]}
-                  </div>
-
-                  <details className="group [&_summary::-webkit-details-marker]:hidden">
-                    <summary className="flex cursor-pointer items-center gap-1.5 outline-none">
-                      <div className="group-open:animate-slide-left [animation-fill-mode:backwards] group-open:block hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
-                        Tafsir {surat.name_latin}:{key}{" "}
-                      </div>
-                      <div className="animate-slide-left group-open:hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
-                        Tafsir {surat.name_latin}:{key}{" "}
-                      </div>
-
-                      <svg
-                        className="size-4 shrink-0 transition duration-300 group-open:-rotate-180 text-indigo-600 dark:text-indigo-400 opacity-80"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </summary>
-
-                    <div className="group-open:animate-slide-left group-open:[animation-fill-mode:backwards] group-open:transition-all group-open:duration-300">
-                      <div className="max-w-none prose-lg my-2.5 font-semibold whitespace-pre-wrap text-accent-foreground border-b">
-                        Tafsir {surat.name_latin}:{key}{" "}
-                      </div>
-                      <p className="max-w-none leading-7 prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap">
-                        {surat.tafsir.id.kemenag.text[key]}
-                      </p>
-                      {/*<TafsirText text={surat.tafsir.id.kemenag.text[key]} />*/}
-                      <div className="text-muted-foreground text-xs prose-xs">
-                        Sumber:
-                        <br />
-                        {surat.tafsir.id.kemenag.source}
-                      </div>
+                  {opts?.font_translation === "on" && (
+                    <div className="max-w-none prose prose-base leading-[26px] prose-gray dark:prose-invert whitespace-pre-wrap mb-2">
+                      {surat.translations.id.text[key]}
                     </div>
-                  </details>
+                  )}
+
+                  {opts?.font_tafsir === "on" && (
+                    <details className="group [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex cursor-pointer items-center gap-1.5 outline-none">
+                        <div className="group-open:animate-slide-left [animation-fill-mode:backwards] group-open:block hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
+                          Tafsir {surat.name_latin}:{key}{" "}
+                        </div>
+                        <div className="animate-slide-left group-open:hidden font-medium text-sm text-indigo-600 dark:text-indigo-400">
+                          Tafsir {surat.name_latin}:{key}{" "}
+                        </div>
+
+                        <svg
+                          className="size-4 shrink-0 transition duration-300 group-open:-rotate-180 text-indigo-600 dark:text-indigo-400 opacity-80"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </summary>
+
+                      <div className="group-open:animate-slide-left group-open:[animation-fill-mode:backwards] group-open:transition-all group-open:duration-300">
+                        <div className="max-w-none prose-lg my-2.5 font-semibold whitespace-pre-wrap text-accent-foreground border-b">
+                          Tafsir {surat.name_latin}:{key}{" "}
+                        </div>
+                        <p className="max-w-none leading-7 prose prose-base prose-gray dark:prose-invert whitespace-pre-wrap">
+                          {surat.tafsir.id.kemenag.text[key]}
+                        </p>
+                        {/*<TafsirText text={surat.tafsir.id.kemenag.text[key]} />*/}
+                        <div className="text-muted-foreground text-xs prose-xs">
+                          Sumber:
+                          <br />
+                          {surat.tafsir.id.kemenag.source}
+                        </div>
+                      </div>
+                    </details>
+                  )}
                 </div>
               </div>
             );

@@ -158,13 +158,14 @@ export default function DzikrView() {
                     <span className="counter-display text-2xl font-bold">
                       0
                     </span>
-                    <Button
-                      className="tasbih-counter-btn"
-                      size="icon"
-                      variant="outline"
+                    <button
+                      className={cn(
+                        buttonVariants({ size: "icon", variant: "outline" }),
+                        "tasbih-counter-btn",
+                      )}
                     >
                       <Plus />
-                    </Button>
+                    </button>
                   </div>
                   {opts?.font_translation === "on" && (
                     <div className="">
@@ -253,13 +254,14 @@ export default function DzikrView() {
                     <span className="counter-display text-2xl font-bold">
                       0
                     </span>
-                    <Button
-                      className="tasbih-counter-btn"
-                      size="icon"
-                      variant="outline"
+                    <button
+                      className={cn(
+                        buttonVariants({ size: "icon", variant: "outline" }),
+                        "tasbih-counter-btn",
+                      )}
                     >
                       <Plus />
-                    </Button>
+                    </button>
                   </div>
                   {opts?.font_translation === "on" && (
                     <div className="mt-3 space-y-3">
