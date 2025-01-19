@@ -2,6 +2,7 @@ import React from "react";
 import * as ReactAria from "react-aria-components";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "#app/utils/misc.tsx";
+import { Tooltip, TooltipTrigger } from "#app/components/ui/tooltip";
 
 const buttonVariants = cva(
   [
@@ -42,20 +43,21 @@ const buttonVariants = cva(
   },
 );
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-}
+// export interface ButtonProps
+//   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+//     VariantProps<typeof buttonVariants> {
+//   asChild?: boolean;
+// }
 
 export interface ButtonProps
   extends ReactAria.ButtonProps,
     VariantProps<typeof buttonVariants> {
   className?: string;
+  title?: string;
 }
 
-const Button = ({ className, variant, size, ...props }: ButtonProps) => {
-  return (
+const Button = ({ title, className, variant, size, ...props }: ButtonProps) => {
+  const element = (
     <ReactAria.Button
       className={cn(
         buttonVariants({
@@ -67,6 +69,19 @@ const Button = ({ className, variant, size, ...props }: ButtonProps) => {
       {...props}
     />
   );
+
+  if (title) {
+    return (
+      <TooltipTrigger delay={300}>
+        {element}
+        <Tooltip placement="bottom">
+          <p>{title}</p>
+        </Tooltip>
+      </TooltipTrigger>
+    );
+  } else {
+    return element;
+  }
 };
 Button.displayName = "Button";
 

@@ -123,6 +123,7 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
           variant="outline"
           className="bg-transparent"
           size="icon"
+          title="Ubah Tema"
         >
           {modeLabel[mode]}
         </Button>
@@ -191,6 +192,7 @@ export function DisplaySetting({
               size="icon"
               variant="outline"
               className="bg-transparent"
+              title="Pengaturan Tampilan"
             >
               <Settings2 size={20} />
             </Button>

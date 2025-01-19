@@ -1,4 +1,5 @@
-import { Button, buttonVariants } from "#app/components/ui/button";
+import { buttonVariants } from "#app/components/ui/button";
+import { Tooltip, TooltipTrigger } from "#app/components/ui/tooltip";
 import { Badge } from "#app/components/ui/badge";
 import { DisplaySetting } from "#app/routes/resources+/prefs";
 import { motion, useSpring, useScroll } from "framer-motion";
@@ -9,7 +10,6 @@ import {
   ChevronLeft,
   Puzzle,
   MoveRight,
-  Bookmark,
   Check,
 } from "lucide-react";
 import { useLoaderData, Link } from "@remix-run/react";
@@ -133,27 +133,32 @@ function SurahView() {
           >
             <ChevronLeft />
           </Link>
-          <Select
-            aria-label="Select Type List"
-            className="text-lg font-semibold min-w-[120px]"
-            placeholder="Daftar Surat"
-            selectedKey={version}
-            onSelectionChange={(selected) => setVersion(selected as string)}
-          >
-            <SelectTrigger className="data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px]">
-              <SelectValue className="text-lg font-semibold" />
-            </SelectTrigger>
-            <SelectPopover>
-              <SelectListBox>
-                <SelectItem id="all" textValue="Al-Quran">
-                  Al-Quran
-                </SelectItem>
-                <SelectItem id="j30" textValue="Jus Amma">
-                  Jus Amma
-                </SelectItem>
-              </SelectListBox>
-            </SelectPopover>
-          </Select>
+          <TooltipTrigger defaultOpen={true} delay={300}>
+            <Select
+              aria-label="Select Type List"
+              className="text-lg font-semibold min-w-[120px]"
+              placeholder="Daftar Surat"
+              selectedKey={version}
+              onSelectionChange={(selected) => setVersion(selected as string)}
+            >
+              <SelectTrigger className="data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0 border-none shadow-none p-0 [&_svg]:opacity-80 [&_svg]:size-[14px]">
+                <SelectValue className="text-lg font-semibold" />
+              </SelectTrigger>
+              <SelectPopover>
+                <SelectListBox>
+                  <SelectItem id="all" textValue="Al-Quran">
+                    Al-Quran
+                  </SelectItem>
+                  <SelectItem id="j30" textValue="Jus Amma">
+                    Jus Amma
+                  </SelectItem>
+                </SelectListBox>
+              </SelectPopover>
+            </Select>
+            <Tooltip placement="bottom">
+              <p>Juz Amma / Semua Juz</p>
+            </Tooltip>
+          </TooltipTrigger>
         </div>
 
         <div className="flex items-center gap-x-1">
@@ -163,6 +168,7 @@ function SurahView() {
               "prose-none [&_svg]:size-6 mr-0.5",
             )}
             to="/muslim/quran-v2/1"
+            title="Al-Quran Per halaman"
           >
             V2
           </Link>
@@ -252,7 +258,7 @@ function SurahView() {
         className="p-3 flex items-center justify-center gap-x-2 bg-muted/30 text-sm [&_svg]:size-4 font-medium"
       >
         <Puzzle /> Susun Ayat{" "}
-        <Badge className="bg-lime-400 text-black">New</Badge>
+        <Badge className="bg-lime-400 hover:bg-lime-500 text-black">New</Badge>
       </Link>
     </div>
   );

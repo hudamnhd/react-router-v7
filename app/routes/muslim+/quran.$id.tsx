@@ -198,6 +198,7 @@ const SuratDetail: React.FC = () => {
                 "prose-none [&_svg]:size-6",
               )}
               to="/muslim/quran"
+              title="Kembali ke daftar surat"
             >
               <ChevronLeft />
             </Link>
@@ -229,6 +230,7 @@ const SuratDetail: React.FC = () => {
               className={cn(
                 buttonVariants({ size: "icon", variant: "outline" }),
               )}
+              title="Surat sebelumnya"
               to={
                 parseInt(surat?.number as string) === 1
                   ? "#"
@@ -246,6 +248,7 @@ const SuratDetail: React.FC = () => {
               className={cn(
                 buttonVariants({ size: "icon", variant: "outline" }),
               )}
+              title="Surat selanjutnya"
               to={
                 parseInt(surat?.number as string) === 114
                   ? "#"
@@ -448,6 +451,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
             variant="outline"
             size="icon"
             className="gap-2 absolute right-[87px] -mt-[45px] bg-background z-10 transition-all duration-300 data-[focused]:outline-none data-[focused]:ring-none data-[focused]:ring-0 data-[focus-visible]:outline-none data-[focus-visible]:ring-none data-[focus-visible]:ring-0"
+            title="Pindah ke ayat"
           >
             <MoveDown />
           </Button>
@@ -589,6 +593,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                           variant="outline"
                           size="icon"
                           className={cn("h-8 w-8")}
+                          title="Hapus bookmark"
                         >
                           <Star
                             className={cn(
@@ -603,6 +608,7 @@ const VirtualizedListSurah = ({ children }: { children: React.ReactNode }) => {
                           variant="outline"
                           size="icon"
                           className={cn("h-8 w-8")}
+                          title={`Menu ayat ${key}`}
                         >
                           <Ellipsis />
                         </Button>
